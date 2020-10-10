@@ -1,6 +1,20 @@
 
 from django import forms
 
+class WordUploadForm(forms.Form):
+    
+    FONT_NAME_ASCII_CHOICES = [
+        ('无', '无'),
+        ('MS Gothic', 'MS Gothic'),
+        ('MS Mincho', 'MS Mincho'),
+        ('MS PMincho', 'MS PMincho'),
+        ('MS UI Gothic', 'MS UI Gothic'),
+        ('Yu Gothic', 'Yu Gothic'),
+    ]
+
+    file_upload =  forms.FileField()
+
+
 class WordOpForm(forms.Form):
 
     FONT_NAME_ASCII_CHOICES = [

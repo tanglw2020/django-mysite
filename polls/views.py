@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django import forms
-from .forms import WordOpForm
+from .forms import WordOpForm, WordUploadForm
 
 def index(request):
     action_list = [
@@ -24,8 +24,24 @@ def add_choice_question(request):
     return HttpResponse(response)
 
 def add_word_question(request):
-    response = 'add_word_question'
-    return HttpResponse(response)
+    
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = WordUploadForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            print(form.cleaned_data)
+
+            # redirect to a new URL:
+            return HttpResponseRedirect(reverse('polls:set_word_operation'))
+    else:
+        form = WordUploadForm()
+
+    context = {
+        'form': form,
+        }
+    return render(request, 'polls/add_word_question.html', context)
 
 def add_excel_question(request):
     response = 'add_excel_question'

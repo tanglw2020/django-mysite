@@ -1,0 +1,10 @@
+
+<h1>Word操作题录入页面</h1>
+
+<form action="{% url 'polls:add_word_question'  %}" method="post">
+    {% csrf_token %}
+
+    {% include "polls/form_item.html" with form_item=form.file_upload %}
+
+    <input type="submit" value="提交">
+</form>
