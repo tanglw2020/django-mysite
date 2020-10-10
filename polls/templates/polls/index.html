@@ -1,8 +1,8 @@
 {% if action_list %}
-<p>请选择需要的操作</p>
+<p>请选择要添加的操作</p>
 <ul>
-    {% for question in action_list %}
-    <li>{{ question }}</a></li>
+    {% for action, link in action_list %}
+    <li><a href="{{ link }}" > {{ action }}</a></li>
     {% endfor %}
 </ul>
 {% endif %}

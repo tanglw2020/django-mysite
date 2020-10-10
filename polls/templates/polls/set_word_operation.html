@@ -1,0 +1,47 @@
+
+<h1>Word操作题录入页面</h1>
+
+<form action="{% url 'polls:set_word_operation'  %}" method="post">
+    {% csrf_token %}
+
+    <HR style="FILTER: alpha (opacity = 100, finishopacity =0 , style=2 )" width="100%" color=#987cb9 cb 9 SIZE=3>
+
+    {% include "polls/form_item.html" with form_item=form.para_text %}
+
+    <HR style="FILTER: alpha (opacity = 100, finishopacity =0 , style=2 )" width="100%" color=#987cb9 cb 9 SIZE=3>
+
+    {% include "polls/form_item.html" with form_item=form.char_edit_op %}
+    {% include "polls/form_item.html" with form_item=form.char_edit_origin %}
+    {% include "polls/form_item.html" with form_item=form.char_edit_replace %}
+
+    <HR style="FILTER: alpha (opacity = 100, finishopacity =0 , style=2 )" width="100%" color=#987cb9 cb 9 SIZE=3>
+
+    {% include "polls/form_item.html" with form_item=form.font_op %}
+    {% include "polls/form_item.html" with form_item=form.font_name_ascii %}
+    {% include "polls/form_item.html" with form_item=form.font_name_chinese %}
+    {% include "polls/form_item.html" with form_item=form.font_size %}
+    {% include "polls/form_item.html" with form_item=form.font_color %}
+    {% include "polls/form_item.html" with form_item=form.font_bold %}
+    {% include "polls/form_item.html" with form_item=form.font_italic %}
+    {% include "polls/form_item.html" with form_item=form.font_underline %}
+
+    <HR style="FILTER: alpha (opacity = 100, finishopacity =0 , style=2 )" width="100%" color=#987cb9 cb 9 SIZE=3>
+    {% include "polls/form_item.html" with form_item=form.paraformat_op %}
+    {% include "polls/form_item.html" with form_item=form.para_alignment %}
+    {% include "polls/form_item.html" with form_item=form.para_left_indent %}
+    {% include "polls/form_item.html" with form_item=form.para_right_indent %}
+    {% include "polls/form_item.html" with form_item=form.para_first_line_indent %}
+    {% include "polls/form_item.html" with form_item=form.para_first_line_indent_size %}
+
+    {% include "polls/form_item.html" with form_item=form.para_space_before %}
+    {% include "polls/form_item.html" with form_item=form.para_space_after %}
+    {% include "polls/form_item.html" with form_item=form.para_line_spacing_rule %}
+    {% include "polls/form_item.html" with form_item=form.para_line_spacing %}
+    {% include "polls/form_item.html" with form_item=form.para_firstchardropcap %}
+    {% include "polls/form_item.html" with form_item=form.para_firstchardropcaplines %}
+    <HR style="FILTER: alpha (opacity = 0, finishopacity =0 , style=2 )" width="100%" color=#ffffff cb 9 SIZE=3>
+    {% include "polls/form_item.html" with form_item=form.para_line_page %}
+
+
+    <input type="submit" value="提交">
+</form>
