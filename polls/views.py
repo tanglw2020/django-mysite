@@ -27,11 +27,11 @@ def add_word_question(request):
     
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = WordUploadForm(request.POST)
+        form = WordUploadForm(request.POST, request.FILES)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            print(form.cleaned_data)
+            print(request.FILES['file_upload'])
 
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('polls:set_word_operation'))

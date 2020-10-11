@@ -12,7 +12,8 @@ class WordUploadForm(forms.Form):
         ('Yu Gothic', 'Yu Gothic'),
     ]
 
-    file_upload =  forms.FileField()
+    title = forms.CharField(label='题目', max_length=50)
+    file_upload =  forms.FileField(label='上传要操作的word文件(.docx)')
 
 
 class WordOpForm(forms.Form):
