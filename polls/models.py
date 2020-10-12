@@ -4,8 +4,22 @@ from .choices import *
 # Create your models here.
 class WordOperations(models.Model):
 
-    pub_date = models.DateTimeField('创建时间')
+    def para_text_simple(self):
+        return self.para_text[:10] +'...'+self.para_text[-10:]
 
+    def operations_list(self):
+            op_list = '考查：'
+            if self.char_edit_op:
+                op_list += '#文字查找替换  '
+            if self.font_op:
+                op_list += '#字体设置  '
+            if self.paraformat_op:
+                op_list += '#段落格式设置  '
+            return op_list
+    para_text_simple.short_description = '考查内容'
+    operations_list.short_description = '操作列表'
+
+    pub_date = models.DateTimeField('创建时间')
     para_text = models.TextField('要考查的段落内容', max_length=2000)
 
     char_edit_op = models.BooleanField('是否考查文字查找替换？', blank=True)
@@ -48,4 +62,4 @@ class WordOperations(models.Model):
 class WordQuestion(models.Model):
 
     pub_date = models.DateTimeField('创建时间')
-    word_operations = models.ManyToManyField(WordOperations,'操作题', blank=True)
+    word_operation_list = models.ManyToManyField(WordOperations, blank=True)
