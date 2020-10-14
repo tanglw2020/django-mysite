@@ -4,7 +4,7 @@ from .models import WordOperations, WordQuestion, WordDocxFile, WordDocxFileTest
 
 class WordOperationsAdmin(admin.ModelAdmin):
 
-    list_display = ('para_text_simple', 'operations_list')
+    list_display = ('id', 'para_text_simple', 'operations_list')
 
     # 'collapse',
     fieldsets  = (
@@ -24,7 +24,7 @@ class WordOperationsAdmin(admin.ModelAdmin):
 
 class WordQuestionAdmin(admin.ModelAdmin):
         filter_horizontal = ['word_operation_list']
-        list_display = ('file_path','word_op_numb','word_op_description', 'word_test_result')
+        list_display = ('id', 'file_path','word_op_numb','word_op_description', 'word_test_result')
 
 admin.site.register(WordOperations, WordOperationsAdmin)
 admin.site.register(WordQuestion, WordQuestionAdmin)

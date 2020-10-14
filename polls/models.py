@@ -13,6 +13,9 @@ class WordOperations(models.Model):
         verbose_name = 'Word操作'
         verbose_name_plural = 'Word操作'
 
+    def __str__(self):
+        return str(self.id)+':'+self.operations_list()
+
     def para_text_simple(self):
         return self.para_text[:10] +'...'+self.para_text[-10:]
     para_text_simple.short_description = '考查段落内容'
@@ -93,8 +96,8 @@ class WordDocxFile(models.Model):
     class Meta:
         verbose_name = '考试用Word文件'
         verbose_name_plural = '考试用Word文件'
-        def __str__(self):
-            return self.upload.name
+    def __str__(self):
+        return self.upload.name
 
 class WordDocxFileTest(models.Model):
     
@@ -104,8 +107,8 @@ class WordDocxFileTest(models.Model):
     class Meta:
         verbose_name = '内部测试用word文件'
         verbose_name_plural = '内部测试用word文件'
-        def __str__(self):
-            return self.upload.name
+    def __str__(self):
+        return self.upload.name
 
 # Create your models here.
 class WordQuestion(models.Model):
