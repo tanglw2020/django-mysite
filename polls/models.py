@@ -2,6 +2,7 @@ import os
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.utils.html import format_html, format_html_join
 from docx import Document
 from .choices import *
 from .fileModels import *
@@ -16,7 +17,7 @@ class WordOperations(models.Model):
 
     def __str__(self):
         if self.upload_docx is not None:
-            return 'Word文件'+str(self.upload_docx.id)+':'+self.operations_list()
+            return '#'+str(self.id)+':Word文件'+str(self.upload_docx.id)+':'+self.operations_list()
         else:
             return self.operations_list()
 
@@ -146,11 +147,29 @@ class WordQuestion(models.Model):
     file_path.short_description = '考查Word文件'
 
     def word_op_numb(self):
-        return len(self.word_operation_list.all())
+        op_numb = len(self.word_operation_list.all())
+        if op_numb != 5:
+            return format_html(
+            '<b style="color:red;">{}[不等于5]</b>',
+            str(op_numb),
+            )
+        else:
+            return '5'
     word_op_numb.short_description = '题目数量'
 
     def word_op_description(self):
-        return [ x.operations_list()+'||' for x in self.word_operation_list.all()]
+        result_list = []
+        for x in self.word_operation_list.all():
+            if x.upload_docx.upload.name == self.upload_docx.upload.name:
+                result_list.append(['black', x.operations_list()])
+            else:
+                result_list.append(['red', 'Word文件ID不一致'])
+
+        return format_html_join(
+                '\n', '<li style="color:{};">{}</li>',
+                ((x[0], x[1]) for x in result_list)
+                )
+        # return '\n'.join([ x.operations_list() for x in self.word_operation_list.all()])
     word_op_description.short_description = '题目内容'
 
     def word_test_result(self):
@@ -170,8 +189,7 @@ class WordQuestion(models.Model):
     verbose_name='操作题目',
     help_text='操作对应的Word文件必须和上面的Word文件一致',
     )
-    # through='Membership',
-    # through_fields=('question', 'operation'),
+ 
 
     upload_docx_test = models.ForeignKey(
         WordDocxFileTest,
