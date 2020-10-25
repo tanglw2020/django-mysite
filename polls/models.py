@@ -9,17 +9,76 @@ from .fileModels import *
 
 
 # Create your models here.
+class WordQuestion(models.Model):
+
+    def __str__(self):
+        return 'Word文件'+str(self.upload_docx.id)+':'+self.upload_docx.upload.name
+
+    class Meta:
+        verbose_name = 'Word题目'
+        verbose_name_plural = 'Word题目'
+
+    def file_path(self):
+        return self.upload_docx.upload.name
+    file_path.short_description = '考查Word文件'
+
+    def word_op_numb(self):
+        op_numb = len(self.wordoperations_set.all())
+        if op_numb != 5:
+            return format_html(
+            '<b style="color:red;">{}[不等于5]</b>',
+            str(op_numb),
+            )
+        else:
+            return '5'
+    word_op_numb.short_description = '题目数量'
+
+    def word_op_description(self):
+        result_list = []
+        for x in self.wordoperations_set.all():
+            result_list.append(['black', x.operations_list()])
+
+        return format_html_join(
+                '\n', '<li style="color:{};">{}</li>',
+                ((x[0], x[1]) for x in result_list)
+                )
+    word_op_description.short_description = '题目内容'
+
+    def word_test_result(self):
+        return self.upload_docx.upload.name
+        # return self.upload_docx.upload.name + "::" + self.upload_docx_test.upload.name
+    word_test_result.short_description = '测试文件评估结果'
+
+    #########
+    pub_date = models.DateTimeField('创建时间')
+
+    upload_docx =  models.ForeignKey(
+        WordDocxFile,
+        on_delete=models.CASCADE, null=True,
+        verbose_name='上传Word文件(.docx)'
+    ) 
+
+    upload_docx_test = models.ForeignKey(
+        WordDocxFileTest,
+        on_delete=models.CASCADE, null=True, blank=True,
+        verbose_name='内部测试用word文件.docx'
+    )
+
+
+# Create your models here.
 class WordOperations(models.Model):
 
     class Meta:
-        verbose_name = 'Word操作'
-        verbose_name_plural = 'Word操作'
+        verbose_name = 'Word操作列表'
+        verbose_name_plural = 'Word操作列表'
 
     def __str__(self):
-        if self.upload_docx is not None:
-            return '#'+str(self.id)+':Word文件'+str(self.upload_docx.id)+':'+self.operations_list()
-        else:
-            return self.operations_list()
+        return '#'+str(self.id)+':'+self.operations_list()
+
+    def word_question_info(self):
+        if self.word_question is not None:
+            return str(self.word_question.__str__())
+    word_question_info.short_description = '操作所属题目'
 
     def para_text_simple(self):
         return self.para_text[:10] +'...'+self.para_text[-10:]
@@ -40,14 +99,13 @@ class WordOperations(models.Model):
             return '+'.join(op_list)
     operations_list.short_description = '操作列表'
 
-    pub_date = models.DateTimeField('创建时间')
-    para_text = models.TextField('要考查的段落内容')
-
-    upload_docx =  models.ForeignKey(
-        WordDocxFile,
-        on_delete=models.CASCADE, null=True,
-        verbose_name='考试用Word文件(.docx)'
+    word_question = models.ForeignKey(
+        WordQuestion,
+        on_delete=models.CASCADE, null=True, blank=True,
+        verbose_name='word操作大题'
     )
+
+    para_text = models.TextField('要考查的段落内容')
 
     ############## 文字查找替换
     char_edit_op = models.BooleanField('是否考查文字查找替换？', default=False)
@@ -131,71 +189,6 @@ def validate_operation_list(value):
             _('操作题数量不足5个'),
             params={'value': value.id},
         )
-
-# Create your models here.
-class WordQuestion(models.Model):
-
-    def __str__(self):
-        return 'Word文件'+str(self.upload_docx.id)+':'+self.upload_docx.upload.name
-
-    class Meta:
-        verbose_name = 'Word题目'
-        verbose_name_plural = 'Word题目'
-
-    def file_path(self):
-        return self.upload_docx.upload.name
-    file_path.short_description = '考查Word文件'
-
-    def word_op_numb(self):
-        op_numb = len(self.word_operation_list.all())
-        if op_numb != 5:
-            return format_html(
-            '<b style="color:red;">{}[不等于5]</b>',
-            str(op_numb),
-            )
-        else:
-            return '5'
-    word_op_numb.short_description = '题目数量'
-
-    def word_op_description(self):
-        result_list = []
-        for x in self.word_operation_list.all():
-            if x.upload_docx.upload.name == self.upload_docx.upload.name:
-                result_list.append(['black', x.operations_list()])
-            else:
-                result_list.append(['red', 'Word文件ID不一致'])
-
-        return format_html_join(
-                '\n', '<li style="color:{};">{}</li>',
-                ((x[0], x[1]) for x in result_list)
-                )
-        # return '\n'.join([ x.operations_list() for x in self.word_operation_list.all()])
-    word_op_description.short_description = '题目内容'
-
-    def word_test_result(self):
-        return self.upload_docx.upload.name + "::" + self.upload_docx_test.upload.name
-    word_test_result.short_description = '测试文件评估结果'
-
-    #########
-    pub_date = models.DateTimeField('创建时间')
-
-    upload_docx =  models.ForeignKey(
-        WordDocxFile,
-        on_delete=models.CASCADE, null=True,
-        verbose_name='上传Word文件(.docx)'
-    )
-
-    word_operation_list = models.ManyToManyField(WordOperations, blank=True,
-    verbose_name='操作题目',
-    help_text='操作对应的Word文件必须和上面的Word文件一致',
-    )
- 
-
-    upload_docx_test = models.ForeignKey(
-        WordDocxFileTest,
-        on_delete=models.CASCADE, null=True, blank=True,
-        verbose_name='内部测试用word文件.docx'
-    )
 
     # def save(self, *args, **kwargs):
     #     op_list = [x for x in  self.word_operation_list.all()]
