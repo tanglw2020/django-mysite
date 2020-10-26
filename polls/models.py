@@ -12,7 +12,7 @@ from .fileModels import *
 class WordQuestion(models.Model):
 
     def __str__(self):
-        return 'Word文件'+str(self.upload_docx.id)+':'+self.upload_docx.upload.name
+        return '题目'+str(self.id)+':Word文件'+str(self.upload_docx.id)
 
     class Meta:
         verbose_name = 'Word题目'
@@ -49,6 +49,13 @@ class WordQuestion(models.Model):
         # return self.upload_docx.upload.name + "::" + self.upload_docx_test.upload.name
     word_test_result.short_description = '测试文件评估结果'
 
+    # def clean(self):
+    #     op_list = [x for x in  self.wordoperations_set.all()]
+
+    #     print(len(op_list))
+    #     if len(op_list) != 5:
+    #         raise ValidationError({'pub_date':_('Word操作题个数不等于5')})
+
     #########
     pub_date = models.DateTimeField('创建时间')
 
@@ -73,11 +80,11 @@ class WordOperations(models.Model):
         verbose_name_plural = 'Word操作列表'
 
     def __str__(self):
-        return '#'+str(self.id)+':'+self.operations_list()
+        return 'Word操作'+str(self.id)
 
     def word_question_info(self):
         if self.word_question is not None:
-            return str(self.word_question.__str__())
+            return self.word_question.__str__()
     word_question_info.short_description = '操作所属题目'
 
     def para_text_simple(self):
@@ -97,7 +104,11 @@ class WordOperations(models.Model):
             if self.image_op:
                 op_list.append('图片插入')
             return '+'.join(op_list)
-    operations_list.short_description = '操作列表'
+    operations_list.short_description = '涉及操作'
+
+    def clean(self):
+        if not (self.char_edit_op or self.font_op or self.paraformat_op or self.style_op or self.image_op):
+            raise ValidationError({'para_text':_('至少选择一个考查操作')})
 
     word_question = models.ForeignKey(
         WordQuestion,

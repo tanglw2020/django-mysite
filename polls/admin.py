@@ -8,12 +8,13 @@ class WordOperationsInline(admin.StackedInline):
     extra = 0
 
     fieldsets  = (
-        ('段落内容', { 'fields': ('para_text',)}), 
-        ('文字编辑', { 'classes': ( 'collapse',), 'fields': ('char_edit_op','char_edit_origin','char_edit_replace')}), 
-        ('字体设置', { 'classes': ( 'collapse',),'fields': ('font_op', ('font_name_chinese', 'font_name_ascii','font_size'),
+        ('', { 'fields': ('para_text',)}), 
+        ('', { 'fields': (('char_edit_op','paraformat_op','style_op','image_op'),)}), 
+        ('文字编辑', { 'classes': ('collapse',), 'fields': ('char_edit_origin','char_edit_replace')}), 
+        ('字体设置', { 'classes': ('collapse',),'fields': ('font_op', ('font_name_chinese', 'font_name_ascii','font_size'),
                                  'font_color', ('font_underline','font_bold','font_italic'),
                                 )}), 
-        ('段落格式设置', { 'classes': ( 'collapse',), 'fields': ('paraformat_op','para_alignment', 
+        ('段落格式设置', { 'classes': ('collapse',), 'fields': ('para_alignment', 
                                 ('para_left_indent','para_right_indent'), 
                                 ('para_space_before','para_space_after'),
                                 ('para_line_spacing_rule','para_line_spacing'),
@@ -21,7 +22,7 @@ class WordOperationsInline(admin.StackedInline):
                                 ('para_firstchardropcap','para_firstchardropcaplines'),
                                 ('page_break_before','keep_with_next','keep_together','window_control'),
                                 )}), 
-        ('样式设置', { 'classes': ( 'collapse',), 'fields': ('style_op', 'style_name', 
+        ('样式设置', { 'classes': ( 'collapse',), 'fields': ( 'style_name', 
                                 ('style_font_name_chinese','style_font_name_ascii','style_font_size'),
                                   'style_font_color', ('style_font_underline', 'style_font_bold','style_font_italic'),
                                 'style_para_alignment', ('style_para_left_indent','style_para_right_indent'),
@@ -31,7 +32,7 @@ class WordOperationsInline(admin.StackedInline):
                                 ('style_para_firstchardropcap','style_para_firstchardropcaplines'),
                                 ('style_page_break_before','style_keep_with_next','style_keep_together','style_window_control'),
                                 )}), 
-        ('图像插入', { 'classes': ( 'collapse',), 'fields': ('image_op','image_position_style',
+        ('图像插入', { 'classes': ( 'collapse',), 'fields': ('image_position_style',
                                 ('image_width', 'image_height'), 
                                 'upload_image_file'
                                 )}), 
@@ -40,18 +41,19 @@ class WordOperationsInline(admin.StackedInline):
 
 class WordOperationsAdmin(admin.ModelAdmin):
 
-    list_display = ('word_question_info', 'operations_list', 'para_text_simple')
+    list_display = ('word_question_info', '__str__', 'operations_list', 'para_text_simple')
     # search_fields = ('word_question',)
 
 
     # 'collapse',
     fieldsets  = (
         ('段落内容', { 'fields': ('word_question', 'para_text',)}), 
-        ('文字编辑', { 'classes': ( 'extrapretty'), 'fields': ('char_edit_op','char_edit_origin','char_edit_replace')}), 
+        ('考查操作', { 'fields': ('char_edit_op','paraformat_op','style_op','image_op',)}), 
+        ('文字编辑', { 'classes': ( 'extrapretty'), 'fields': ('char_edit_origin','char_edit_replace')}), 
         ('字体设置', { 'fields': ('font_op', ('font_name_chinese', 'font_name_ascii','font_size'),
                                  'font_color', ('font_underline','font_bold','font_italic'),
                                 )}), 
-        ('段落格式设置', { 'classes': ( 'extrapretty'), 'fields': ('paraformat_op','para_alignment', 
+        ('段落格式设置', { 'classes': ( 'extrapretty'), 'fields': ('para_alignment', 
                                 ('para_left_indent','para_right_indent'), 
                                 ('para_space_before','para_space_after'),
                                 ('para_line_spacing_rule','para_line_spacing'),
@@ -59,7 +61,7 @@ class WordOperationsAdmin(admin.ModelAdmin):
                                 ('para_firstchardropcap','para_firstchardropcaplines'),
                                 ('page_break_before','keep_with_next','keep_together','window_control'),
                                 )}), 
-        ('样式设置', { 'classes': ( 'extrapretty'), 'fields': ('style_op', 'style_name', 
+        ('样式设置', { 'classes': ( 'extrapretty'), 'fields': ( 'style_name', 
                                 ('style_font_name_chinese','style_font_name_ascii','style_font_size'),
                                   'style_font_color', ('style_font_underline', 'style_font_bold','style_font_italic'),
                                 'style_para_alignment', ('style_para_left_indent','style_para_right_indent'),
@@ -69,7 +71,7 @@ class WordOperationsAdmin(admin.ModelAdmin):
                                 ('style_para_firstchardropcap','style_para_firstchardropcaplines'),
                                 ('style_page_break_before','style_keep_with_next','style_keep_together','style_window_control'),
                                 )}), 
-        ('图像插入', { 'classes': ( 'extrapretty'), 'fields': ('image_op','image_position_style',
+        ('图像插入', { 'classes': ( 'extrapretty'), 'fields': ('image_position_style',
                                 ('image_width', 'image_height'), 
                                 'upload_image_file'
                                 )}), 
