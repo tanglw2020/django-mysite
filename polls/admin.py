@@ -40,16 +40,15 @@ class WordOperationsInline(admin.StackedInline):
 
 class WordOperationsAdmin(admin.ModelAdmin):
 
-    list_display = ('word_question_info', '__str__', 'operations_list', 'para_text_simple')
-    # search_fields = ('word_question',)
-
+    list_display = ('__str__', 'word_question_info',  'operations_list', 'operation_description_all')
+    search_fields = ('id',)
 
     # 'collapse',
     fieldsets  = (
         ('段落内容', { 'fields': ('word_question', 'para_text',)}), 
-        ('考查操作', { 'fields': ('char_edit_op','paraformat_op','style_op','image_op',)}), 
+        ('考查操作', { 'fields': ('char_edit_op','font_op','paraformat_op','style_op','image_op',)}), 
         ('文字编辑', { 'classes': ( 'extrapretty'), 'fields': ('char_edit_origin','char_edit_replace')}), 
-        ('字体设置', { 'fields': ('font_op', ('font_name_chinese', 'font_name_ascii','font_size'),
+        ('字体设置', { 'fields': ( ('font_name_chinese', 'font_name_ascii','font_size'),
                                  'font_color', ('font_underline','font_bold','font_italic'),
                                 )}), 
         ('段落格式设置', { 'classes': ( 'extrapretty'), 'fields': ('para_alignment', 

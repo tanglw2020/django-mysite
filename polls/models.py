@@ -91,6 +91,7 @@ class WordOperations(models.Model):
         return self.para_text[:10] +'...'+self.para_text[-10:]
     para_text_simple.short_description = '考查段落内容'
 
+
     def operations_list(self):
             op_list = []
             if self.char_edit_op:
@@ -106,9 +107,38 @@ class WordOperations(models.Model):
             return '+'.join(op_list)
     operations_list.short_description = '涉及操作'
 
+    def operation_description_all(self):
+        return ','.join([x for x in [self.char_edit_description(), self.font_description()] if len(x)>0])
+    operation_description_all.short_description = '题目文字描述'
+
+    def char_edit_description(self):
+        if self.char_edit_op:
+            return '将所有"'+self.char_edit_origin+'"替换成"'+self.char_edit_replace+'"'
+        else:
+            return ''
+    char_edit_description.short_description = '查找替换文字描述'
+
+    def font_description(self):
+        if self.font_op:
+            setting_list=[]
+            if self.font_name_chinese !='': setting_list.append('中文'+self.font_name_chinese)
+            if self.font_name_ascii !='':  setting_list.append('西文'+self.font_name_ascii)
+            if self.font_size !='': setting_list.append('字号'+self.font_size)
+            if self.font_color !='': setting_list.append(self.font_color)
+            if self.font_bold==True: setting_list.append('粗体')
+            if self.font_italic==True: setting_list.append('斜体')
+            if self.font_underline !='': setting_list.append(self.font_underline)
+            return '字体设置成'+'、'.join(setting_list)
+        else:
+            return ''
+    font_description.short_description = '字体设置描述'
+
     def clean(self):
         if not (self.char_edit_op or self.font_op or self.paraformat_op or self.style_op or self.image_op):
             raise ValidationError(_('至少选择一个操作考查'))
+
+        if (self.font_op or self.paraformat_op) and self.style_op:
+            raise ValidationError(_('样式和单独的字体和段落格式不应同时设置'))
 
         error_dict = {}
         if self.font_op and \
@@ -173,7 +203,7 @@ class WordOperations(models.Model):
 
     word_question = models.ForeignKey(
         WordQuestion,
-        on_delete=models.CASCADE, null=True, blank=True, default='',
+        on_delete=models.CASCADE, 
         verbose_name='word操作大题'
     )
 
