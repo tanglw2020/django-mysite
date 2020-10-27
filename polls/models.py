@@ -170,6 +170,12 @@ class WordOperations(models.Model):
             raise ValidationError(_('样式和单独的字体和段落格式不应同时设置'))
 
         error_dict = {}
+
+        if self.char_edit_op and (self.char_edit_origin==''):
+            error_dict['char_edit_origin'] = _('不能为空')
+        if self.char_edit_op and (self.char_edit_replace==''):
+            error_dict['char_edit_replace'] = _('不能为空')
+
         if self.font_op and \
         (self.font_name_ascii=='' and 
         self.font_name_chinese=='' and 
@@ -214,36 +220,104 @@ class WordOperations(models.Model):
 
         if self.paraformat_op and (self.para_first_line_indent=='' and self.para_first_line_indent_size!=''):
             error_dict['para_first_line_indent'] = _('不能为空')
+            error_dict['para_first_line_indent_size'] = _('*')
         if self.paraformat_op and (self.para_first_line_indent !='' and self.para_first_line_indent_size==''):
+            error_dict['para_first_line_indent'] = _('*')
             error_dict['para_first_line_indent_size'] = _('不能为空')
 
         if self.paraformat_op and (self.para_line_spacing_rule=='' and self.para_line_spacing!=''):
             error_dict['para_line_spacing_rule'] = _('不能为空')
+            error_dict['para_line_spacing'] = _('*')
         if self.paraformat_op and (self.para_line_spacing_rule !='' and self.para_line_spacing==''):
+            error_dict['para_line_spacing_rule'] = _('*')
             error_dict['para_line_spacing'] = _('不能为空')
 
         if self.paraformat_op and (self.para_firstchardropcap=='' and self.para_firstchardropcaplines!=''):
             error_dict['para_firstchardropcap'] = _('不能为空')
+            error_dict['para_firstchardropcaplines'] = _('*')
         if self.paraformat_op and (self.para_firstchardropcap !='' and self.para_firstchardropcaplines==''):
+            error_dict['para_firstchardropcap'] = _('*')
             error_dict['para_firstchardropcaplines'] = _('不能为空')
 
-        if self.char_edit_op and (self.char_edit_origin==''):
-            error_dict['char_edit_origin'] = _('不能为空')
-        if self.char_edit_op and (self.char_edit_replace==''):
-            error_dict['char_edit_replace'] = _('不能为空')
-            # raise ValidationError({'char_edit_origin':_('内容不能为空'),
-                        # 'char_edit_replace':_('内容不能为空'),})
 
         if self.style_op and self.style_name=='':
             error_dict['style_name'] = _('内容不能为空')
-            # raise ValidationError({'style_name':_('内容不能为空'),})
 
-        print('self.upload_image_file',  self.upload_image_file.name)
+        if self.style_op and self.style_name in ['新样式1', '新样式2'] and \
+               (self.style_font_name_ascii=='' and 
+                self.style_font_name_chinese=='' and 
+                self.style_font_size=='' and 
+                self.style_font_underline=='' and 
+                self.style_font_color=='' and
+                self.style_font_bold==False and
+                self.style_font_italic==False and
+                self.style_para_alignment=='' and 
+                self.style_para_left_indent=='' and 
+                self.style_para_right_indent=='' and 
+                self.style_para_first_line_indent=='' and 
+                self.style_para_first_line_indent_size=='' and 
+                self.style_para_space_before=='' and 
+                self.style_para_space_after=='' and 
+                self.style_para_line_spacing_rule=='' and 
+                self.style_para_line_spacing=='' and 
+                self.style_para_firstchardropcap=='' and 
+                self.style_para_firstchardropcaplines=='' and 
+                self.style_page_break_before==False and
+                self.style_keep_with_next==False and
+                self.style_keep_together==False and
+                self.style_window_control==False
+                ):
+            error_dict['style_name'] = _('至少为新样式设定一个具体设置')
+            error_dict['style_font_name_chinese'] = _('')
+            error_dict['style_font_name_ascii'] = _('')
+            error_dict['style_font_size'] = _('')
+            error_dict['style_font_underline'] = _('')
+            error_dict['style_font_color'] = _('')
+            error_dict['style_para_alignment'] = _('')
+            error_dict['style_para_left_indent'] = _('')
+            error_dict['style_para_right_indent'] = _('')
+            error_dict['style_para_first_line_indent'] = _('')
+            error_dict['style_para_first_line_indent_size'] = _('')
+            error_dict['style_para_space_before'] = _('')
+            error_dict['style_para_space_after'] = _('')
+            error_dict['style_para_line_spacing_rule'] = _('')
+            error_dict['style_para_line_spacing'] = _('')
+            error_dict['style_para_firstchardropcap'] = _('')
+            error_dict['style_para_firstchardropcaplines'] = _('')
+
+        if self.style_op and \
+        (self.style_para_first_line_indent=='' and 
+         self.style_para_first_line_indent_size!=''):
+            error_dict['style_para_first_line_indent'] = _('不能为空')
+            error_dict['style_para_first_line_indent_size'] = _('*')
+
+        if self.style_op and \
+            (self.style_para_first_line_indent !='' and 
+             self.style_para_first_line_indent_size==''):
+            error_dict['style_para_first_line_indent'] = _('*')
+            error_dict['style_para_first_line_indent_size'] = _('不能为空')
+
+        if self.style_op and (self.style_para_line_spacing_rule=='' and self.style_para_line_spacing!=''):
+            error_dict['style_para_line_spacing'] = _('*')
+            error_dict['style_para_line_spacing_rule'] = _('不能为空')
+        if self.style_op and (self.style_para_line_spacing_rule !='' and self.style_para_line_spacing==''):
+            error_dict['style_para_line_spacing'] = _('不能为空')
+            error_dict['style_para_line_spacing_rule'] = _('*')
+
+        if self.style_op and (self.style_para_firstchardropcap=='' and self.style_para_firstchardropcaplines!=''):
+            error_dict['style_para_firstchardropcap'] = _('不能为空')
+            error_dict['style_para_firstchardropcaplines'] = _('*')
+        if self.style_op and (self.style_para_firstchardropcap !='' and self.style_para_firstchardropcaplines==''):
+            error_dict['style_para_firstchardropcap'] = _('*')
+            error_dict['style_para_firstchardropcaplines'] = _('不能为空')
+
+        # print('self.upload_image_file',  self.upload_image_file.name)
         if self.image_op and self.upload_image_file.name=='':
             error_dict['upload_image_file'] = _('必须上传图片(jpg,bmp,png)')
         
         if len(error_dict)>0:
             raise ValidationError(error_dict)
+
 
     word_question = models.ForeignKey(
         WordQuestion,
