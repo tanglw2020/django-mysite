@@ -67,7 +67,7 @@ class WordQuestion(models.Model):
 
     upload_docx_test = models.ForeignKey(
         WordDocxFileTest,
-        on_delete=models.CASCADE, null=True, blank=True,
+        on_delete=models.CASCADE, null=True, blank=True, default='',
         verbose_name='内部测试用word文件.docx'
     )
 
@@ -94,11 +94,11 @@ class WordOperations(models.Model):
     def operations_list(self):
             op_list = []
             if self.char_edit_op:
-                op_list.append('文字查找替换')
+                op_list.append('查找替换')
             if self.font_op:
                 op_list.append('字体设置')
             if self.paraformat_op:
-                op_list.append('段落格式设置')
+                op_list.append('段落设置')
             if self.style_op:
                 op_list.append('样式设置')
             if self.image_op:
@@ -108,11 +108,72 @@ class WordOperations(models.Model):
 
     def clean(self):
         if not (self.char_edit_op or self.font_op or self.paraformat_op or self.style_op or self.image_op):
-            raise ValidationError({'para_text':_('至少选择一个考查操作')})
+            raise ValidationError(_('至少选择一个操作考查'))
+
+        error_dict = {}
+        if self.font_op and \
+        (self.font_name_ascii=='' and 
+        self.font_name_chinese=='' and 
+        self.font_size=='' and 
+        self.font_underline=='' and 
+        self.font_color=='' and
+        self.font_bold==False and
+        self.font_italic==False):
+            error_dict['font_name_chinese'] = _('至少设定一个字体相关设置')
+            error_dict['font_name_ascii'] = _('')
+            error_dict['font_size'] = _('')
+            error_dict['font_underline'] = _('')
+            error_dict['font_color'] = _('')
+
+        if self.paraformat_op and \
+        (self.para_alignment=='' and 
+        self.para_left_indent=='' and 
+        self.para_right_indent=='' and 
+        self.para_first_line_indent=='' and 
+        self.para_first_line_indent_size=='' and 
+        self.para_space_before=='' and 
+        self.para_space_after=='' and 
+        self.para_line_spacing_rule=='' and 
+        self.para_line_spacing=='' and 
+        self.para_firstchardropcap=='' and 
+        self.para_firstchardropcaplines=='' and 
+        self.page_break_before==False and
+        self.keep_with_next==False and
+        self.keep_together==False and
+        self.window_control==False):
+            error_dict['para_alignment'] = _('至少选择一个段落格式相关设置')
+            error_dict['para_left_indent'] = _('')
+            error_dict['para_right_indent'] = _('')
+            error_dict['para_first_line_indent'] = _('')
+            error_dict['para_first_line_indent_size'] = _('')
+            error_dict['para_space_before'] = _('')
+            error_dict['para_space_after'] = _('')
+            error_dict['para_line_spacing_rule'] = _('')
+            error_dict['para_line_spacing'] = _('')
+            error_dict['para_firstchardropcap'] = _('')
+            error_dict['para_firstchardropcaplines'] = _('')
+
+        if self.char_edit_op and (self.char_edit_origin==''):
+            error_dict['char_edit_origin'] = _('不能为空')
+        if self.char_edit_op and (self.char_edit_replace==''):
+            error_dict['char_edit_replace'] = _('不能为空')
+            # raise ValidationError({'char_edit_origin':_('内容不能为空'),
+                        # 'char_edit_replace':_('内容不能为空'),})
+
+        if self.style_op and self.style_name=='':
+            error_dict['style_name'] = _('内容不能为空')
+            # raise ValidationError({'style_name':_('内容不能为空'),})
+
+        print('self.upload_image_file',  self.upload_image_file.name)
+        if self.image_op and self.upload_image_file.name=='':
+            error_dict['upload_image_file'] = _('必须上传图片(jpg,bmp,png)')
+        
+        if len(error_dict)>0:
+            raise ValidationError(error_dict)
 
     word_question = models.ForeignKey(
         WordQuestion,
-        on_delete=models.CASCADE, null=True, blank=True,
+        on_delete=models.CASCADE, null=True, blank=True, default='',
         verbose_name='word操作大题'
     )
 
@@ -120,35 +181,34 @@ class WordOperations(models.Model):
 
     ############## 文字查找替换
     char_edit_op = models.BooleanField('是否考查文字查找替换？', default=False)
-    char_edit_origin = models.CharField('原词', max_length=200, blank=True)
-    char_edit_replace = models.CharField('替换为', max_length=200, blank=True)
-    # char_edit_result = models.CharField('文字编辑结果', widget=models.Textarea, blank=True)
+    char_edit_origin = models.CharField('原词', max_length=200, blank=True, default='')
+    char_edit_replace = models.CharField('替换为', max_length=200, blank=True, default='')
 
     ############## 字体设置
     font_op = models.BooleanField('是否考查字体设置？', default=False)
-    font_name_ascii = models.CharField('英文字体', choices=FONT_NAME_ASCII_CHOICES, max_length=200, blank=True) 
-    font_name_chinese = models.CharField('中文字体', choices=FONT_NAME_CHINESE_CHOICES, max_length=200, blank=True)
-    font_size = models.CharField('字号', choices=FONT_SIZE_CHOICES, max_length=200, blank=True)
-    font_bold = models.BooleanField('粗体', blank=True)
-    font_italic = models.BooleanField('斜体', blank=True)
-    font_underline = models.CharField('下划线', choices=FONT_UNDERLINE_CHOICES, max_length=200, blank=True)
-    font_color = models.CharField('字体颜色', choices=FONT_COLOR_CHOICES, max_length=200, blank=True)
+    font_name_ascii = models.CharField('英文字体', choices=FONT_NAME_ASCII_CHOICES, max_length=200, blank=True, default='') 
+    font_name_chinese = models.CharField('中文字体', choices=FONT_NAME_CHINESE_CHOICES, max_length=200, blank=True, default='')
+    font_size = models.CharField('字号', choices=FONT_SIZE_CHOICES, max_length=200, blank=True, default='')
+    font_bold = models.BooleanField('粗体', blank=True, default='')
+    font_italic = models.BooleanField('斜体', blank=True, default='')
+    font_underline = models.CharField('下划线', choices=FONT_UNDERLINE_CHOICES, max_length=200, blank=True, default='')
+    font_color = models.CharField('字体颜色', choices=FONT_COLOR_CHOICES, max_length=200, blank=True, default='')
 
     ############## 段落格式设置
     paraformat_op = models.BooleanField('是否考查段落格式设置？', default=False)
-    para_alignment = models.CharField('段落对齐', choices=PARA_ALIGNMENT_CHOICES, max_length=200, blank=True)
-    para_left_indent = models.CharField('左侧缩进(磅)', choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
-    para_right_indent = models.CharField('右侧缩进(磅)', choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
-    para_first_line_indent = models.CharField('首行缩进', choices=PARA_FIRST_LINE_INDENT_CHOICES, max_length=200, blank=True)
-    para_first_line_indent_size = models.CharField('首行缩进距离(磅)', choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
+    para_alignment = models.CharField('段落对齐', choices=PARA_ALIGNMENT_CHOICES, max_length=200, blank=True, default='')
+    para_left_indent = models.CharField('左侧缩进(磅)', choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    para_right_indent = models.CharField('右侧缩进(磅)', choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    para_first_line_indent = models.CharField('首行缩进', choices=PARA_FIRST_LINE_INDENT_CHOICES, max_length=200, blank=True, default='')
+    para_first_line_indent_size = models.CharField('首行缩进距离(磅)', choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
 
-    para_space_before = models.CharField('段前间距(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
-    para_space_after = models.CharField('段后间距(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
-    para_line_spacing_rule = models.CharField('行距规则', choices=PARA_LINE_SPACING_RULE_CHOICES, max_length=200, blank=True)
-    para_line_spacing = models.CharField('行距(行)',  choices=LINE_NUM_CHOICES, max_length=200, blank=True)
+    para_space_before = models.CharField('段前间距(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    para_space_after = models.CharField('段后间距(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    para_line_spacing_rule = models.CharField('行距规则', choices=PARA_LINE_SPACING_RULE_CHOICES, max_length=200, blank=True, default='')
+    para_line_spacing = models.CharField('行距(行)',  choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
 
-    para_firstchardropcap = models.CharField('首字下沉', choices=PARA_FIRSTCHARDROPCAP_CHOICES, max_length=200, blank=True)
-    para_firstchardropcaplines = models.CharField('下沉(行)',  choices=LINE_NUM_CHOICES, max_length=200, blank=True)
+    para_firstchardropcap = models.CharField('首字下沉', choices=PARA_FIRSTCHARDROPCAP_CHOICES, max_length=200, blank=True, default='')
+    para_firstchardropcaplines = models.CharField('下沉(行)',  choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
 
     page_break_before = models.BooleanField('段前分页', default=False)
     keep_with_next = models.BooleanField('与下段同页', default=False)
@@ -157,28 +217,28 @@ class WordOperations(models.Model):
 
     ############## 样式设置
     style_op = models.BooleanField('是否考查样式设置？', default=False)
-    style_name = models.CharField('样式名称', choices=STYLE_NAME_CHOICES, max_length=200, blank=True) 
-    style_font_name_ascii = models.CharField('英文字体', choices=FONT_NAME_ASCII_CHOICES, max_length=200, blank=True) 
-    style_font_name_chinese = models.CharField('中文字体', choices=FONT_NAME_CHINESE_CHOICES, max_length=200, blank=True)
-    style_font_size = models.CharField('字号', choices=FONT_SIZE_CHOICES, max_length=200, blank=True)
+    style_name = models.CharField('样式名称', choices=STYLE_NAME_CHOICES, max_length=200, blank=True, default='') 
+    style_font_name_ascii = models.CharField('英文字体', choices=FONT_NAME_ASCII_CHOICES, max_length=200, blank=True, default='') 
+    style_font_name_chinese = models.CharField('中文字体', choices=FONT_NAME_CHINESE_CHOICES, max_length=200, blank=True, default='')
+    style_font_size = models.CharField('字号', choices=FONT_SIZE_CHOICES, max_length=200, blank=True, default='')
     style_font_bold = models.BooleanField('粗体', default=False)
     style_font_italic = models.BooleanField('斜体', default=False)
-    style_font_underline = models.CharField('下划线', choices=FONT_UNDERLINE_CHOICES, max_length=200, blank=True)
-    style_font_color = models.CharField('字体颜色', choices=FONT_COLOR_CHOICES, max_length=200, blank=True)
+    style_font_underline = models.CharField('下划线', choices=FONT_UNDERLINE_CHOICES, max_length=200, blank=True, default='')
+    style_font_color = models.CharField('字体颜色', choices=FONT_COLOR_CHOICES, max_length=200, blank=True, default='')
 
-    style_para_alignment = models.CharField('段落对齐', choices=PARA_ALIGNMENT_CHOICES, max_length=200, blank=True)
-    style_para_left_indent = models.CharField('左侧缩进(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
-    style_para_right_indent = models.CharField('右侧缩进(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
-    style_para_first_line_indent = models.CharField('首行缩进', choices=PARA_FIRST_LINE_INDENT_CHOICES, max_length=200, blank=True)
-    style_para_first_line_indent_size = models.CharField('首行缩进距离(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
+    style_para_alignment = models.CharField('段落对齐', choices=PARA_ALIGNMENT_CHOICES, max_length=200, blank=True, default='')
+    style_para_left_indent = models.CharField('左侧缩进(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    style_para_right_indent = models.CharField('右侧缩进(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    style_para_first_line_indent = models.CharField('首行缩进', choices=PARA_FIRST_LINE_INDENT_CHOICES, max_length=200, blank=True, default='')
+    style_para_first_line_indent_size = models.CharField('首行缩进距离(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
 
-    style_para_space_before = models.CharField('段前间距(磅)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
-    style_para_space_after = models.CharField('段后间距(磅)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
-    style_para_line_spacing_rule = models.CharField('行距规则', choices=PARA_LINE_SPACING_RULE_CHOICES, max_length=200, blank=True)
-    style_para_line_spacing = models.CharField('行距(行)',   choices=LINE_NUM_CHOICES, max_length=200, blank=True)
+    style_para_space_before = models.CharField('段前间距(磅)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    style_para_space_after = models.CharField('段后间距(磅)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    style_para_line_spacing_rule = models.CharField('行距规则', choices=PARA_LINE_SPACING_RULE_CHOICES, max_length=200, blank=True, default='')
+    style_para_line_spacing = models.CharField('行距(行)',   choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
 
-    style_para_firstchardropcap = models.CharField('首字下沉', choices=PARA_FIRSTCHARDROPCAP_CHOICES, max_length=200, blank=True)
-    style_para_firstchardropcaplines = models.CharField('下沉(行)',   choices=LINE_NUM_CHOICES, max_length=200, blank=True)
+    style_para_firstchardropcap = models.CharField('首字下沉', choices=PARA_FIRSTCHARDROPCAP_CHOICES, max_length=200, blank=True, default='')
+    style_para_firstchardropcaplines = models.CharField('下沉(行)',   choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
 
     style_page_break_before = models.BooleanField('段前分页', default=False)
     style_keep_with_next = models.BooleanField('与下段同页', default=False)
@@ -187,9 +247,9 @@ class WordOperations(models.Model):
 
     ############## 图片插入
     image_op = models.BooleanField('是否考查图片插入？', default=False)
-    image_position_style = models.CharField('位置类型', choices=IMAGE_POSITION_STYLE_CHOICES, max_length=200, blank=True)
-    image_width = models.CharField('图像宽(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
-    image_height = models.CharField('图像高(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True)
+    image_position_style = models.CharField('位置类型', choices=IMAGE_POSITION_STYLE_CHOICES, max_length=200, default='嵌入文本行中')
+    image_width = models.CharField('图像宽(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    image_height = models.CharField('图像高(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
     upload_image_file = models.FileField(upload_to='uploads_image/', null=True, blank=True, 
     validators=[validate_image], verbose_name='上传图片')
 
