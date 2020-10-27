@@ -64,19 +64,20 @@ PARA_ALIGNMENT_CHOICES = [
 ]
 
 PARA_FIRST_LINE_INDENT_CHOICES = [
-    ('首行', '首行'),
-    ('悬挂', '悬挂'),
+    ('首行缩进', '缩进'),
+    ('首行悬挂', '悬挂'),
 ]
 
 PARA_LINE_SPACING_RULE_CHOICES = [
     ('单倍行距', '单倍行距'),
+    ('1.5倍行距', '1.5倍行距'),
+    ('双倍行距', '双倍行距'),
     ('多倍行距', '多倍行距'),
-    ('固定值', '固定值'),
 ]
 
 PARA_FIRSTCHARDROPCAP_CHOICES = [
     ('下沉', '下沉'),
-    ('下沉', '悬挂'),
+    ('悬挂', '悬挂'),
 ]
 
 PARA_LINE_PAGE_CHOICES = [

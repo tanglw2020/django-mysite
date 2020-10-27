@@ -108,7 +108,9 @@ class WordOperations(models.Model):
     operations_list.short_description = '涉及操作'
 
     def operation_description_all(self):
-        return ','.join([x for x in [self.char_edit_description(), self.font_description()] if len(x)>0])
+        description_list = [self.char_edit_description(), self.font_description(),
+        self.paraformat_description()]
+        return ','.join([x for x in description_list if len(x)>0])
     operation_description_all.short_description = '题目文字描述'
 
     def char_edit_description(self):
@@ -132,6 +134,33 @@ class WordOperations(models.Model):
         else:
             return ''
     font_description.short_description = '字体设置描述'
+
+    def paraformat_description(self):
+        if self.paraformat_op:
+            setting_list=[]
+            if self.para_alignment !='': setting_list.append(self.para_alignment)
+            if self.para_left_indent !='': setting_list.append('左缩进'+self.para_left_indent+'磅')
+            if self.para_right_indent !='': setting_list.append('右缩进'+self.para_right_indent+'磅')
+            if self.para_first_line_indent !='' and self.para_first_line_indent_size !='': 
+                setting_list.append(self.para_first_line_indent+self.para_first_line_indent_size+'磅')
+            if self.para_space_before !='': setting_list.append('段前'+self.para_space_before+'磅')
+            if self.para_space_after !='':  setting_list.append('段后'+self.para_space_before+'磅')
+            if self.para_line_spacing_rule !='': 
+                if self.para_line_spacing_rule in ('单倍行距','双倍行距','1.5倍行距'):
+                    setting_list.append(self.para_line_spacing_rule)
+                else:
+                    setting_list.append(self.para_line_spacing+'倍行距')
+            if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
+                setting_list.append('首字'+self.para_firstchardropcap+self.para_firstchardropcaplines+'磅')
+            if self.page_break_before==True: setting_list.append('段前分页')
+            if self.keep_with_next==True: setting_list.append('与下段同页')
+            if self.keep_together==True: setting_list.append('段中不分页')
+            if self.window_control==True: setting_list.append('孤行控制')
+
+            return '段落格式设置成'+'、'.join(setting_list)
+        else:
+            return ''
+    paraformat_description.short_description = '段落设置描述'
 
     def clean(self):
         if not (self.char_edit_op or self.font_op or self.paraformat_op or self.style_op or self.image_op):
@@ -183,6 +212,21 @@ class WordOperations(models.Model):
             error_dict['para_firstchardropcap'] = _('')
             error_dict['para_firstchardropcaplines'] = _('')
 
+        if self.paraformat_op and (self.para_first_line_indent=='' and self.para_first_line_indent_size!=''):
+            error_dict['para_first_line_indent'] = _('不能为空')
+        if self.paraformat_op and (self.para_first_line_indent !='' and self.para_first_line_indent_size==''):
+            error_dict['para_first_line_indent_size'] = _('不能为空')
+
+        if self.paraformat_op and (self.para_line_spacing_rule=='' and self.para_line_spacing!=''):
+            error_dict['para_line_spacing_rule'] = _('不能为空')
+        if self.paraformat_op and (self.para_line_spacing_rule !='' and self.para_line_spacing==''):
+            error_dict['para_line_spacing'] = _('不能为空')
+
+        if self.paraformat_op and (self.para_firstchardropcap=='' and self.para_firstchardropcaplines!=''):
+            error_dict['para_firstchardropcap'] = _('不能为空')
+        if self.paraformat_op and (self.para_firstchardropcap !='' and self.para_firstchardropcaplines==''):
+            error_dict['para_firstchardropcaplines'] = _('不能为空')
+
         if self.char_edit_op and (self.char_edit_origin==''):
             error_dict['char_edit_origin'] = _('不能为空')
         if self.char_edit_op and (self.char_edit_replace==''):
@@ -203,7 +247,7 @@ class WordOperations(models.Model):
 
     word_question = models.ForeignKey(
         WordQuestion,
-        on_delete=models.CASCADE, 
+        on_delete=models.CASCADE, blank=True, default='',
         verbose_name='word操作大题'
     )
 
