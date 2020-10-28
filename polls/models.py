@@ -217,11 +217,11 @@ class WordOperations(models.Model):
 
     def image_description(self):
         if self.image_op:
-            image_desc = '在文章合适位置以'+self.image_position_style+'格式插入图片"'+self.upload_image_file.name.split('/')[-1]+'"'
+            image_desc = '在段落('+self.para_text_simple()+')后以'+self.image_position_style+'格式插入图片"'+self.upload_image_file.name.split('/')[-1]+'"'
             if self.image_width !='':
-                image_desc = image_desc + '、宽度为'+self.image_width+'里面'
+                image_desc = image_desc + '、宽度'+self.image_width+'厘米'
             if self.image_height !='': 
-                image_desc = image_desc + '、高度为'+self.image_height+'里面'
+                image_desc = image_desc + '、高度'+self.image_height+'厘米'
             return image_desc
         else:
             return ''
@@ -233,6 +233,23 @@ class WordOperations(models.Model):
 
         if (self.font_op or self.paraformat_op) and self.style_op:
             raise ValidationError(_('样式和单独的字体和段落格式不应同时设置'))
+
+        # check word file
+        # print('file:', self.word_question.upload_docx.upload.path)
+        try:
+            document = Document(self.word_question.upload_docx.upload.path)
+        except:
+            raise ValidationError({'word_question':_('文件异常')})
+
+        all_paras  = document.paragraphs
+        para_text = self.para_text.strip()
+        matched = 0
+        for para in para_text.split('\n'):
+            for i in range(len(all_paras)):
+                if all_paras[i].text.strip()==para.strip():
+                    matched = matched + 1
+        if matched != len(para_text.split('\n')):
+            raise ValidationError({'para_text':_('未找到文章中对应内容，请检查是否输入正确内容')})
 
         error_dict = {}
 
