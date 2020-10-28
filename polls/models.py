@@ -91,7 +91,6 @@ class WordOperations(models.Model):
         return self.para_text[:10] +'...'+self.para_text[-10:]
     para_text_simple.short_description = '考查段落内容'
 
-
     def operations_list(self):
             op_list = []
             if self.char_edit_op:
@@ -110,7 +109,13 @@ class WordOperations(models.Model):
     def operation_description_all(self):
         description_list = [self.char_edit_description(), self.font_description(),
         self.paraformat_description(), self.style_description()]
-        return '将段落"'+self.para_text_simple()+'"'+'，'.join([x for x in description_list if len(x)>0])+'。'
+        description_list = [x for x in description_list if len(x)>0]
+        op_desc_all = ''
+        if len(description_list): 
+            op_desc_all = '将段落"'+self.para_text_simple()+'"'+'，'.join(description_list)+'。'
+        if len(self.image_description()):
+            op_desc_all = op_desc_all + self.image_description() +'。'
+        return op_desc_all
     operation_description_all.short_description = '题目文字描述'
 
     def char_edit_description(self):
@@ -209,6 +214,18 @@ class WordOperations(models.Model):
         else:
             return ''
     style_description.short_description = '样式设置描述'
+
+    def image_description(self):
+        if self.image_op:
+            image_desc = '在文章合适位置以'+self.image_position_style+'格式插入图片"'+self.upload_image_file.name.split('/')[-1]+'"'
+            if self.image_width !='':
+                image_desc = image_desc + '、宽度为'+self.image_width+'里面'
+            if self.image_height !='': 
+                image_desc = image_desc + '、高度为'+self.image_height+'里面'
+            return image_desc
+        else:
+            return ''
+    image_description.short_description = '图片插入描述'
 
     def clean(self):
         if not (self.char_edit_op or self.font_op or self.paraformat_op or self.style_op or self.image_op):
