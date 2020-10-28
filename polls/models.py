@@ -109,13 +109,13 @@ class WordOperations(models.Model):
 
     def operation_description_all(self):
         description_list = [self.char_edit_description(), self.font_description(),
-        self.paraformat_description()]
-        return ','.join([x for x in description_list if len(x)>0])
+        self.paraformat_description(), self.style_description()]
+        return '将段落"'+self.para_text_simple()+'"'+'，'.join([x for x in description_list if len(x)>0])+'。'
     operation_description_all.short_description = '题目文字描述'
 
     def char_edit_description(self):
         if self.char_edit_op:
-            return '将所有"'+self.char_edit_origin+'"替换成"'+self.char_edit_replace+'"'
+            return '所有“'+self.char_edit_origin+'”替换成“'+self.char_edit_replace+'”'
         else:
             return ''
     char_edit_description.short_description = '查找替换文字描述'
@@ -161,6 +161,54 @@ class WordOperations(models.Model):
         else:
             return ''
     paraformat_description.short_description = '段落设置描述'
+
+    def style_description(self):
+        if self.style_op:
+            style_des = ''
+            style_des_add = []
+            if self.style_name in ['新样式1', '新样式2']:
+                style_des = '创建并应用“'+self.style_name+'”'
+            else:
+                style_des = '应用“'+self.style_name+'”'
+
+            font_setting_list=[]
+            if self.style_font_name_chinese !='': font_setting_list.append('中文'+self.style_font_name_chinese)
+            if self.style_font_name_ascii !='':  font_setting_list.append('西文'+self.style_font_name_ascii)
+            if self.style_font_size !='': font_setting_list.append('字号'+self.style_font_size)
+            if self.style_font_color !='': font_setting_list.append(self.style_font_color)
+            if self.style_font_bold==True: font_setting_list.append('粗体')
+            if self.style_font_italic==True: font_setting_list.append('斜体')
+            if self.style_font_underline !='': font_setting_list.append(self.style_font_underline)
+            if len(font_setting_list)>0:
+                style_des_add.append('其字体设置成'+'、'.join(font_setting_list))
+
+            para_setting_list=[]
+            if self.style_para_alignment !='': para_setting_list.append(self.style_para_alignment)
+            if self.style_para_left_indent !='': para_setting_list.append('左缩进'+self.style_para_left_indent+'磅')
+            if self.style_para_right_indent !='': para_setting_list.append('右缩进'+self.style_para_right_indent+'磅')
+            if self.style_para_first_line_indent !='' and \
+               self.style_para_first_line_indent_size !='': 
+                para_setting_list.append(self.style_para_first_line_indent+self.style_para_first_line_indent_size+'磅')
+            if self.style_para_space_before !='': para_setting_list.append('段前'+self.style_para_space_before+'磅')
+            if self.style_para_space_after !='':  para_setting_list.append('段后'+self.style_para_space_before+'磅')
+            if self.style_para_line_spacing_rule !='': 
+                if self.style_para_line_spacing_rule in ('单倍行距','双倍行距','1.5倍行距'):
+                    para_setting_list.append(self.style_para_line_spacing_rule)
+                else:
+                    para_setting_list.append(self.style_para_line_spacing+'倍行距')
+            if self.style_para_firstchardropcap !='' and self.style_para_firstchardropcaplines !='': 
+                para_setting_list.append('首字'+self.style_para_firstchardropcap+self.style_para_firstchardropcaplines+'磅')
+            if self.style_page_break_before==True: para_setting_list.append('段前分页')
+            if self.style_keep_with_next==True: para_setting_list.append('与下段同页')
+            if self.style_keep_together==True: para_setting_list.append('段中不分页')
+            if self.style_window_control==True: para_setting_list.append('孤行控制')
+
+            if len(para_setting_list)>0:
+                style_des_add.append('其段落格式设置成'+'、'.join(para_setting_list))
+            return style_des+'('+'，'.join(style_des_add)+')'
+        else:
+            return ''
+    style_description.short_description = '样式设置描述'
 
     def clean(self):
         if not (self.char_edit_op or self.font_op or self.paraformat_op or self.style_op or self.image_op):
