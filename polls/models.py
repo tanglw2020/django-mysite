@@ -88,7 +88,10 @@ class WordOperations(models.Model):
     word_question_info.short_description = '操作所属题目'
 
     def para_text_simple(self):
-        return self.para_text[:10] +'...'+self.para_text[-10:]
+        if len(self.para_text)<30:
+            return self.para_text.strip()
+        else:
+            return self.para_text[:15] +' ...... '+self.para_text[-15:]
     para_text_simple.short_description = '考查段落内容'
 
     def operations_list(self):
@@ -112,7 +115,7 @@ class WordOperations(models.Model):
         description_list = [x for x in description_list if len(x)>0]
         op_desc_all = ''
         if len(description_list): 
-            op_desc_all = '将段落"'+self.para_text_simple()+'"'+'，'.join(description_list)+'。'
+            op_desc_all = '将段落【'+self.para_text_simple()+'】'+'，'.join(description_list)+'。'
         if len(self.image_description()):
             op_desc_all = op_desc_all + self.image_description() +'。'
         return op_desc_all
@@ -174,7 +177,7 @@ class WordOperations(models.Model):
             if self.style_name in ['新样式1', '新样式2']:
                 style_des = '创建并应用“'+self.style_name+'”'
             else:
-                style_des = '应用“'+self.style_name+'”'
+                style_des = '应用样式“'+self.style_name+'”'
 
             font_setting_list=[]
             if self.style_font_name_chinese !='': font_setting_list.append('中文'+self.style_font_name_chinese)
