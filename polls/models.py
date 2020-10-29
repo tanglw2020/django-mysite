@@ -36,25 +36,41 @@ class WordQuestion(models.Model):
     def word_op_description(self):
         result_list = []
         for x in self.wordoperations_set.all():
-            result_list.append(['black', x.operations_list()])
+            result_list.append(['black', x.operation_description_all()])
 
-        return format_html_join(
+        return format_html("<ol>") + \
+                format_html_join(
                 '\n', '<li style="color:{};">{}</li>',
                 ((x[0], x[1]) for x in result_list)
-                )
+                ) \
+                + format_html("</ol>")
     word_op_description.short_description = '题目内容'
 
     def word_test_result(self):
-        return self.upload_docx.upload.name
+        if self.upload_docx_test is not None:
+            # check valid docx file
+            try:
+                document_test = Document(self.upload_docx_test.upload.path)
+            except:
+                return self.upload_docx_test.upload.path+'打开异常'
+
+            result_list = []
+            for x in self.wordoperations_set.all():
+                result_list.append(x.compare_operation(document_test))
+
+            return format_html("<ol>") + \
+                format_html_join(
+                '\n', '<li style="color:{};">{}</li>',
+                ((x[0],x[1]) for x in result_list)
+                ) \
+                + format_html("</ol>")
+        else:
+            return '没有上传测试文件'
         # return self.upload_docx.upload.name + "::" + self.upload_docx_test.upload.name
     word_test_result.short_description = '测试文件评估结果'
 
     # def clean(self):
     #     op_list = [x for x in  self.wordoperations_set.all()]
-
-    #     print(len(op_list))
-    #     if len(op_list) != 5:
-    #         raise ValidationError({'pub_date':_('Word操作题个数不等于5')})
 
     #########
     pub_date = models.DateTimeField('创建时间')
@@ -108,6 +124,48 @@ class WordOperations(models.Model):
                 op_list.append('图片插入')
             return '+'.join(op_list)
     operations_list.short_description = '涉及操作'
+
+    def compare_operation(self, document_test):
+        all_paras  = document_test.paragraphs
+        para_text_list = self.para_text.strip().split('\n')
+        matched_list = []
+        for para in para_text_list:
+            for i in range(len(all_paras)):
+                if all_paras[i].text.strip()==para.strip():
+                    matched_list.append(i)
+        if len(matched_list) != len(para_text_list):
+            return ['red', '未找到文章中对应考查段落']
+
+        result_list = []
+        # 
+        if self.char_edit_op:
+            count_origin, count_replace = 0, 0
+            for para in para_text_list:
+                count_origin += para.count(self.char_edit_origin)
+            for ind in  matched_list:
+                count_replace += all_paras[ind].text.count(self.char_edit_replace)
+            result_list.append(['替换',str(count_origin),str(count_replace)])
+
+        if self.font_op:
+            r0 = all_paras[matched_list[0]].runs[0]
+            if self.font_name_chinese !='': 
+                result_list.append(['中文', self.font_name_chinese, r0.font.name_eastasia])
+            if self.font_name_ascii !='':  
+                result_list.append(['西文', self.font_name_ascii, r0.font.name])
+            if self.font_size !='': 
+                result_list.append(['字号', self.font_size, r0.font.size.pt])
+            if self.font_color !='': 
+                result_list.append(['字色', self.font_color, r0.font.color.rgb])
+            if self.font_bold==True: 
+                result_list.append(['粗体', self.font_bold, r0.font.bold])
+            if self.font_italic==True: 
+                result_list.append(['斜体', self.font_italic, r0.font.italic])
+            if self.font_underline !='': 
+                result_list.append(['下划线', self.font_underline, FONT_UNDERLINE_MAP.get(str(r0.font.underline),0), str(r0.font.underline) ])
+                # result_list.append(['下划线', self.font_underline, str(r0.font.underline)])
+
+        result_list = [str(x) for x in result_list]
+        return ['black', '&&'.join(result_list)]
 
     def operation_description_all(self):
         description_list = [self.char_edit_description(), self.font_description(),
@@ -404,6 +462,7 @@ class WordOperations(models.Model):
             raise ValidationError(error_dict)
 
 
+    ############## 所属大题
     word_question = models.ForeignKey(
         WordQuestion,
         on_delete=models.CASCADE, blank=True, default='',
@@ -421,7 +480,7 @@ class WordOperations(models.Model):
     font_op = models.BooleanField('是否考查字体设置？', default=False)
     font_name_ascii = models.CharField('英文字体', choices=FONT_NAME_ASCII_CHOICES, max_length=200, blank=True, default='') 
     font_name_chinese = models.CharField('中文字体', choices=FONT_NAME_CHINESE_CHOICES, max_length=200, blank=True, default='')
-    font_size = models.CharField('字号', choices=FONT_SIZE_CHOICES, max_length=200, blank=True, default='')
+    font_size = models.CharField('字号(磅)', choices=FONT_SIZE_CHOICES, max_length=200, blank=True, default='')
     font_bold = models.BooleanField('粗体', blank=True, default='')
     font_italic = models.BooleanField('斜体', blank=True, default='')
     font_underline = models.CharField('下划线', choices=FONT_UNDERLINE_CHOICES, max_length=200, blank=True, default='')
