@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import WordOperations, WordQuestion
-from .fileModels import  WordDocxFile, WordDocxFileTest
+from .wordModels import WordOperations, WordQuestion
+from .wordFileModels import  WordDocxFile, WordDocxFileTest
 
 # Register your models here.
 class WordOperationsInline(admin.StackedInline):
@@ -83,5 +83,4 @@ class WordQuestionAdmin(admin.ModelAdmin):
 
 admin.site.register(WordOperations, WordOperationsAdmin)
 admin.site.register(WordQuestion, WordQuestionAdmin)
-admin.site.register(WordDocxFile)
-admin.site.register(WordDocxFileTest)
+admin.site.register([WordDocxFile,WordDocxFileTest])

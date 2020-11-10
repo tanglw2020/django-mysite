@@ -4,8 +4,8 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, format_html_join
 from docx import Document
-from .choices import *
-from .fileModels import *
+from .wordChoices import *
+from .wordFileModels import *
 
 
 # Create your models here.
@@ -56,7 +56,9 @@ class WordQuestion(models.Model):
 
             result_list = []
             for x in self.wordoperations_set.all():
-                result_list.append(x.compare_operation(document_test))
+                result_list_str = [str(y) for y in x.compare_operation(document_test)]
+                result_list_str = ['black', '||'.join(result_list_str)]
+                result_list.append(result_list_str)
 
             return format_html("<ol>") + \
                 format_html_join(
@@ -164,8 +166,7 @@ class WordOperations(models.Model):
                 result_list.append(['下划线', self.font_underline, FONT_UNDERLINE_MAP.get(str(r0.font.underline),0), str(r0.font.underline) ])
                 # result_list.append(['下划线', self.font_underline, str(r0.font.underline)])
 
-        result_list = [str(x) for x in result_list]
-        return ['black', '&&'.join(result_list)]
+        return result_list
 
     def operation_description_all(self):
         description_list = [self.char_edit_description(), self.font_description(),
