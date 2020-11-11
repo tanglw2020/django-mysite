@@ -95,6 +95,20 @@ def getPtorNone(sz):
         return sz
     return sz.pt
 
+def getSzorNone(sz1, sz2):
+    if sz1 is not None:
+        return sz1.pt
+    if sz2 is not None:
+        return sz2.pt
+    return 0
+
+def getLineorNone(sz1, sz2):
+    if sz1 is not None:
+        return str(int(sz1))
+    if sz2 is not None:
+        return str(int(sz2))
+    return str(sz1)
+
 # Create your models here.
 class WordOperations(models.Model):
 
@@ -184,30 +198,53 @@ class WordOperations(models.Model):
 
                 result_list.append(['对齐', self.para_alignment, str(para_alignment), str(pstyle_format.alignment)])
             if self.para_left_indent !='': 
-                result_list.append(['左缩进', self.para_left_indent, getPtorNone(p_format.left_indent)])
+                result_list.append(['左缩进', 
+                self.para_left_indent,getSzorNone(p_format.left_indent, pstyle_format.left_indent), 
+                getPtorNone(p_format.left_indent), 
+                getPtorNone(pstyle_format.left_indent)])
+                # result_list.append(['左缩进', self.para_left_indent, (p_format.left_indent), pstyle_format.left_indent])
             if self.para_right_indent !='': 
-                result_list.append(['右缩进', self.para_right_indent, getPtorNone(p_format.right_indent)])
+                result_list.append(['右缩进', 
+                self.para_left_indent, getSzorNone(p_format.right_indent, pstyle_format.right_indent), 
+                getPtorNone(p_format.right_indent), 
+                getPtorNone(pstyle_format.right_indent)])
+                # result_list.append(['右缩进', self.para_right_indent, (p_format.right_indent), pstyle_format.right_indent])
+
             # if self.para_first_line_indent !='' and self.para_first_line_indent_size !='': 
                 # result_list.append(self.para_first_line_indent+self.para_first_line_indent_size+'磅')
+
             if self.para_space_before !='': 
-                result_list.append(['段前', self.para_space_before, getPtorNone(p_format.space_before)])
+                result_list.append(['段前', self.para_space_before, 
+                getSzorNone(p_format.space_before, pstyle_format.space_before), 
+                getPtorNone(p_format.space_before), 
+                getPtorNone(pstyle_format.space_before)])
             if self.para_space_after !='':  
-                result_list.append(['段后', self.para_space_after, getPtorNone(p_format.space_after)])
-            # if self.para_line_spacing_rule !='': 
-            #     if self.para_line_spacing_rule in ('单倍行距','双倍行距','1.5倍行距'):
-            #         result_list.append(self.para_line_spacing_rule)
-            #     else:
-            #         result_list.append(self.para_line_spacing+'倍行距')
+                result_list.append(['段后', self.para_space_after, 
+                getSzorNone(p_format.space_after, pstyle_format.space_after), 
+                getPtorNone(p_format.space_after), 
+                getPtorNone(pstyle_format.space_after)])
+
             # if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
             #     result_list.append('首字'+self.para_firstchardropcap+self.para_firstchardropcaplines+'磅')
+
+            if self.para_line_spacing_rule !='': 
+                result_list.append(['行间距规则', self.para_line_spacing_rule, str(p_format.line_spacing_rule or pstyle_format.line_spacing_rule), \
+                    str(pstyle_format.line_spacing_rule)])
+                if self.para_line_spacing_rule not in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:3]):
+                    result_list.append(['行距', self.para_line_spacing, getLineorNone(p_format.line_spacing, pstyle_format.line_spacing), 
+                    pstyle_format.line_spacing])
+
             if self.page_break_before==True: 
-                result_list.append(['段前分页', self.page_break_before, p_format.page_break_before])
+                result_list.append(['段前分页', self.page_break_before, p_format.page_break_before or pstyle_format.page_break_before])
             if self.keep_with_next==True: 
-                result_list.append(['与下段同页',self.keep_with_next, p_format.keep_with_next] )
+                result_list.append(['与下段同页',self.keep_with_next, p_format.keep_with_next or pstyle_format.keep_with_next])
             if self.keep_together==True: 
-                result_list.append(['段中不分页',self.keep_together,p_format.keep_together])
-            if self.widow_control==True: 
-                result_list.append(['孤行控制', None, p_format.widow_control])
+                result_list.append(['段中不分页',self.keep_together, p_format.keep_together or pstyle_format.keep_together])
+            if self.widow_control==True:
+                widow_control = True
+                if p_format.widow_control==False or (p_format.widow_control is None and pstyle_format.widow_control==False):
+                    widow_control = False
+                result_list.append(['孤行控制', True, widow_control, p_format.widow_control , pstyle_format.widow_control])
 
         return result_list
 
@@ -259,12 +296,14 @@ class WordOperations(models.Model):
             if self.para_space_before !='': setting_list.append('段前'+self.para_space_before+'磅')
             if self.para_space_after !='':  setting_list.append('段后'+self.para_space_after+'磅')
             if self.para_line_spacing_rule !='': 
-                if self.para_line_spacing_rule in ('单倍行距','双倍行距','1.5倍行距'):
-                    setting_list.append(self.para_line_spacing_rule)
+                if self.para_line_spacing_rule in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:3]):
+                    setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.para_line_spacing_rule][0])
                 else:
-                    setting_list.append(self.para_line_spacing+'倍行距')
+                    setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.para_line_spacing_rule][0]+self.para_line_spacing+'倍行距')
+            
             if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
                 setting_list.append('首字'+self.para_firstchardropcap+self.para_firstchardropcaplines+'磅')
+            
             if self.page_break_before==True: setting_list.append('段前分页')
             if self.keep_with_next==True: setting_list.append('与下段同页')
             if self.keep_together==True: setting_list.append('段中不分页')
@@ -418,7 +457,7 @@ class WordOperations(models.Model):
         if self.paraformat_op and (self.para_line_spacing_rule=='' and self.para_line_spacing!=''):
             error_dict['para_line_spacing_rule'] = _('不能为空')
             error_dict['para_line_spacing'] = _('*')
-        if self.paraformat_op and (self.para_line_spacing_rule !='' and self.para_line_spacing==''):
+        if self.paraformat_op and (self.para_line_spacing_rule =='MULTIPLE (5)' and self.para_line_spacing==''):
             error_dict['para_line_spacing_rule'] = _('*')
             error_dict['para_line_spacing'] = _('不能为空')
 
@@ -594,7 +633,6 @@ class WordOperations(models.Model):
 
 def validate_operation_list(value):
     operation_list = value.all()
-    # if len(operation_list)<5:
     raise ValidationError(
             _('操作题数量不足5个'),
             params={'value': value.id},
