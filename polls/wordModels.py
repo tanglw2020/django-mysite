@@ -124,7 +124,7 @@ class WordOperations(models.Model):
                 op_list.append('样式设置')
             if self.image_op:
                 op_list.append('图片插入')
-            return '+'.join(op_list)
+            return '/'.join(op_list)
     operations_list.short_description = '涉及操作'
 
     def compare_operation(self, document_test):
@@ -155,7 +155,7 @@ class WordOperations(models.Model):
             if self.font_name_ascii !='':  
                 result_list.append(['西文', self.font_name_ascii, r0.font.name])
             if self.font_size !='': 
-                result_list.append(['字号', self.font_size, r0.font.size.pt])
+                result_list.append(['字号', self.font_size, r0.font.size])
             if self.font_color !='': 
                 result_list.append(['字色', self.font_color, r0.font.color.rgb])
             if self.font_bold==True: 
@@ -163,8 +163,39 @@ class WordOperations(models.Model):
             if self.font_italic==True: 
                 result_list.append(['斜体', self.font_italic, r0.font.italic])
             if self.font_underline !='': 
-                result_list.append(['下划线', self.font_underline, FONT_UNDERLINE_MAP.get(str(r0.font.underline),0), str(r0.font.underline) ])
+                result_list.append(['下划线', self.font_underline, str(r0.font.underline)])
                 # result_list.append(['下划线', self.font_underline, str(r0.font.underline)])
+
+        if self.paraformat_op:
+            p_format = all_paras[matched_list[0]].paragraph_format
+            pstyle_format = all_paras[matched_list[0]].style.paragraph_format
+            if self.para_alignment !='': 
+                result_list.append(['对齐', self.para_alignment, p_format.alignment, pstyle_format.alignment])
+            if self.para_left_indent !='': 
+                result_list.append(['左缩进', self.para_left_indent, p_format.left_indent])
+            if self.para_right_indent !='': 
+                result_list.append(['右缩进', self.para_right_indent, p_format.right_indent])
+            # if self.para_first_line_indent !='' and self.para_first_line_indent_size !='': 
+                # result_list.append(self.para_first_line_indent+self.para_first_line_indent_size+'磅')
+            if self.para_space_before !='': 
+                result_list.append(['段前', self.para_space_before, p_format.space_before])
+            if self.para_space_after !='':  
+                result_list.append(['段后', self.para_space_after, p_format.space_after])
+            # if self.para_line_spacing_rule !='': 
+            #     if self.para_line_spacing_rule in ('单倍行距','双倍行距','1.5倍行距'):
+            #         result_list.append(self.para_line_spacing_rule)
+            #     else:
+            #         result_list.append(self.para_line_spacing+'倍行距')
+            # if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
+            #     result_list.append('首字'+self.para_firstchardropcap+self.para_firstchardropcaplines+'磅')
+            if self.page_break_before==True: 
+                result_list.append(['段前分页', self.page_break_before, p_format.page_break_before])
+            if self.keep_with_next==True: 
+                result_list.append(['与下段同页',self.keep_with_next, p_format.keep_with_next] )
+            if self.keep_together==True: 
+                result_list.append(['段中不分页',self.keep_together,p_format.keep_together])
+            if self.widow_control==True: 
+                result_list.append(['孤行控制',self.widow_control,p_format.widow_control])
 
         return result_list
 
@@ -192,11 +223,12 @@ class WordOperations(models.Model):
             setting_list=[]
             if self.font_name_chinese !='': setting_list.append('中文'+self.font_name_chinese)
             if self.font_name_ascii !='':  setting_list.append('西文'+self.font_name_ascii)
-            if self.font_size !='': setting_list.append('字号'+self.font_size)
+            if self.font_size !='': setting_list.append('字号'+self.font_size+'磅')
             if self.font_color !='': setting_list.append(self.font_color)
             if self.font_bold==True: setting_list.append('粗体')
             if self.font_italic==True: setting_list.append('斜体')
-            if self.font_underline !='': setting_list.append(self.font_underline)
+            if self.font_underline !='': 
+                setting_list.append([x[1] for x in FONT_UNDERLINE_CHOICES if x[0]==self.font_underline][0])
             return '字体设置成'+'、'.join(setting_list)
         else:
             return ''
@@ -211,7 +243,7 @@ class WordOperations(models.Model):
             if self.para_first_line_indent !='' and self.para_first_line_indent_size !='': 
                 setting_list.append(self.para_first_line_indent+self.para_first_line_indent_size+'磅')
             if self.para_space_before !='': setting_list.append('段前'+self.para_space_before+'磅')
-            if self.para_space_after !='':  setting_list.append('段后'+self.para_space_before+'磅')
+            if self.para_space_after !='':  setting_list.append('段后'+self.para_space_after+'磅')
             if self.para_line_spacing_rule !='': 
                 if self.para_line_spacing_rule in ('单倍行距','双倍行距','1.5倍行距'):
                     setting_list.append(self.para_line_spacing_rule)
@@ -222,7 +254,7 @@ class WordOperations(models.Model):
             if self.page_break_before==True: setting_list.append('段前分页')
             if self.keep_with_next==True: setting_list.append('与下段同页')
             if self.keep_together==True: setting_list.append('段中不分页')
-            if self.window_control==True: setting_list.append('孤行控制')
+            if self.widow_control==True: setting_list.append('孤行控制')
 
             return '段落格式设置成'+'、'.join(setting_list)
         else:
@@ -268,7 +300,7 @@ class WordOperations(models.Model):
             if self.style_page_break_before==True: para_setting_list.append('段前分页')
             if self.style_keep_with_next==True: para_setting_list.append('与下段同页')
             if self.style_keep_together==True: para_setting_list.append('段中不分页')
-            if self.style_window_control==True: para_setting_list.append('孤行控制')
+            if self.style_widow_control==True: para_setting_list.append('孤行控制')
 
             if len(para_setting_list)>0:
                 style_des_add.append('其段落格式设置成'+'、'.join(para_setting_list))
@@ -349,7 +381,7 @@ class WordOperations(models.Model):
         self.page_break_before==False and
         self.keep_with_next==False and
         self.keep_together==False and
-        self.window_control==False):
+        self.widow_control==False):
             error_dict['para_alignment'] = _('至少选择一个段落格式相关设置')
             error_dict['para_left_indent'] = _('')
             error_dict['para_right_indent'] = _('')
@@ -409,7 +441,7 @@ class WordOperations(models.Model):
                 self.style_page_break_before==False and
                 self.style_keep_with_next==False and
                 self.style_keep_together==False and
-                self.style_window_control==False
+                self.style_widow_control==False
                 ):
             error_dict['style_name'] = _('至少为新样式设定一个具体设置')
             error_dict['style_font_name_chinese'] = _('')
@@ -506,7 +538,7 @@ class WordOperations(models.Model):
     page_break_before = models.BooleanField('段前分页', default=False)
     keep_with_next = models.BooleanField('与下段同页', default=False)
     keep_together = models.BooleanField('段中不分页', default=False)
-    window_control = models.BooleanField('孤行控制', default=False)
+    widow_control = models.BooleanField('孤行控制', default=False)
 
     ############## 样式设置
     style_op = models.BooleanField('是否考查样式设置？', default=False)
@@ -536,7 +568,7 @@ class WordOperations(models.Model):
     style_page_break_before = models.BooleanField('段前分页', default=False)
     style_keep_with_next = models.BooleanField('与下段同页', default=False)
     style_keep_together = models.BooleanField('段中不分页', default=False)
-    style_window_control = models.BooleanField('孤行控制', default=False)
+    style_widow_control = models.BooleanField('孤行控制', default=False)
 
     ############## 图片插入
     image_op = models.BooleanField('是否考查图片插入？', default=False)
