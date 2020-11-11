@@ -92,8 +92,8 @@ PARA_LINE_SPACING_RULE_CHOICES = [
 ]
 
 PARA_FIRSTCHARDROPCAP_CHOICES = [
-    ('下沉', '下沉'),
-    ('悬挂', '悬挂'),
+    ('drop', '下沉'),
+    ('margin', '悬挂'),
 ]
 
 PARA_LINE_PAGE_CHOICES = [

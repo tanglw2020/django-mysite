@@ -202,16 +202,21 @@ class WordOperations(models.Model):
                 self.para_left_indent,getSzorNone(p_format.left_indent, pstyle_format.left_indent), 
                 getPtorNone(p_format.left_indent), 
                 getPtorNone(pstyle_format.left_indent)])
-                # result_list.append(['左缩进', self.para_left_indent, (p_format.left_indent), pstyle_format.left_indent])
             if self.para_right_indent !='': 
                 result_list.append(['右缩进', 
                 self.para_left_indent, getSzorNone(p_format.right_indent, pstyle_format.right_indent), 
                 getPtorNone(p_format.right_indent), 
                 getPtorNone(pstyle_format.right_indent)])
-                # result_list.append(['右缩进', self.para_right_indent, (p_format.right_indent), pstyle_format.right_indent])
 
-            # if self.para_first_line_indent !='' and self.para_first_line_indent_size !='': 
-                # result_list.append(self.para_first_line_indent+self.para_first_line_indent_size+'磅')
+            if self.para_first_line_indent !='' and self.para_first_line_indent_size !='':
+                if self.para_first_line_indent == PARA_FIRST_LINE_INDENT_CHOICES[0][0]:  ## +
+                    result_list.append(['首行缩进', self.para_first_line_indent_size, 
+                    getSzorNone(p_format.first_line_indent, pstyle_format.first_line_indent),
+                        p_format.first_line_indent, pstyle_format.first_line_indent])
+                else:  ## -
+                    result_list.append(['首行缩进', self.para_first_line_indent_size, 
+                    -getSzorNone(p_format.first_line_indent, pstyle_format.first_line_indent),
+                        p_format.first_line_indent, pstyle_format.first_line_indent])
 
             if self.para_space_before !='': 
                 result_list.append(['段前', self.para_space_before, 
@@ -225,7 +230,9 @@ class WordOperations(models.Model):
                 getPtorNone(pstyle_format.space_after)])
 
             # if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
-            #     result_list.append('首字'+self.para_firstchardropcap+self.para_firstchardropcaplines+'磅')
+            #     result_list.append(['首字下沉', self.para_firstchardropcap, str(p_format.first_char_dropcap)])
+            #     result_list.append(['首字下沉行数', 
+            #         self.para_firstchardropcaplines, str(p_format.first_char_dropcap_lines)])
 
             if self.para_line_spacing_rule !='': 
                 result_list.append(['行间距规则', self.para_line_spacing_rule, str(p_format.line_spacing_rule or pstyle_format.line_spacing_rule), \
@@ -301,9 +308,12 @@ class WordOperations(models.Model):
                 else:
                     setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.para_line_spacing_rule][0]+self.para_line_spacing+'倍行距')
             
-            if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
-                setting_list.append('首字'+self.para_firstchardropcap+self.para_firstchardropcaplines+'磅')
-            
+            # if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
+            #     if self.para_firstchardropcap == PARA_FIRSTCHARDROPCAP_CHOICES[0][0]:
+            #         setting_list.append('首字下沉'+self.para_firstchardropcaplines+'行')
+            #     if self.para_firstchardropcap == PARA_FIRSTCHARDROPCAP_CHOICES[1][0]:
+            #         setting_list.append('首字悬挂'+self.para_firstchardropcaplines+'行')
+                
             if self.page_break_before==True: setting_list.append('段前分页')
             if self.keep_with_next==True: setting_list.append('与下段同页')
             if self.keep_together==True: setting_list.append('段中不分页')
@@ -348,8 +358,8 @@ class WordOperations(models.Model):
                     para_setting_list.append(self.style_para_line_spacing_rule)
                 else:
                     para_setting_list.append(self.style_para_line_spacing+'倍行距')
-            if self.style_para_firstchardropcap !='' and self.style_para_firstchardropcaplines !='': 
-                para_setting_list.append('首字'+self.style_para_firstchardropcap+self.style_para_firstchardropcaplines+'磅')
+            # if self.style_para_firstchardropcap !='' and self.style_para_firstchardropcaplines !='': 
+                # para_setting_list.append('首字'+self.style_para_firstchardropcap+self.style_para_firstchardropcaplines+'磅')
             if self.style_page_break_before==True: para_setting_list.append('段前分页')
             if self.style_keep_with_next==True: para_setting_list.append('与下段同页')
             if self.style_keep_together==True: para_setting_list.append('段中不分页')
@@ -429,8 +439,8 @@ class WordOperations(models.Model):
         self.para_space_after=='' and 
         self.para_line_spacing_rule=='' and 
         self.para_line_spacing=='' and 
-        self.para_firstchardropcap=='' and 
-        self.para_firstchardropcaplines=='' and 
+        # self.para_firstchardropcap=='' and 
+        # self.para_firstchardropcaplines=='' and 
         self.page_break_before==False and
         self.keep_with_next==False and
         self.keep_together==False and
@@ -444,8 +454,8 @@ class WordOperations(models.Model):
             error_dict['para_space_after'] = _('')
             error_dict['para_line_spacing_rule'] = _('')
             error_dict['para_line_spacing'] = _('')
-            error_dict['para_firstchardropcap'] = _('')
-            error_dict['para_firstchardropcaplines'] = _('')
+            # error_dict['para_firstchardropcap'] = _('')
+            # error_dict['para_firstchardropcaplines'] = _('')
 
         if self.paraformat_op and (self.para_first_line_indent=='' and self.para_first_line_indent_size!=''):
             error_dict['para_first_line_indent'] = _('不能为空')
@@ -461,12 +471,12 @@ class WordOperations(models.Model):
             error_dict['para_line_spacing_rule'] = _('*')
             error_dict['para_line_spacing'] = _('不能为空')
 
-        if self.paraformat_op and (self.para_firstchardropcap=='' and self.para_firstchardropcaplines!=''):
-            error_dict['para_firstchardropcap'] = _('不能为空')
-            error_dict['para_firstchardropcaplines'] = _('*')
-        if self.paraformat_op and (self.para_firstchardropcap !='' and self.para_firstchardropcaplines==''):
-            error_dict['para_firstchardropcap'] = _('*')
-            error_dict['para_firstchardropcaplines'] = _('不能为空')
+        # if self.paraformat_op and (self.para_firstchardropcap=='' and self.para_firstchardropcaplines!=''):
+        #     error_dict['para_firstchardropcap'] = _('不能为空')
+        #     error_dict['para_firstchardropcaplines'] = _('*')
+        # if self.paraformat_op and (self.para_firstchardropcap !='' and self.para_firstchardropcaplines==''):
+        #     error_dict['para_firstchardropcap'] = _('*')
+        #     error_dict['para_firstchardropcaplines'] = _('不能为空')
 
 
         if self.style_op and self.style_name=='':
@@ -489,8 +499,6 @@ class WordOperations(models.Model):
                 self.style_para_space_after=='' and 
                 self.style_para_line_spacing_rule=='' and 
                 self.style_para_line_spacing=='' and 
-                self.style_para_firstchardropcap=='' and 
-                self.style_para_firstchardropcaplines=='' and 
                 self.style_page_break_before==False and
                 self.style_keep_with_next==False and
                 self.style_keep_together==False and
@@ -511,8 +519,6 @@ class WordOperations(models.Model):
             error_dict['style_para_space_after'] = _('')
             error_dict['style_para_line_spacing_rule'] = _('')
             error_dict['style_para_line_spacing'] = _('')
-            error_dict['style_para_firstchardropcap'] = _('')
-            error_dict['style_para_firstchardropcaplines'] = _('')
 
         if self.style_op and \
         (self.style_para_first_line_indent=='' and 
@@ -532,13 +538,6 @@ class WordOperations(models.Model):
         if self.style_op and (self.style_para_line_spacing_rule !='' and self.style_para_line_spacing==''):
             error_dict['style_para_line_spacing'] = _('不能为空')
             error_dict['style_para_line_spacing_rule'] = _('*')
-
-        if self.style_op and (self.style_para_firstchardropcap=='' and self.style_para_firstchardropcaplines!=''):
-            error_dict['style_para_firstchardropcap'] = _('不能为空')
-            error_dict['style_para_firstchardropcaplines'] = _('*')
-        if self.style_op and (self.style_para_firstchardropcap !='' and self.style_para_firstchardropcaplines==''):
-            error_dict['style_para_firstchardropcap'] = _('*')
-            error_dict['style_para_firstchardropcaplines'] = _('不能为空')
 
         # print('self.upload_image_file',  self.upload_image_file.name)
         if self.image_op and self.upload_image_file.name=='':
@@ -585,8 +584,8 @@ class WordOperations(models.Model):
     para_line_spacing_rule = models.CharField('行距规则', choices=PARA_LINE_SPACING_RULE_CHOICES, max_length=200, blank=True, default='')
     para_line_spacing = models.CharField('行距(行)',  choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
 
-    para_firstchardropcap = models.CharField('首字下沉', choices=PARA_FIRSTCHARDROPCAP_CHOICES, max_length=200, blank=True, default='')
-    para_firstchardropcaplines = models.CharField('下沉(行)',  choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
+    # para_firstchardropcap = models.CharField('首字下沉', choices=PARA_FIRSTCHARDROPCAP_CHOICES, max_length=200, blank=True, default='')
+    # para_firstchardropcaplines = models.CharField('下沉(行)',  choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
 
     page_break_before = models.BooleanField('段前分页', default=False)
     keep_with_next = models.BooleanField('与下段同页', default=False)
@@ -614,9 +613,6 @@ class WordOperations(models.Model):
     style_para_space_after = models.CharField('段后间距(磅)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
     style_para_line_spacing_rule = models.CharField('行距规则', choices=PARA_LINE_SPACING_RULE_CHOICES, max_length=200, blank=True, default='')
     style_para_line_spacing = models.CharField('行距(行)',   choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
-
-    style_para_firstchardropcap = models.CharField('首字下沉', choices=PARA_FIRSTCHARDROPCAP_CHOICES, max_length=200, blank=True, default='')
-    style_para_firstchardropcaplines = models.CharField('下沉(行)',   choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
 
     style_page_break_before = models.BooleanField('段前分页', default=False)
     style_keep_with_next = models.BooleanField('与下段同页', default=False)
