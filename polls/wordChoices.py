@@ -70,11 +70,11 @@ FONT_UNDERLINE_CHOICES = [
 
 
 PARA_ALIGNMENT_CHOICES = [
-    ('左对齐', '左对齐'),
-    ('居中对齐', '居中对齐'),
-    ('右对齐', '右对齐'),
-    ('两端对齐', '两端对齐'),
-    ('分散对齐', '分散对齐'),
+    ('LEFT (0)', '左对齐'),   ##  or 'None'
+    ('CENTER (1)', '居中对齐'),
+    ('RIGHT (2)', '右对齐'),
+    ('JUSTIFY (3)', '两端对齐'),
+    ('DISTRIBUTE (4)', '分散对齐'),
 ]
 
 PARA_FIRST_LINE_INDENT_CHOICES = [

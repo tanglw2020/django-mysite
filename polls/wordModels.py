@@ -90,6 +90,11 @@ class WordQuestion(models.Model):
     )
 
 
+def getPtorNone(sz):
+    if sz is None:
+        return sz
+    return sz.pt
+
 # Create your models here.
 class WordOperations(models.Model):
 
@@ -155,7 +160,7 @@ class WordOperations(models.Model):
             if self.font_name_ascii !='':  
                 result_list.append(['西文', self.font_name_ascii, r0.font.name])
             if self.font_size !='': 
-                result_list.append(['字号', self.font_size, r0.font.size])
+                result_list.append(['字号', self.font_size, getPtorNone(r0.font.size)])
             if self.font_color !='': 
                 result_list.append(['字色', self.font_color, r0.font.color.rgb])
             if self.font_bold==True: 
@@ -169,18 +174,25 @@ class WordOperations(models.Model):
         if self.paraformat_op:
             p_format = all_paras[matched_list[0]].paragraph_format
             pstyle_format = all_paras[matched_list[0]].style.paragraph_format
+
             if self.para_alignment !='': 
-                result_list.append(['对齐', self.para_alignment, p_format.alignment, pstyle_format.alignment])
+                para_alignment = PARA_ALIGNMENT_CHOICES[0][0]  ## 'LEFT (0)'
+                if p_format.alignment is not None:
+                    para_alignment = p_format.alignment
+                elif pstyle_format.alignment is not None:
+                    para_alignment = pstyle_format.alignment
+
+                result_list.append(['对齐', self.para_alignment, str(para_alignment), str(pstyle_format.alignment)])
             if self.para_left_indent !='': 
-                result_list.append(['左缩进', self.para_left_indent, p_format.left_indent])
+                result_list.append(['左缩进', self.para_left_indent, getPtorNone(p_format.left_indent)])
             if self.para_right_indent !='': 
-                result_list.append(['右缩进', self.para_right_indent, p_format.right_indent])
+                result_list.append(['右缩进', self.para_right_indent, getPtorNone(p_format.right_indent)])
             # if self.para_first_line_indent !='' and self.para_first_line_indent_size !='': 
                 # result_list.append(self.para_first_line_indent+self.para_first_line_indent_size+'磅')
             if self.para_space_before !='': 
-                result_list.append(['段前', self.para_space_before, p_format.space_before])
+                result_list.append(['段前', self.para_space_before, getPtorNone(p_format.space_before)])
             if self.para_space_after !='':  
-                result_list.append(['段后', self.para_space_after, p_format.space_after])
+                result_list.append(['段后', self.para_space_after, getPtorNone(p_format.space_after)])
             # if self.para_line_spacing_rule !='': 
             #     if self.para_line_spacing_rule in ('单倍行距','双倍行距','1.5倍行距'):
             #         result_list.append(self.para_line_spacing_rule)
@@ -195,7 +207,7 @@ class WordOperations(models.Model):
             if self.keep_together==True: 
                 result_list.append(['段中不分页',self.keep_together,p_format.keep_together])
             if self.widow_control==True: 
-                result_list.append(['孤行控制',self.widow_control,p_format.widow_control])
+                result_list.append(['孤行控制', None, p_format.widow_control])
 
         return result_list
 
@@ -237,7 +249,9 @@ class WordOperations(models.Model):
     def paraformat_description(self):
         if self.paraformat_op:
             setting_list=[]
-            if self.para_alignment !='': setting_list.append(self.para_alignment)
+            if self.para_alignment !='': 
+                setting_list.append([x[1] for x in PARA_ALIGNMENT_CHOICES if x[0]==self.para_alignment][0])
+                # setting_list.append(self.para_alignment)
             if self.para_left_indent !='': setting_list.append('左缩进'+self.para_left_indent+'磅')
             if self.para_right_indent !='': setting_list.append('右缩进'+self.para_right_indent+'磅')
             if self.para_first_line_indent !='' and self.para_first_line_indent_size !='': 
