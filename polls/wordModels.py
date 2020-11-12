@@ -89,6 +89,10 @@ class WordQuestion(models.Model):
         verbose_name='内部测试用word文件.docx'
     )
 
+def getColororNone(c):
+    if c is None:
+        return c
+    return c.rgb
 
 def getPtorNone(sz):
     if sz is None:
@@ -169,21 +173,21 @@ class WordOperations(models.Model):
 
         if self.font_op:
             r0 = all_paras[matched_list[0]].runs[0]
+            pstyle_font = all_paras[matched_list[0]].style.font
             if self.font_name_chinese !='': 
-                result_list.append(['中文', self.font_name_chinese, r0.font.name_eastasia])
+                result_list.append(['中文', self.font_name_chinese, r0.font.name_eastasia or pstyle_font.name_eastasia, r0.font.name_eastasia, pstyle_font.name_eastasia])
             if self.font_name_ascii !='':  
-                result_list.append(['西文', self.font_name_ascii, r0.font.name])
+                result_list.append(['西文', self.font_name_ascii, r0.font.name or pstyle_font.name, r0.font.name, pstyle_font.name])
             if self.font_size !='': 
-                result_list.append(['字号', self.font_size, getPtorNone(r0.font.size)])
+                result_list.append(['字号', self.font_size, getPtorNone(r0.font.size) or getPtorNone(pstyle_font.size) ,getPtorNone(r0.font.size), getPtorNone(pstyle_font.size)])
             if self.font_color !='': 
-                result_list.append(['字色', self.font_color, r0.font.color.rgb])
+                result_list.append(['字色', self.font_color, str(r0.font.color.rgb or pstyle_font.color.rgb), str(r0.font.color.rgb), str(pstyle_font.color.rgb)])
             if self.font_bold==True: 
-                result_list.append(['粗体', self.font_bold, r0.font.bold])
+                result_list.append(['粗体', self.font_bold, r0.font.bold or pstyle_font.bold, r0.font.bold, pstyle_font.bold])
             if self.font_italic==True: 
-                result_list.append(['斜体', self.font_italic, r0.font.italic])
+                result_list.append(['斜体', self.font_italic, r0.font.italic or pstyle_font.italic, r0.font.italic, pstyle_font.italic])
             if self.font_underline !='': 
-                result_list.append(['下划线', self.font_underline, str(r0.font.underline)])
-                # result_list.append(['下划线', self.font_underline, str(r0.font.underline)])
+                result_list.append(['下划线', self.font_underline, str(r0.font.underline or pstyle_font.underline) ,str(r0.font.underline), str(pstyle_font.underline)])
 
         if self.paraformat_op:
             p_format = all_paras[matched_list[0]].paragraph_format
@@ -280,7 +284,7 @@ class WordOperations(models.Model):
             if self.font_name_chinese !='': setting_list.append('中文'+self.font_name_chinese)
             if self.font_name_ascii !='':  setting_list.append('西文'+self.font_name_ascii)
             if self.font_size !='': setting_list.append('字号'+self.font_size+'磅')
-            if self.font_color !='': setting_list.append(self.font_color)
+            if self.font_color !='': setting_list.append('标准色'+[x[1] for x in FONT_COLOR_CHOICES if x[0]==self.font_color][0])
             if self.font_bold==True: setting_list.append('粗体')
             if self.font_italic==True: setting_list.append('斜体')
             if self.font_underline !='': 
@@ -569,7 +573,7 @@ class WordOperations(models.Model):
     font_bold = models.BooleanField('粗体', blank=True, default='')
     font_italic = models.BooleanField('斜体', blank=True, default='')
     font_underline = models.CharField('下划线', choices=FONT_UNDERLINE_CHOICES, max_length=200, blank=True, default='')
-    font_color = models.CharField('字体颜色', choices=FONT_COLOR_CHOICES, max_length=200, blank=True, default='')
+    font_color = models.CharField('字色(标准色)', choices=FONT_COLOR_CHOICES, max_length=200, blank=True, default='')
 
     ############## 段落格式设置
     paraformat_op = models.BooleanField('是否考查段落格式设置？', default=False)
@@ -601,7 +605,7 @@ class WordOperations(models.Model):
     style_font_bold = models.BooleanField('粗体', default=False)
     style_font_italic = models.BooleanField('斜体', default=False)
     style_font_underline = models.CharField('下划线', choices=FONT_UNDERLINE_CHOICES, max_length=200, blank=True, default='')
-    style_font_color = models.CharField('字体颜色', choices=FONT_COLOR_CHOICES, max_length=200, blank=True, default='')
+    style_font_color = models.CharField('字色(标准色)', choices=FONT_COLOR_CHOICES, max_length=200, blank=True, default='')
 
     style_para_alignment = models.CharField('段落对齐', choices=PARA_ALIGNMENT_CHOICES, max_length=200, blank=True, default='')
     style_para_left_indent = models.CharField('左侧缩进(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')

@@ -1,19 +1,15 @@
 
 
 FONT_NAME_ASCII_CHOICES = [
-    ('MS Gothic', 'MS Gothic'),
-    ('MS Mincho', 'MS Mincho'),
-    ('Yu Gothic', 'Yu Gothic'),
     ('Arial Black', 'Arial Black'),
     ('Bahnschrift', 'Bahnschrift'),
     ('Book Antiqua', 'Book Antiqua'),
-    ('Calibri', 'Calibri'),
     ('Dubai', 'Dubai'),
     ('Impact', 'Impact'),
 ]
 
 FONT_NAME_CHINESE_CHOICES = [
-    ('宋体', '宋体'),
+    # ('宋体', '宋体'),
     ('黑体', '黑体'),
     ('华文仿宋', '华文仿宋'),
     ('楷体', '楷体'),
@@ -44,8 +40,8 @@ FONT_NAME_CHINESE_CHOICES = [
 FONT_SIZE_CHOICES = [
     ('5','5' ),
     ('8','8' ),
-    ('10','10' ),
-    ('12','12' ),
+    # ('10','10' ),
+    # ('12','12' ),
     ('14','14' ),
     ('18','18' ),
     ('22','22' ),
@@ -56,9 +52,13 @@ FONT_SIZE_CHOICES = [
 ]
 
 FONT_COLOR_CHOICES = [
-    ('红色', '红色'),
-    ('黄色', '黄色'),
-    ('绿色', '绿色'),
+    ('C00000', '深红'),
+    ('FF0000', '红色'),
+    ('92D050', '浅绿'),
+    ('00B050', '绿色'),
+    ('00B0F0', '浅蓝'),
+    ('0070C0', '蓝色'),
+    ('7030A0', '紫色'),
 ]
 
 FONT_UNDERLINE_CHOICES = [
