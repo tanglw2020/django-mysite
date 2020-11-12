@@ -96,7 +96,7 @@ def getColororNone(c):
 
 def getPtorNone(sz):
     if sz is None:
-        return sz
+        return 0
     return sz.pt
 
 def getSzorNone(sz1, sz2):
@@ -108,10 +108,10 @@ def getSzorNone(sz1, sz2):
 
 def getLineorNone(sz1, sz2):
     if sz1 is not None:
-        return str(int(sz1))
+        return ((sz1))
     if sz2 is not None:
-        return str(int(sz2))
-    return str(sz1)
+        return ((sz2))
+    return 0
 
 # Create your models here.
 class WordOperations(models.Model):
@@ -179,7 +179,7 @@ class WordOperations(models.Model):
             if self.font_name_ascii !='':  
                 result_list.append(['西文', self.font_name_ascii, r0.font.name or pstyle_font.name, r0.font.name, pstyle_font.name])
             if self.font_size !='': 
-                result_list.append(['字号', self.font_size, getPtorNone(r0.font.size) or getPtorNone(pstyle_font.size) ,getPtorNone(r0.font.size), getPtorNone(pstyle_font.size)])
+                result_list.append(['字号', float(self.font_size), getPtorNone(r0.font.size) or getPtorNone(pstyle_font.size) ,getPtorNone(r0.font.size), getPtorNone(pstyle_font.size)])
             if self.font_color !='': 
                 result_list.append(['字色', self.font_color, str(r0.font.color.rgb or pstyle_font.color.rgb), str(r0.font.color.rgb), str(pstyle_font.color.rgb)])
             if self.font_bold==True: 
@@ -203,32 +203,32 @@ class WordOperations(models.Model):
                 result_list.append(['对齐', self.para_alignment, str(para_alignment), str(pstyle_format.alignment)])
             if self.para_left_indent !='': 
                 result_list.append(['左缩进', 
-                self.para_left_indent,getSzorNone(p_format.left_indent, pstyle_format.left_indent), 
+                float(self.para_left_indent), getSzorNone(p_format.left_indent, pstyle_format.left_indent), 
                 getPtorNone(p_format.left_indent), 
                 getPtorNone(pstyle_format.left_indent)])
             if self.para_right_indent !='': 
                 result_list.append(['右缩进', 
-                self.para_left_indent, getSzorNone(p_format.right_indent, pstyle_format.right_indent), 
+                float(self.para_left_indent), getSzorNone(p_format.right_indent, pstyle_format.right_indent), 
                 getPtorNone(p_format.right_indent), 
                 getPtorNone(pstyle_format.right_indent)])
 
             if self.para_first_line_indent !='' and self.para_first_line_indent_size !='':
                 if self.para_first_line_indent == PARA_FIRST_LINE_INDENT_CHOICES[0][0]:  ## +
-                    result_list.append(['首行缩进', self.para_first_line_indent_size, 
+                    result_list.append(['首行缩进', float(self.para_first_line_indent_size), 
                     getSzorNone(p_format.first_line_indent, pstyle_format.first_line_indent),
                         p_format.first_line_indent, pstyle_format.first_line_indent])
                 else:  ## -
-                    result_list.append(['首行缩进', self.para_first_line_indent_size, 
+                    result_list.append(['首行缩进', float(self.para_first_line_indent_size), 
                     -getSzorNone(p_format.first_line_indent, pstyle_format.first_line_indent),
                         p_format.first_line_indent, pstyle_format.first_line_indent])
 
             if self.para_space_before !='': 
-                result_list.append(['段前', self.para_space_before, 
+                result_list.append(['段前', float(self.para_space_before), 
                 getSzorNone(p_format.space_before, pstyle_format.space_before), 
                 getPtorNone(p_format.space_before), 
                 getPtorNone(pstyle_format.space_before)])
             if self.para_space_after !='':  
-                result_list.append(['段后', self.para_space_after, 
+                result_list.append(['段后', float(self.para_space_after), 
                 getSzorNone(p_format.space_after, pstyle_format.space_after), 
                 getPtorNone(p_format.space_after), 
                 getPtorNone(pstyle_format.space_after)])
@@ -242,7 +242,7 @@ class WordOperations(models.Model):
                 result_list.append(['行间距规则', self.para_line_spacing_rule, str(p_format.line_spacing_rule or pstyle_format.line_spacing_rule), \
                     str(pstyle_format.line_spacing_rule)])
                 if self.para_line_spacing_rule not in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:3]):
-                    result_list.append(['行距', self.para_line_spacing, getLineorNone(p_format.line_spacing, pstyle_format.line_spacing), 
+                    result_list.append(['行距', float(self.para_line_spacing), getLineorNone(p_format.line_spacing, pstyle_format.line_spacing), 
                     pstyle_format.line_spacing])
 
             if self.page_break_before==True: 
