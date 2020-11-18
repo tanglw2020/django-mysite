@@ -15,8 +15,8 @@ class WordQuestion(models.Model):
         return '题目'+str(self.id)+':Word文件'+str(self.upload_docx.id)
 
     class Meta:
-        verbose_name = 'Word题目'
-        verbose_name_plural = 'Word题目'
+        verbose_name = 'Word操作题目'
+        verbose_name_plural = 'Word操作题目'
 
     def file_path(self):
         return self.upload_docx.upload.name
@@ -31,7 +31,7 @@ class WordQuestion(models.Model):
             )
         else:
             return '5'
-    word_op_numb.short_description = '题目数量'
+    word_op_numb.short_description = '操作小题数目'
 
     def word_op_description(self):
         result_list = []
@@ -378,7 +378,7 @@ class WordOperations(models.Model):
 
     def image_description(self):
         if self.image_op:
-            image_desc = '在段落('+self.para_text_simple()+')后以'+self.image_position_style+'格式插入图片"'+self.upload_image_file.name.split('/')[-1]+'"'
+            image_desc = '在段落【'+self.para_text_simple()+'】后以'+self.image_position_style+'格式插入图片"'+self.upload_image_file.name.split('/')[-1]+'"'
             if self.image_width !='':
                 image_desc = image_desc + '、宽度'+self.image_width+'厘米'
             if self.image_height !='': 

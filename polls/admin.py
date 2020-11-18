@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .wordModels import WordOperations, WordQuestion
 from .wordFileModels import  WordDocxFile, WordDocxFileTest
+from .choiceQuestionModels import ChoiceQuestion
 
 # Register your models here.
 class WordOperationsInline(admin.StackedInline):
@@ -80,6 +81,12 @@ class WordQuestionAdmin(admin.ModelAdmin):
 
         inlines = [WordOperationsInline]
 
-admin.site.register(WordOperations, WordOperationsAdmin)
+class ChoiceQuestionAdmin(admin.ModelAdmin):
+        list_display = ('__str__','description', 'answer')
+        list_display_links = ('description',)
+        # list_editable = ( 'answer',)
+
+# admin.site.register(WordOperations, WordOperationsAdmin)
+admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
 admin.site.register(WordQuestion, WordQuestionAdmin)
 admin.site.register([WordDocxFile,WordDocxFileTest])
