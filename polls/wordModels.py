@@ -26,7 +26,7 @@ class WordQuestion(models.Model):
         op_numb = len(self.wordoperations_set.all())
         if op_numb != 5:
             return format_html(
-            '<b style="color:red;">{}[不等于5]</b>',
+            '<b style="background-color:red;">{} [不等于5]</b>',
             str(op_numb),
             )
         else:
@@ -256,6 +256,21 @@ class WordOperations(models.Model):
                 if p_format.widow_control==False or (p_format.widow_control is None and pstyle_format.widow_control==False):
                     widow_control = False
                 result_list.append(['孤行控制', True, widow_control, p_format.widow_control , pstyle_format.widow_control])
+
+        if self.image_op:
+            all_images = document_test.inline_shapes
+            if len(all_images)>0:
+                result_list.append(['插入图片','True','True',])
+                if self.image_width !='':
+                    result_list.append(['图片宽度', float(self.image_width), all_images[0].width.cm,])
+                if self.image_height !='': 
+                    result_list.append(['图片高度', float(self.image_height), all_images[0].height.cm,])
+            else:
+                result_list.append(['插入图片','True','False',])
+                if self.image_width !='':
+                    result_list.append(['图片宽度', float(self.image_width), 0,])
+                if self.image_height !='': 
+                    result_list.append(['图片高度', float(self.image_height), 0,])
 
         return result_list
 
@@ -561,12 +576,12 @@ class WordOperations(models.Model):
     para_text = models.TextField('要考查的段落内容')
 
     ############## 文字查找替换
-    char_edit_op = models.BooleanField('是否考查文字查找替换？', default=False)
+    char_edit_op = models.BooleanField('考查文字查找替换？', default=False)
     char_edit_origin = models.CharField('原词', max_length=200, blank=True, default='')
     char_edit_replace = models.CharField('替换为', max_length=200, blank=True, default='')
 
     ############## 字体设置
-    font_op = models.BooleanField('是否考查字体设置？', default=False)
+    font_op = models.BooleanField('考查字体设置？', default=False)
     font_name_ascii = models.CharField('英文字体', choices=FONT_NAME_ASCII_CHOICES, max_length=200, blank=True, default='') 
     font_name_chinese = models.CharField('中文字体', choices=FONT_NAME_CHINESE_CHOICES, max_length=200, blank=True, default='')
     font_size = models.CharField('字号(磅)', choices=FONT_SIZE_CHOICES, max_length=200, blank=True, default='')
@@ -576,7 +591,7 @@ class WordOperations(models.Model):
     font_color = models.CharField('字色(标准色)', choices=FONT_COLOR_CHOICES, max_length=200, blank=True, default='')
 
     ############## 段落格式设置
-    paraformat_op = models.BooleanField('是否考查段落格式设置？', default=False)
+    paraformat_op = models.BooleanField('考查段落格式设置？', default=False)
     para_alignment = models.CharField('段落对齐', choices=PARA_ALIGNMENT_CHOICES, max_length=200, blank=True, default='')
     para_left_indent = models.CharField('左侧缩进(磅)', choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
     para_right_indent = models.CharField('右侧缩进(磅)', choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
@@ -597,7 +612,7 @@ class WordOperations(models.Model):
     widow_control = models.BooleanField('孤行控制', default=False)
 
     ############## 样式设置
-    style_op = models.BooleanField('是否考查样式设置？', default=False)
+    style_op = models.BooleanField('考查样式设置？', default=False)
     style_name = models.CharField('样式名称', choices=STYLE_NAME_CHOICES, max_length=200, blank=True, default='') 
     style_font_name_ascii = models.CharField('英文字体', choices=FONT_NAME_ASCII_CHOICES, max_length=200, blank=True, default='') 
     style_font_name_chinese = models.CharField('中文字体', choices=FONT_NAME_CHINESE_CHOICES, max_length=200, blank=True, default='')
@@ -624,37 +639,10 @@ class WordOperations(models.Model):
     style_widow_control = models.BooleanField('孤行控制', default=False)
 
     ############## 图片插入
-    image_op = models.BooleanField('是否考查图片插入？', default=False)
+    image_op = models.BooleanField('考查图片插入？', default=False)
     image_position_style = models.CharField('位置类型', choices=IMAGE_POSITION_STYLE_CHOICES, max_length=200, default='嵌入文本行中')
     image_width = models.CharField('图像宽(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
     image_height = models.CharField('图像高(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
     upload_image_file = models.FileField(upload_to='uploads_image/', null=True, blank=True, 
     validators=[validate_image], verbose_name='上传图片')
 
-def validate_operation_list(value):
-    operation_list = value.all()
-    raise ValidationError(
-            _('操作题数量不足5个'),
-            params={'value': value.id},
-        )
-
-    # def save(self, *args, **kwargs):
-    #     op_list = [x for x in  self.word_operation_list.all()]
-    #     print(len(op_list))
-    #     if len(op_list) < 5 :
-            
-    #         return # Yoko shall never have her own blog!
-    #     else:
-    #         super().save(*args, **kwargs)
-
-    # def clean(self):
-
-    #     op_list = [x for x in  self.word_operation_list.all()]
-    #     op_err = [self.upload_docx.id==x.upload_docx.id  for x in  self.word_operation_list.all()]
-
-    #     print(len(op_list))
-    #     # if len(op_list) != 5:
-    #         # raise ValidationError({'word_operation_list':_('Word操作题个数不等于5')})
-
-    #     for i in range(len(op_err)):
-    #         if(op_err[i]==False): raise ValidationError({'word_operation_list':_('第'+str(i+1)+'个操作题的Word文件不等于此处上传的Word文件')})

@@ -21,17 +21,16 @@ class ChoiceQuestion(models.Model):
 
     def description(self):
         choice_list = [
-            ['black', 'A. '+ self.choice_1], 
-            ['black', 'B. '+  self.choice_2], 
-            ['black', 'C. '+  self.choice_3], 
-            ['black', 'D. '+  self.choice_4], 
+            ['white', 'A. '+ self.choice_1], 
+            ['white', 'B. '+  self.choice_2], 
+            ['white', 'C. '+  self.choice_3], 
+            ['white', 'D. '+  self.choice_4], 
             ]
-        choice_list[int(self.answer)-1][0] = 'green'
+        choice_list[int(self.answer)-1][0] = 'Lime'
 
-        return format_html(self.question_text)+ \
-                format_html("<ul>") + \
+        return format_html("<ul>") + \
                 format_html_join(
-                '\n', '<li style="color:{};">{}</li>',
+                '\n', '<li style="background-color:{};">{}</li>',
                 ((x[0], x[1]) for x in choice_list)
                 ) \
                 + format_html("</ul>")
