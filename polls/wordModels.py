@@ -283,6 +283,8 @@ class WordOperations(models.Model):
             op_desc_all = '将段落【'+self.para_text_simple()+'】'+'，'.join(description_list)+'。'
         if len(self.image_description()):
             op_desc_all = op_desc_all + self.image_description() +'。'
+        if len(self.table_description()):
+            op_desc_all = op_desc_all + self.table_description() +'。'
         return op_desc_all
     operation_description_all.short_description = '题目文字描述'
 
@@ -403,9 +405,26 @@ class WordOperations(models.Model):
             return ''
     image_description.short_description = '图片插入描述'
 
+    def table_description(self):
+        if self.table_op:
+            table_desc = '将内容【'+self.para_text_simple()+'】生成表格'
+            if self.table_alignment!='':
+                table_desc = table_desc +'， 表格'+ [x[1] for x in TABLE_ALIGNMENT_CHOICES if x[0]==self.table_alignment][0]
+            if self.table_style!='':
+                table_desc = table_desc +'， 应用'+ [x[1] for x in TABLE_STYLE_CHOICES if x[0]==self.table_style][0] +'表格样式'
+            if self.table_autofit:
+                table_desc = table_desc +'， 宽度自动调整' 
+            return table_desc
+        else:
+            return ''
+    table_description.short_description = '表格插入描述'
+
     def clean(self):
-        if not (self.char_edit_op or self.font_op or self.paraformat_op or self.style_op or self.image_op):
+        if not (self.char_edit_op or self.font_op or self.paraformat_op or self.style_op or self.image_op or self.table_op):
             raise ValidationError(_('至少选择一个操作考查'))
+
+        if self.table_op and (self.char_edit_op or self.font_op or self.paraformat_op or self.style_op or self.image_op):
+            raise ValidationError(_('插入表格不能和其他操作同时选择'))
 
         if (self.font_op or self.paraformat_op) and self.style_op:
             raise ValidationError(_('样式和单独的字体和段落格式不应同时设置'))
@@ -640,9 +659,15 @@ class WordOperations(models.Model):
 
     ############## 图片插入
     image_op = models.BooleanField('考查图片插入？', default=False)
-    image_position_style = models.CharField('位置类型', choices=IMAGE_POSITION_STYLE_CHOICES, max_length=200, default='嵌入文本行中')
+    image_position_style = models.CharField('位置类型', choices=IMAGE_POSITION_STYLE_CHOICES, max_length=20, default='嵌入文本行中')
     image_width = models.CharField('图像宽(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
     image_height = models.CharField('图像高(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
     upload_image_file = models.FileField(upload_to='uploads_image/', null=True, blank=True, 
     validators=[validate_image], verbose_name='上传图片')
+
+    ############## 表格插入
+    table_op = models.BooleanField('考查表格插入？', default=False)
+    table_alignment = models.CharField('对齐方式', choices=TABLE_ALIGNMENT_CHOICES, max_length=10, default='')
+    table_autofit = models.BooleanField('表格宽度自动调整？', default=False)
+    table_style = models.CharField('表格样式', choices=TABLE_STYLE_CHOICES, max_length=30, default='')
 

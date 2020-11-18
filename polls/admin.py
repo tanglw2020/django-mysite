@@ -9,7 +9,7 @@ class WordOperationsInline(admin.StackedInline):
     extra = 0
 
     fieldsets  = (
-        ('', { 'fields': ('para_text',('char_edit_op','font_op','paraformat_op','style_op','image_op'),)}), 
+        ('', { 'fields': ('para_text',('char_edit_op','font_op','paraformat_op','style_op','image_op','table_op'),)}), 
         ('文字编辑', { 'classes': ('collapse',), 'fields': ('char_edit_origin','char_edit_replace')}), 
         ('字体设置', { 'classes': ('collapse',),'fields': ( 'font_name_chinese', 'font_name_ascii','font_size',
                                  'font_color', 'font_underline',('font_bold','font_italic'),
@@ -34,6 +34,9 @@ class WordOperationsInline(admin.StackedInline):
         ('图像插入(默认原文档无图片)', { 'classes': ( 'collapse',), 'fields': ('upload_image_file',
                                 'image_position_style',
                                 ('image_width', 'image_height'), 
+                                )}), 
+        ('表格插入', { 'classes': ( 'collapse',), 'fields': (
+                                'table_autofit', 'table_alignment',  'table_style', 
                                 )}), 
         )
 

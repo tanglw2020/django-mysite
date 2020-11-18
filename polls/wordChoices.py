@@ -136,3 +136,18 @@ LINE_NUM_CHOICES = [
 IMAGE_POSITION_STYLE_CHOICES = [
     ('嵌入文本行中','嵌入文本行中'),
 ]
+
+TABLE_ALIGNMENT_CHOICES = [
+    ('None','左对齐'),
+    ('CENTER (1)','居中'),
+    ('RIGHT (2)','右对齐'),
+]
+
+TABLE_STYLE_CHOICES = [
+    ('Grid Table Light','网格型浅色'),
+    ('Plain Table 3','无格式表格3'),
+    ('Grid Table 2 Accent 1','网格表2着色1'),
+    ('Grid Table 2 Accent 1','网格表5深色'),
+    ('List Table 1 Light','清单表1浅色'),
+    ('List Table 6 Colorful','清单表6彩色'),
+]
