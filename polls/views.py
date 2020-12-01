@@ -37,14 +37,15 @@ def login(request):
             exam = Exam.objects.get(id=exam_id)
             student_set = exam.student_set.all()
             if student_set.filter(student_id=student_id).exists():
-                user = student_set.get(student_id=student_id)
-                return HttpResponse('exist student_id: '+user.student_id)
+                # user = student_set.get(student_id=student_id)
+                return HttpResponseRedirect(reverse('polls:exampage', args=(exam_id, student_id)))
             else:
                 student_set.create( exam_info_id=exam_id,
                                     class_name = class_name,
                                     name = name, 
                                     student_id = student_id)
-                return HttpResponse('添加: '+ str(student_id))
+                return HttpResponseRedirect(reverse('polls:exampage', args=(exam_id, student_id)))
+                # return HttpResponse('添加: '+ str(student_id))
     else:
         form = StudentForm()
 
@@ -52,3 +53,7 @@ def login(request):
         'form': form,
         }
     return render(request, 'polls/login.html', context)
+
+def examPage(request, exam_id, student_id):
+    return HttpResponse('考试:{} 学号:{} '.format(exam_id, student_id))
+    
