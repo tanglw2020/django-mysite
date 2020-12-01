@@ -53,12 +53,14 @@ class ChoiceQuestionAdmin(admin.ModelAdmin):
         list_display_links = ('question_text',)
 
 class StudentAdmin(admin.ModelAdmin):
-        list_display = ('exam_name', 'class_name', 'name', 'student_id',)
+        list_display = ('exam_id', 'exam_name',  'class_name', 'name', 'student_id',)
         list_display_links = ('name', 'student_id')
+        search_fields = ['exam_info__id']
 
 class ExamAdmin(admin.ModelAdmin):
-        list_display = ('__str__', 'exam_special_id', )
-        list_display_links = ('__str__', 'exam_special_id')
+        list_display = ('special_id', 'exam_type',  'exam_name', )
+        list_display_links = ('special_id', 'exam_name')
+        # list_filter = ('exam_special_id', )
 
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
 admin.site.register(WordQuestion, WordQuestionAdmin)

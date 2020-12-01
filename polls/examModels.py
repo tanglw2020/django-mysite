@@ -17,12 +17,16 @@ class Exam(models.Model):
     class Meta:
         verbose_name = '考试信息'
         verbose_name_plural = '考试信息'
-    def __str__(self):
+    def exam_long_name(self):
         return  self.exam_type+'-'+self.exam_name
+    exam_long_name.short_description = '考试名称'
 
-    def exam_special_id(self):
+    def __str__(self):
         return  self.pub_date.date().isoformat()+'-'+str(self.id)
-    exam_special_id.short_description = '考试编码(考生登录时填写)'
+
+    def special_id(self):
+        return  str(self.id)
+    special_id.short_description = '考试编号(考生登录时使用)'
 
 
 

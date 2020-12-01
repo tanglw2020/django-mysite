@@ -11,7 +11,7 @@ class Student(models.Model):
     exam_info = models.ForeignKey(
         Exam,
         on_delete=models.CASCADE, blank=True, default='',
-        verbose_name='考试信息'
+        verbose_name='考试编号(考试登录时填写)'
     )
     class_name = models.CharField('班级',  max_length=50)
     name = models.CharField('姓名',  max_length=50)
@@ -20,11 +20,16 @@ class Student(models.Model):
     class Meta:
         verbose_name = '考生'
         verbose_name_plural = '考生'
+
     def __str__(self):
         return str(self.class_name)+'-'+str(self.name)+'-'+self.student_id
 
     def exam_name(self):
-        return self.exam_info.__str__()
-    exam_name.short_description = '考场'
+        return self.exam_info.exam_name
+    exam_name.short_description = '考试名称'
+
+    def exam_id(self):
+            return self.exam_info.id
+    exam_id.short_description = '考试编号'
 
 
