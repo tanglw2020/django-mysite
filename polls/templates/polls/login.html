@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+</head>
+
+<body>
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% include "polls/form_item.html" with form_item=form.exam_id %}
+        {% include "polls/form_item.html" with form_item=form.class_name %}
+        {% include "polls/form_item.html" with form_item=form.name %}
+        {% include "polls/form_item.html" with form_item=form.student_id %}
+
+        <input type="submit" value="登录">
+    </form>
+</body>
+
+</html>

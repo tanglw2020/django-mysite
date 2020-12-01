@@ -2,7 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django import forms
-from .forms import WordOpForm, WordUploadForm
+from .forms import StudentForm
+from .studentModels import Student
+from .examModels import Exam
 
 def index(request):
     action_list = [
@@ -15,67 +17,38 @@ def index(request):
     context = {'action_list': action_list}
     return render(request, 'polls/index.html', context)
 
-def scan_question(request):
-    response = 'scan_question'
-    return HttpResponse(response)
 
-def add_choice_question(request):
-    response = 'add_choice_question'
-    return HttpResponse(response)
+def login(request):
 
-def add_word_question(request):
-    
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = WordUploadForm(request.POST, request.FILES)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            print(request.FILES['file_upload'])
+        # 如果登录成功，绑定参数到cookie中，set_cookie
+        form = StudentForm(request.POST)
 
-            # redirect to a new URL:
-            return HttpResponseRedirect(reverse('polls:set_word_operation'))
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            # print(cleaned_data)
+
+            # 查询用户是否在数据库中
+            exam_id = cleaned_data['exam_id']
+            student_id = cleaned_data['student_id']
+            name = cleaned_data['name']
+            class_name = cleaned_data['class_name']
+
+            exam = Exam.objects.get(id=exam_id)
+            student_set = exam.student_set.all()
+            if student_set.filter(student_id=student_id).exists():
+                user = student_set.get(student_id=student_id)
+                return HttpResponse('exist student_id: '+user.student_id)
+            else:
+                student_set.create( exam_info_id=exam_id,
+                                    class_name = class_name,
+                                    name = name, 
+                                    student_id = student_id)
+                return HttpResponse('添加: '+ str(student_id))
     else:
-        form = WordUploadForm()
+        form = StudentForm()
 
     context = {
         'form': form,
         }
-    return render(request, 'polls/add_word_question.html', context)
-
-def add_excel_question(request):
-    response = 'add_excel_question'
-    return HttpResponse(response)
-
-def add_ppt_question(request):
-    response = 'add_ppt_question'
-    return HttpResponse(response)
-
-def set_word_operation(request):
-
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = WordOpForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            print(form.cleaned_data)
-
-            ## cleaned_data 可以用于重新初始化
-            # form2 = WordOpForm(form.cleaned_data)
-            # context = {
-            # 'title': "Word操作题录入页面",
-            # 'form': form2
-            # }
-            # return render(request, 'polls/input_word_operation.html', context)
-            
-            # redirect to a new URL:
-            return HttpResponseRedirect(reverse('polls:set_word_operation'))
-    else:
-        form = WordOpForm()
-
-    context = {
-        'title': "Word操作题录入页面",
-        'form': form,
-        }
-    return render(request, 'polls/set_word_operation.html', context)
+    return render(request, 'polls/login.html', context)
