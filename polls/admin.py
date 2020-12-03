@@ -3,7 +3,9 @@ from .wordModels import WordOperations, WordQuestion
 from .wordFileModels import  WordDocxFile, WordDocxFileTest
 from .choiceQuestionModels import ChoiceQuestion
 from .studentModels import Student
-from .examModels import Exam
+from .examModels import Exam, ExamPaper, EXAM_TYPE_CHOICES
+
+import random
 
 # Register your models here.
 class WordOperationsInline(admin.StackedInline):
@@ -60,13 +62,28 @@ class StudentAdmin(admin.ModelAdmin):
 class ExamAdmin(admin.ModelAdmin):
         list_display = ('special_id', 'exam_type',  'exam_name', )
         list_display_links = ('special_id', 'exam_name')
-        # list_filter = ('exam_special_id', )
+
+class ExamPaperAdmin(admin.ModelAdmin):
+        list_display = ('__str__', 'choicequestion_list', )
+
+        actions = ['add_random_50']
+
+        def add_random_50(self, request, queryset):
+                cq_id_set = [str(item.id) for item in ChoiceQuestion.objects.all()]
+
+                for i in range(50):
+                        choicequestion_list = ','.join(random.sample(cq_id_set, 5))
+                        ep = ExamPaper(exam_type=EXAM_TYPE_CHOICES[0][0], choicequestion_list=choicequestion_list)
+                        ep.save()
+        add_random_50.short_description = " 自动生成50套试卷"
+
 
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
 admin.site.register(WordQuestion, WordQuestionAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Exam, ExamAdmin)
-admin.site.register([WordDocxFile,WordDocxFileTest,])
+admin.site.register(ExamPaper, ExamPaperAdmin)
+admin.site.register([WordDocxFile, WordDocxFileTest,  ])
 
 
 # admin.site.register(WordOperations, WordOperationsAdmin)

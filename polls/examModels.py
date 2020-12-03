@@ -29,4 +29,19 @@ class Exam(models.Model):
     special_id.short_description = '考试编号(考生登录时使用)'
 
 
+class ExamPaper(models.Model):
+    
+    exam_type = models.CharField('考试类型', choices = EXAM_TYPE_CHOICES, max_length=50)
+    choicequestion_list = models.CharField('选择题', max_length=200, default='')
+    systemquestion_id = models.PositiveIntegerField('系统操作题', default=0)
+    internetquestion_id = models.PositiveIntegerField('上网题', default=0)
+    wordquestion_id = models.PositiveIntegerField('word操作题', default=0)
+    excelquestion_id = models.PositiveIntegerField('excel操作题', default=0)
+    pptquestion_id = models.PositiveIntegerField('ppt操作题', default=0)
 
+    class Meta:
+        verbose_name = '试卷'
+        verbose_name_plural = '试卷'
+
+    def __str__(self):
+        return  self.exam_type+'-'+str(self.id)

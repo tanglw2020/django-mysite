@@ -37,7 +37,6 @@ def login(request):
             exam = Exam.objects.get(id=exam_id)
             student_set = exam.student_set.all()
             if student_set.filter(student_id=student_id).exists():
-                # user = student_set.get(student_id=student_id)
                 return HttpResponseRedirect(reverse('polls:exampage', args=(exam_id, student_id)))
             else:
                 student_set.create( exam_info_id=exam_id,
@@ -45,7 +44,6 @@ def login(request):
                                     name = name, 
                                     student_id = student_id)
                 return HttpResponseRedirect(reverse('polls:exampage', args=(exam_id, student_id)))
-                # return HttpResponse('添加: '+ str(student_id))
     else:
         form = StudentForm()
 
