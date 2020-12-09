@@ -83,7 +83,7 @@ admin.site.register(WordQuestion, WordQuestionAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Exam, ExamAdmin)
 admin.site.register(ExamPaper, ExamPaperAdmin)
-admin.site.register([WordDocxFile, WordDocxFileTest,  ])
+admin.site.register([WordDocxFile, WordDocxFileTest, ])
 
 
 # admin.site.register(WordOperations, WordOperationsAdmin)

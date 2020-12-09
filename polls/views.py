@@ -2,9 +2,12 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django import forms
+from django.http import Http404
+
 from .forms import StudentForm
 from .studentModels import Student
-from .examModels import Exam
+from .examModels import Exam, ExamPaper
+from .choiceQuestionModels import ChoiceQuestion
 
 def index(request):
     action_list = [
@@ -53,5 +56,31 @@ def login(request):
     return render(request, 'polls/login.html', context)
 
 def examPage(request, exam_id, student_id):
-    return HttpResponse('考试:{} 学号:{} '.format(exam_id, student_id))
+    try:
+        exam = Exam.objects.get(id=exam_id)
+    except Exam.DoesNotExist:
+        raise Http404("exam Paper does not exist 1")
+
+    try:
+        student_set = exam.student_set.all()
+        student = student_set.get(student_id = student_id)
+    except Student.DoesNotExist:
+        raise Http404("exam Paper does not exist 2")
+        
+    exam_paper = ExamPaper.objects.get(pk=60)
+    choicequestion_id_list = [ int(i) for i in exam_paper.choicequestion_list.split(',')]
+    choicequestion_list = [ChoiceQuestion.objects.get(pk=i) for i in choicequestion_id_list]
+    for choicequestion in choicequestion_list:
+        print(choicequestion.question_text)
+    # return HttpResponse('考试:{} 学号:{} choicequestion_list:{}'.format(exam_id, student_id, choicequestion_list))
     
+    context = {
+        'exam_id': exam_id,
+        'student_id': student_id,
+        'student_name': student.name,
+        'choicequestion_list': choicequestion_list,
+        'is_popup': False,
+        'has_permission': True,
+        'is_nav_sidebar_enabled': True,
+        }
+    return render(request, 'polls/exampage.html', context)

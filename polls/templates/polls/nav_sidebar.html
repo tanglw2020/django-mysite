@@ -1,0 +1,35 @@
+{% load i18n %}
+<button class="sticky toggle-nav-sidebar" id="toggle-nav-sidebar" aria-label="{% translate 'Toggle navigation' %}"></button>
+<nav class="sticky" id="nav-sidebar">
+  <div class="current-app module">
+    <table>
+      <caption>
+        试题列表
+      </caption>
+      <tr class="model">
+        <td>选择题</td>
+        <td><a href="{{ cc }}" class="changelink">{% translate '答题' %}</a></td>
+      </tr>
+      <tr class="model">
+        <td>上网题</td>
+        <td><a href="{{ cc }}" class="changelink">{% translate '答题' %}</a></td>
+      </tr>
+      <tr class="model">
+        <td>系统操作题</td>
+        <td><a href="{{ cc }}" class="changelink">{% translate '答题' %}</a></td>
+      </tr>
+      <tr class="model">
+        <td>Word操作题</td>
+        <td><a href="{{ cc }}" class="changelink">{% translate '答题' %}</a></td>
+      </tr>
+      <tr class="model">
+        <td>Excel操作题</td>
+        <td><a href="{{ cc }}" class="changelink">{% translate '答题' %}</a></td>
+      </tr>
+      <tr class="model">
+        <td>PPT操作题</td>
+        <td><a href="{{ cc }}" class="changelink">{% translate '答题' %}</a></td>
+      </tr>
+    </table>
+  </div>
+</nav>
