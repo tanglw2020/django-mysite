@@ -1,0 +1,21 @@
+{% extends "polls/base.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block content %}
+<div id="content-main">
+    <h2>选择题</h2>
+    <a href="{% url 'polls:exampage-choicequestion' exam_id student_id 1 %}" class="changelink">1</a>
+    <a href="{% url 'polls:exampage-choicequestion' exam_id student_id 2 %}" class="changelink">2</a>
+    <a href="{% url 'polls:exampage-choicequestion' exam_id student_id 3 %}" class="changelink">3</a>
+    <a href="{% url 'polls:exampage-choicequestion' exam_id student_id 4 %}" class="changelink">4</a>
+    <a href="{% url 'polls:exampage-choicequestion' exam_id student_id 5 %}" class="changelink">5</a>
+    
+    <h3>{{question_id}} {{choicequestion.question_text}}</h3>
+    <ul>
+        <li> A. {{ choicequestion.choice_1 }}</li>
+        <li> B. {{ choicequestion.choice_2 }}</li>
+        <li> C. {{ choicequestion.choice_3 }}</li>
+        <li> D. {{ choicequestion.choice_4 }}</li>
+    </ul>
+</div>
+{% endblock %}

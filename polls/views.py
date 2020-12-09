@@ -78,10 +78,41 @@ def examPage(request, exam_id, student_id):
         'exam_id': exam_id,
         'student_id': student_id,
         'student_name': student.name,
-        'choicequestion_list': choicequestion_list,
         'is_popup': False,
         'has_permission': True,
         'is_nav_sidebar_enabled': True,
         'exam_time': '90分钟',
         }
     return render(request, 'polls/exampage.html', context)
+
+
+def examPageChoiceQuestioin(request, exam_id, student_id, question_id):
+    try:
+        exam = Exam.objects.get(id=exam_id)
+    except Exam.DoesNotExist:
+        raise Http404("exam Paper does not exist")
+
+    try:
+        student_set = exam.student_set.all()
+        student = student_set.get(student_id = student_id)
+    except Student.DoesNotExist:
+        raise Http404("exam Paper does not exist")
+        
+    exam_paper = ExamPaper.objects.get(pk=60)
+    choicequestion_id_list = [ int(i) for i in exam_paper.choicequestion_list.split(',')]
+    choicequestion_id = choicequestion_id_list[question_id-1]
+    choicequestion = ChoiceQuestion.objects.get(pk=choicequestion_id)
+    # return HttpResponse('考试:{} 学号:{} choicequestion_list:{}'.format(exam_id, student_id, choicequestion_list))
+    
+    context = {
+        'exam_id': exam_id,
+        'student_id': student_id,
+        'question_id': question_id,
+        'student_name': student.name,
+        'choicequestion': choicequestion,
+        'is_popup': False,
+        'has_permission': True,
+        'is_nav_sidebar_enabled': True,
+        'exam_time': '90分钟',
+        }
+    return render(request, 'polls/exampage_choicequestioin.html', context)

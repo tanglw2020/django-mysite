@@ -22,7 +22,7 @@
       </caption>
       <tr class="model">
         <td>选择题</td>
-        <td><a href="{{ cc }}" class="changelink">{% translate '答题' %}</a></td>
+        <td><a href="{% url 'polls:exampage-choicequestion' exam_id student_id 1 %}" class="changelink">{% translate '答题' %}</a></td>
       </tr>
       <tr class="model">
         <td>上网题</td>
