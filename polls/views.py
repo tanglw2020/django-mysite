@@ -82,5 +82,6 @@ def examPage(request, exam_id, student_id):
         'is_popup': False,
         'has_permission': True,
         'is_nav_sidebar_enabled': True,
+        'exam_time': '90分钟',
         }
     return render(request, 'polls/exampage.html', context)
