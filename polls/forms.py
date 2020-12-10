@@ -22,6 +22,6 @@ class StudentForm(forms.Form):
             self.add_error('exam_id', '考试编号不存在')
         else:
             exam = Exam.objects.get(id=exam_id)
-            if exam.pub_date < timezone.now() - datetime.timedelta(days=1):
-                self.add_error('exam_id', '考试编号不是当天的')
+            # if exam.pub_date < timezone.now() - datetime.timedelta(days=1):
+            #     self.add_error('exam_id', '考试编号不是当天的')
         
