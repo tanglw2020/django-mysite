@@ -16,6 +16,7 @@ class Student(models.Model):
     class_name = models.CharField('班级',  max_length=50)
     name = models.CharField('姓名',  max_length=50)
     student_id = models.CharField('学号',  max_length=50)
+    exampage_list = models.CharField('试卷列表',  max_length=50)
 
     class Meta:
         verbose_name = '考生'
@@ -26,7 +27,7 @@ class Student(models.Model):
 
     def exam_name(self):
         return self.exam_info.exam_name
-    exam_name.short_description = '考试名称'
+    exam_name.short_description = '考试学期'
 
     def exam_id(self):
             return self.exam_info.id

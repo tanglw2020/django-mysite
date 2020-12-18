@@ -35,18 +35,12 @@ def login(request):
             exam_id = cleaned_data['exam_id']
             student_id = cleaned_data['student_id']
             name = cleaned_data['name']
-            class_name = cleaned_data['class_name']
+            # class_name = cleaned_data['class_name']
 
-            exam = Exam.objects.get(id=exam_id)
-            student_set = exam.student_set.all()
-            if student_set.filter(student_id=student_id).exists():
-                return HttpResponseRedirect(reverse('polls:exampage', args=(exam_id, student_id)))
-            else:
-                student_set.create( exam_info_id=exam_id,
-                                    class_name = class_name,
-                                    name = name, 
-                                    student_id = student_id)
-                return HttpResponseRedirect(reverse('polls:exampage', args=(exam_id, student_id)))
+            # exam = Exam.objects.get(id=exam_id)
+            # student_set = exam.student_set.all()
+            # if student_set.filter(student_id=student_id).exists():
+            return HttpResponseRedirect(reverse('polls:exampage', args=(exam_id, student_id)))
     else:
         form = StudentForm()
 
@@ -68,7 +62,7 @@ def examPage(request, exam_id, student_id):
         raise Http404("exam Paper does not exist 2")
         
     exam_paper = ExamPaper.objects.get(pk=60)
-    choicequestion_id_list = [ int(i) for i in exam_paper.choicequestion_list.split(',')]
+    choicequestion_id_list = [ int(i) for i in exam_paper.choice_question_list.split(',')]
     choicequestion_list = [ChoiceQuestion.objects.get(pk=i) for i in choicequestion_id_list]
     for choicequestion in choicequestion_list:
         print(choicequestion.question_text)
@@ -99,7 +93,7 @@ def examPageChoiceQuestioin(request, exam_id, student_id, question_id):
         raise Http404("exam Paper does not exist")
         
     exam_paper = ExamPaper.objects.get(pk=60)
-    choicequestion_id_list = [ int(i) for i in exam_paper.choicequestion_list.split(',')]
+    choicequestion_id_list = [ int(i) for i in exam_paper.choice_question_list.split(',')]
     choicequestion_id = choicequestion_id_list[question_id-1]
     choicequestion = ChoiceQuestion.objects.get(pk=choicequestion_id)
     # return HttpResponse('考试:{} 学号:{} choicequestion_list:{}'.format(exam_id, student_id, choicequestion_list))

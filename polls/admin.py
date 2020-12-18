@@ -64,7 +64,7 @@ class ExamAdmin(admin.ModelAdmin):
         list_display_links = ('special_id', 'exam_name')
 
 class ExamPaperAdmin(admin.ModelAdmin):
-        list_display = ('__str__', 'choicequestion_list', )
+        list_display = ('__str__', 'choice_question_list', )
 
         actions = ['add_random_50']
 

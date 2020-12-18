@@ -37,14 +37,11 @@
 <body>
     <div class="login">
     <h1>欢迎登陆考试系统</h1>
-    <form action="" method="POST">
+    <form action="{% url 'polls:login' %}" method="POST">
         {% csrf_token %}
         {{ form.non_field_errors }}
         <div class="form-row">
         {% include "polls/form_item.html" with form_item=form.exam_id %}
-        </div>
-        <div class="form-row">
-        {% include "polls/form_item.html" with form_item=form.class_name %}
         </div>
         <div class="form-row">
         {% include "polls/form_item.html" with form_item=form.name %}
