@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .wordModels import WordOperations, WordQuestion
-from .wordFileModels import  WordDocxFile, WordDocxFileTest
+from .fileModels import  WordDocxFile, WordDocxFileTest
 from .choiceQuestionModels import ChoiceQuestion
+
 from .studentModels import Student
 from .examModels import Exam, ExamPaper, EXAM_TYPE_CHOICES
 
@@ -54,36 +55,36 @@ class ChoiceQuestionAdmin(admin.ModelAdmin):
         list_display = ('__str__', 'question_text', 'description',)
         list_display_links = ('question_text',)
 
-class StudentAdmin(admin.ModelAdmin):
-        list_display = ('exam_id', 'exam_name',  'class_name', 'name', 'student_id',)
-        list_display_links = ('name', 'student_id')
-        search_fields = ['exam_info__id']
+# class StudentAdmin(admin.ModelAdmin):
+#         list_display = ('exam_id', 'exam_name',  'class_name', 'name', 'student_id',)
+#         list_display_links = ('name', 'student_id')
+#         search_fields = ['exam_info__id']
 
-class ExamAdmin(admin.ModelAdmin):
-        list_display = ('special_id', 'exam_type',  'exam_name', )
-        list_display_links = ('special_id', 'exam_name')
+# class ExamAdmin(admin.ModelAdmin):
+#         list_display = ('special_id', 'exam_type',  'exam_name', )
+#         list_display_links = ('special_id', 'exam_name')
 
-class ExamPaperAdmin(admin.ModelAdmin):
-        list_display = ('__str__', 'choice_question_list', )
+# class ExamPaperAdmin(admin.ModelAdmin):
+#         list_display = ('__str__', 'choice_question_list', )
 
-        actions = ['add_random_50']
+#         actions = ['add_random_50']
 
-        def add_random_50(self, request, queryset):
-                cq_id_set = [str(item.id) for item in ChoiceQuestion.objects.all()]
+#         def add_random_50(self, request, queryset):
+#                 cq_id_set = [str(item.id) for item in ChoiceQuestion.objects.all()]
 
-                for i in range(50):
-                        choicequestion_list = ','.join(random.sample(cq_id_set, 5))
-                        ep = ExamPaper(exam_type=EXAM_TYPE_CHOICES[0][0], choicequestion_list=choicequestion_list)
-                        ep.save()
-        add_random_50.short_description = " 自动生成50套试卷"
+#                 for i in range(50):
+#                         choicequestion_list = ','.join(random.sample(cq_id_set, 5))
+#                         ep = ExamPaper(exam_type=EXAM_TYPE_CHOICES[0][0], choicequestion_list=choicequestion_list)
+#                         ep.save()
+#         add_random_50.short_description = " 自动生成50套试卷"
 
 
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
 admin.site.register(WordQuestion, WordQuestionAdmin)
-admin.site.register(Student, StudentAdmin)
-admin.site.register(Exam, ExamAdmin)
-admin.site.register(ExamPaper, ExamPaperAdmin)
 admin.site.register([WordDocxFile, WordDocxFileTest, ])
+# admin.site.register(Student, StudentAdmin)
+# admin.site.register(Exam, ExamAdmin)
+# admin.site.register(ExamPaper, ExamPaperAdmin)
 
 
 # admin.site.register(WordOperations, WordOperationsAdmin)

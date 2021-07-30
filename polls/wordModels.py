@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, format_html_join
 from docx import Document
 from .wordChoices import *
-from .wordFileModels import *
+from .fileModels import *
 
 
 # Create your models here.

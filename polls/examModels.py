@@ -33,20 +33,19 @@ class Exam(models.Model):
 
 class ExamPaper(models.Model):
 
-    student_id = models.CharField('学号', max_length=20, default='-')
-    
     exam_type = models.CharField('考试类型', choices = EXAM_TYPE_CHOICES, max_length=50, default=EXAM_TYPE_CHOICES[0][0])
+
+    student_id = models.CharField('学号', max_length=20, default='-')
+    start_time = models.DateTimeField('开考时间')
     end_by_hand = models.BooleanField('是否已经手动结束')
     delay_by_hand = models.PositiveIntegerField('手动延时(分钟)', default=0)
-    choice_question_list = models.CharField('选择题', max_length=200, default='-')
 
+    choice_question_list = models.CharField('选择题', max_length=200, default='-')
     system_question_id = models.PositiveIntegerField('系统操作题', default=0)
     internet_question_id = models.PositiveIntegerField('上网题', default=0)
     word_question_id = models.PositiveIntegerField('word操作题', default=0)
     excel_question_id = models.PositiveIntegerField('excel操作题', default=0)
     ppt_question_id = models.PositiveIntegerField('ppt操作题', default=0)
-
-    start_time = models.DateTimeField('开考时间', auto_now_add=True)
 
     choice_question_answer = models.CharField('选择题答案', max_length=200, default='-')
     current_choice_question_id = models.PositiveIntegerField('当前选择题', default=0)
