@@ -6,6 +6,8 @@ from .choiceQuestionModels import ChoiceQuestion
 from .studentModels import Student
 from .examModels import Exam, ExamPaper, EXAM_TYPE_CHOICES
 
+from  .emailModels import EmailQuestion
+
 import random
 
 # Register your models here.
@@ -81,7 +83,7 @@ class ChoiceQuestionAdmin(admin.ModelAdmin):
 
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
 admin.site.register(WordQuestion, WordQuestionAdmin)
-admin.site.register([WordDocxFile, WordDocxFileTest, ])
+admin.site.register([WordDocxFile, WordDocxFileTest, EmailQuestion])
 # admin.site.register(Student, StudentAdmin)
 # admin.site.register(Exam, ExamAdmin)
 # admin.site.register(ExamPaper, ExamPaperAdmin)
