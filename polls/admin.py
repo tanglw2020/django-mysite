@@ -6,7 +6,8 @@ from .choiceQuestionModels import ChoiceQuestion
 from .studentModels import Student
 from .examModels import Exam, ExamPaper, EXAM_TYPE_CHOICES
 
-from  .emailModels import EmailQuestion
+from .emailModels import EmailQuestion
+from .fileOperationlModels import FileOperationQuestion
 
 import random
 
@@ -61,9 +62,18 @@ class EmailQuestionAdmin(admin.ModelAdmin):
         list_display = ('__str__', 'des_name', 'cop_name','topic')
 
 
+class FileOperationQuestionAdmin(admin.ModelAdmin):
+        list_display = ('__str__', 'question_content',)
+
+        fieldsets = (
+                ('在考生文件夹中创建文件夹[A]，并在[A]中新建文件[B]', {'fields':('new_folder_dir_A', 'new_file_B')}),
+                ('在考生文件夹中删除[A]/[B]中的文件[C]', {'fields':('del_folder_A', 'del_folder_B','del_file_C')}),
+        )
+
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
 admin.site.register(WordQuestion, WordQuestionAdmin)
 admin.site.register(EmailQuestion, EmailQuestionAdmin)
+admin.site.register(FileOperationQuestion, FileOperationQuestionAdmin)
 admin.site.register([WordDocxFile, WordDocxFileTest, ])
 
 # admin.site.register(Student, StudentAdmin)
