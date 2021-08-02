@@ -57,6 +57,19 @@ class ChoiceQuestionAdmin(admin.ModelAdmin):
         list_display = ('__str__', 'question_text', 'description',)
         list_display_links = ('question_text',)
 
+class EmailQuestionAdmin(admin.ModelAdmin):
+        list_display = ('__str__', 'des_name', 'cop_name','topic')
+
+
+admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
+admin.site.register(WordQuestion, WordQuestionAdmin)
+admin.site.register(EmailQuestion, EmailQuestionAdmin)
+admin.site.register([WordDocxFile, WordDocxFileTest, ])
+
+# admin.site.register(Student, StudentAdmin)
+# admin.site.register(Exam, ExamAdmin)
+# admin.site.register(ExamPaper, ExamPaperAdmin)
+
 # class StudentAdmin(admin.ModelAdmin):
 #         list_display = ('exam_id', 'exam_name',  'class_name', 'name', 'student_id',)
 #         list_display_links = ('name', 'student_id')
@@ -79,15 +92,6 @@ class ChoiceQuestionAdmin(admin.ModelAdmin):
 #                         ep = ExamPaper(exam_type=EXAM_TYPE_CHOICES[0][0], choicequestion_list=choicequestion_list)
 #                         ep.save()
 #         add_random_50.short_description = " 自动生成50套试卷"
-
-
-admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
-admin.site.register(WordQuestion, WordQuestionAdmin)
-admin.site.register([WordDocxFile, WordDocxFileTest, EmailQuestion])
-# admin.site.register(Student, StudentAdmin)
-# admin.site.register(Exam, ExamAdmin)
-# admin.site.register(ExamPaper, ExamPaperAdmin)
-
 
 # admin.site.register(WordOperations, WordOperationsAdmin)
 # class WordOperationsAdmin(admin.ModelAdmin):

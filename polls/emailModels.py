@@ -4,13 +4,6 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, format_html_join
 
-TitleName=[
-    ('感谢', '感谢'),
-    ('hello', 'hello'),
-    ('一路有你', '一路有你'),
-    ('生日快乐', '生日快乐'),
-    ('求职简历','求职简历')
-]
 
 DesEmail=[
     ('lucy@163.com', 'lucy@163.com'),
@@ -31,25 +24,25 @@ class EmailQuestion(models.Model):
 
     # 题型
     # 建立选择下拉框
-    des_name = models.CharField('收件方', choices=DesEmail, max_length=50, blank=True, default='')
-    cop_name = models.CharField('抄送给', choices=DesEmail, max_length=50, blank=True, default='')
-    topic = models.CharField('主  题', max_length=50, blank=True, default='')
+    des_name = models.CharField('收件人', choices=DesEmail, max_length=50,  default='')
+    cop_name = models.CharField('抄 送', choices=DesEmail, max_length=50,  default='')
+    topic = models.CharField('主  题', max_length=50, default='')
     content = models.TextField('内  容',  default='')
 
     # 提交前的判断
     def clean(self):
         # raise ValidationError('请完善未选择的项目。')
-        if self.des_name == '':
-            raise ValidationError(_('收件人不能为空'))
+        # if self.des_name == '':
+        #     raise ValidationError(_('收件人不能为空'))
 
-        if self.cop_name == '':
-            raise ValidationError(_('抄送人不能为空'))
+        # if self.cop_name == '':
+        #     raise ValidationError(_('抄送人不能为空'))
 
-        if self.topic == '':
-            raise ValidationError(_('主题不能为空'))
+        # if self.topic == '':
+        #     raise ValidationError(_('主题不能为空'))
 
-        if self.content == '':
-            raise ValidationError(_('邮件内容不能为空'))
+        # if self.content == '':
+        #     raise ValidationError(_('邮件内容不能为空'))
 
         if self.des_name == self.cop_name:
             raise ValidationError(_('抄送人不能和收件人相同'))
