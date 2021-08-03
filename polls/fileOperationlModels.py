@@ -44,6 +44,73 @@ Del_File_C_Choice = [
     ('delfzz.md', 'delfzz.md'),
 ]
 
+Modify_Folder_A_Choice = [
+    ('modify1', 'modify1'),
+    ('modify2', 'modify2'),
+    ('modify3', 'modify3'),
+    ('modify4', 'modify4'),
+    ('modify5', 'modify5'),
+]
+
+Modify_File_B_Choice = [
+    ('modx1.txt', 'modx1.txt'),
+    ('modx2.dat', 'modx2.dat'),
+    ('modx3.txt', 'modx3.txt'),
+    ('modx4.md', 'modx4.md'),
+]
+
+Modify_File_Attr_Choice = [
+    ('只读','只读'),
+    ('隐藏','隐藏'),
+    ('只读和隐藏','只读和隐藏'),
+]
+
+
+Rename_Folder_A_Choice = [
+    ('rename1001', 'rename1001'),
+    ('rename2001', 'rename2001'),
+    ('rename3001', 'rename3001'),
+    ('rename4001', 'rename4001'),
+]
+
+Rename_File_B_Choice = [
+    ('origin2021.txt', 'origin2021.txt'),
+    ('origin2025.md', 'origin2025.md'),
+    ('origin2031.dat', 'origin2031.dat'),
+    ('origin2050.c', 'origin2050.c'),
+    ('origin2091.js', 'origin2091.js'),
+]
+Rename_File_C_Choice = [
+    ('des2021.txt', 'des2021.txt'),
+    ('des2025.md', 'des2025.md'),
+    ('des2031.dat', 'des2031.dat'),
+    ('des2050.c', 'des2050.c'),
+    ('des2091.js', 'des2091.js'),
+]
+
+Copy_Folder_A_Choice = [
+    ('source999', 'source999'),
+    ('source777', 'source777'),
+    ('source666', 'source666'),
+]
+Copy_File_B_Choice = [
+    ('copy2021.txt', 'copy2021.txt'),
+    ('copy2025.md', 'copy2025.md'),
+    ('copy2031.dat', 'copy2031.dat'),
+    ('copy2050.c', 'copy2050.c'),
+    ('copy2091.js', 'copy2091.js'),
+]
+Copy_Folder_C_Choice = [
+    ('XXXX999', 'XXXX999'),
+    ('UUUUU777', 'UUUUU777'),
+    ('MMMMM666', 'MMMMM666'),
+]
+Copy_Or_Move_Choice = [
+    ('复制', '复制'),
+    ('移动', '移动'),
+]
+
+
 ################文件或文件夹操作
 class FileOperationQuestion(models.Model):
     # 控制 表项显示文字，默认按 类名object（n）显示
@@ -59,16 +126,15 @@ class FileOperationQuestion(models.Model):
     def question_num(self):
         return 5
     question_num.short_description='小题数量'
+
     #题目内容
     def question_content(self):
         result_list = []
-        result_list.append('在考生文件夹下的'+self.new_folder_dir_A+'文件夹中，新建文件'+self.new_file_B)
-        result_list.append('在考生文件夹下的'+self.del_folder_A+'/'+self.del_folder_B+'文件夹中，删除文件'+self.del_file_C)
-        # result_list.append('在考生文件夹下的'+self.folder_dir_ren+'文件夹中，将'+self.folder_or_file_ren+self.folder_or_filetype_ren+'重命名为'+self.folder_or_file_rendes+self.folder_or_filetype_rendes)
-        # result_list.append('在考生文件夹下的' + self.folder_dir_mod + '文件夹中，将' + self.folder_or_file_mod + self.folder_or_filetype_mod+'的属性修改为'+self.folder_file_attmod)
-        # result_list.append('在考生文件夹下的'+self.folder_dir_sea+'文件夹中，搜索'+self.folder_or_file_sea+self.folder_or_filetype_sea+'并将它复制到考生文件夹下的'+self.folder_sea+'文件中')
-        # result_list.append('在考生文件夹下的'+self.folder_dir_cp+'文件夹中，将'+self.folder_or_file_cp+self.folder_or_filetype_cp+self.operation_cp+'到考生文件夹下的'+self.folder_cp+'文件夹中')
-
+        result_list.append('在考生文件夹下创建文件夹'+self.new_folder_dir_A+'，并在此文件夹中新建文件'+self.new_file_B+'.')
+        result_list.append('在考生文件夹下的'+self.del_folder_A+'/'+self.del_folder_B+'文件夹中，删除文件'+self.del_file_C+'.')
+        result_list.append('将考生文件夹下的'+self.modify_folder_A+'中的文件'+self.modify_file_B+'的属性修改为'+self.modify_file_attr+'.')
+        result_list.append('将考生文件夹下的' + self.rename_folder_A + '中文件' + self.rename_file_B+'重命名为'+self.rename_file_C+'.')
+        result_list.append('将考生文件夹下的'+self.copy_folder_A+'中的文件'+self.copy_file_B+self.copy_or_move+'到文件夹'+self.copy_folder_C+'.')
         return format_html("<ol>") + \
                 format_html_join(
                 '\n', '<li style="color:black;">{}</li>',
@@ -77,39 +143,36 @@ class FileOperationQuestion(models.Model):
                 + format_html("</ol>")
     question_content.short_description = '题目内容'
 
-    #新建文件（夹）
-    # （题目示例：在考生文件夹中创建文件夹[A]，并在[A]中新建文件[B]）
+    # 新建文件（夹）
+    # 题目示例：在考生文件夹中创建文件夹[A]，并在[A]中新建文件[B]
     new_folder_dir_A = models.CharField('文件夹[A]', choices=New_Folder_Name_Choice, max_length=20,  default='')
     new_file_B = models.CharField('文件[B]', choices=New_File_Name_Choice, max_length=20,  default='')
 
     # 删除文件（夹）
-    # （题目示例：在考生文件夹中删除[A]/[B]中的文件[C]）
+    # 题目示例：在考生文件夹中删除[A]/[B]中的文件[C]
     del_folder_A = models.CharField('文件夹[A]', choices=Del_Folder_A_Choice, max_length=20,  default='')
     del_folder_B = models.CharField('文件夹[B]', choices=Del_Folder_B_Choice, max_length=20,  default='')
     del_file_C = models.CharField('文件[C]', choices=Del_File_C_Choice, max_length=20,  default='')
+    
+    # 修改文件（夹）属性
+    # 题目示例：在[A]文件中，将[B]的属性修改为[D]
+    modify_folder_A = models.CharField('文件夹[A]', choices=Modify_Folder_A_Choice, max_length=20,  default='')
+    modify_file_B = models.CharField('文件[B]', choices=Modify_File_B_Choice, max_length=20,  default='')
+    modify_file_attr = models.CharField('属性[C]', choices=Modify_File_Attr_Choice, max_length=20,  default='')
+    
     # 重命名文件（夹）
-    # # isrenamefile = models.BooleanField('是否考查重命名文件（夹）？（题目示例：在[A]文件中，将[B][C]重命名为[D][E]）', default=True)
-    # folder_dir_ren = models.CharField('[A]', choices=FolderAndFileName, max_length=20,  default='')
-    # folder_or_file_ren = models.CharField('[B]', choices=FolderAndFileName, max_length=20,  default='')
-    # folder_or_filetype_ren = models.CharField('[C]', choices=FileFolderType, max_length=20,  default='.txt')
-    # folder_or_file_rendes = models.CharField('[D]', choices=FolderAndFileName, max_length=20,  default='')
-    # folder_or_filetype_rendes = models.CharField('[E]', choices=FileFolderType, max_length=20,  default='.txt')
-    # # 修改文件（夹）属性
-    # # ismodifyfile = models.BooleanField('是否考查修改文件（夹）属性？（题目示例：在[A]文件中，将[B][C]的属性修改为[D]）', default=True)
-    # folder_dir_mod = models.CharField('[A]', choices=FolderAndFileName, max_length=20,  default='')
-    # folder_or_file_mod = models.CharField('[B]', choices=FolderAndFileName, max_length=20,  default='')
-    # folder_or_filetype_mod = models.CharField('[C]', choices=FileFolderType, max_length=20,  default='.txt')
-    # folder_file_attmod = models.CharField('[D]', choices=Attribute, max_length=20,  default='只读')
-    # #搜索文件并复制
-    # # issearchfile = models.BooleanField('是否考查搜索文件并复制？（题目示例：在[A]文件中，搜索[B][C]文件，并将[B]文件复制到[D]文件夹中）', default=True)
-    # folder_dir_sea = models.CharField('[A]', choices=FolderAndFileName, max_length=20,  default='')
+    # 题目示例：在[A]文件中，将[B]重命名为[C]
+    rename_folder_A = models.CharField('文件夹[A]', choices=Rename_Folder_A_Choice, max_length=20,  default='')
+    rename_file_B = models.CharField('原文件名[B]', choices=Rename_File_B_Choice, max_length=20,  default='')
+    rename_file_C = models.CharField('新文件名[C]', choices=Rename_File_C_Choice, max_length=20,  default='.txt')
+
+    # 复制或移动
+    # 题目示例：在[A]文件中[B]文件复制或移动到[C]文件夹中
+    copy_folder_A = models.CharField('原文件夹[A]', choices=Copy_Folder_A_Choice, max_length=20,  default='')
+    copy_file_B = models.CharField('文件[B]', choices=Copy_File_B_Choice, max_length=20,  default='')
+    copy_folder_C = models.CharField('目标文件夹[C]', choices=Copy_Folder_C_Choice, max_length=20,  default='')
+    copy_or_move = models.CharField('操作方法', choices=Copy_Or_Move_Choice, max_length=20,  default='')
     # folder_or_file_sea = models.CharField('[B]', choices=FolderAndFileName, max_length=20,  default='')
     # folder_or_filetype_sea = models.CharField('[C]', choices=FileType, max_length=20,  default='.txt')
     # folder_sea = models.CharField('[D]', choices=FolderAndFileName, max_length=20,  default='')
-    # #复制、移动文件（夹）
-    # # iscopyfile = models.BooleanField('是否考查搜复制、移动操作？（题目示例：在[A]文件中，将[B][C]，[D]到[E]文件夹中）', default=True)
-    # folder_dir_cp = models.CharField('[A]', choices=FolderAndFileName, max_length=20,  default='')
-    # folder_or_file_cp = models.CharField('[B]', choices=FolderAndFileName, max_length=20,  default='')
-    # folder_or_filetype_cp = models.CharField('[C]', choices=FileType, max_length=20,  default='.txt')
-    # operation_cp = models.CharField('[D]', choices=OperationType, max_length=20,  default='复制')
-    # folder_cp = models.CharField('[E]', choices=FolderAndFileName, max_length=20,  default='')
+    

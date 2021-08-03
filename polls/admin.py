@@ -68,6 +68,9 @@ class FileOperationQuestionAdmin(admin.ModelAdmin):
         fieldsets = (
                 ('在考生文件夹中创建文件夹[A]，并在[A]中新建文件[B]', {'fields':('new_folder_dir_A', 'new_file_B')}),
                 ('在考生文件夹中删除[A]/[B]中的文件[C]', {'fields':('del_folder_A', 'del_folder_B','del_file_C')}),
+                ('将考生文件夹中[A]/[B]文件的属性修改成[C]', {'fields':('modify_folder_A', 'modify_file_B','modify_file_attr')}),
+                ('将考生文件夹中[A]/[B]重命名为[C]', {'fields':('rename_folder_A', 'rename_file_B','rename_file_C')}),
+                ('将考生文件夹中[A]/[B]复制或移动到[C]', {'fields':('copy_folder_A', 'copy_file_B','copy_or_move','copy_folder_C')}),
         )
 
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
