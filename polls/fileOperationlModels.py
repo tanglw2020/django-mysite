@@ -4,6 +4,15 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, format_html_join
 
+import re
+import shutil
+import zipfile
+from pathlib import Path
+# Create your models here.
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_ROOT  = BASE_DIR / 'media'
+
 New_Folder_Name_Choice = [
     ('new12', 'new12'),
     ('new123', 'new123'),
@@ -142,6 +151,57 @@ class FileOperationQuestion(models.Model):
                 ) \
                 + format_html("</ol>")
     question_content.short_description = '题目内容'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  
+        dir_path = os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id))
+        files_path = os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id),'exam_system_operation')
+        print(dir_path)
+        if dir_path:
+            if os.path.exists(dir_path): shutil.rmtree(dir_path)
+
+            os.makedirs(files_path)
+
+            ## del
+            del_path = os.path.join(files_path, self.del_folder_A, self.del_folder_B)
+            del_file = os.path.join(files_path, self.del_folder_A, self.del_folder_B, self.del_file_C)
+            os.makedirs(del_path)
+            with open(del_file,'w') as f:
+                f.write('file for del operation\n')
+
+            ## modify
+            modify_path = os.path.join(files_path, self.modify_folder_A)
+            modify_file = os.path.join(files_path, self.modify_folder_A, self.modify_file_B)
+            os.makedirs(modify_path)
+            with open(modify_file, 'w') as f:
+                f.write('file for modify operation\n')
+
+            ## rename
+            rename_path = os.path.join(files_path, self.rename_folder_A)
+            rename_file = os.path.join(files_path, self.rename_folder_A, self.rename_file_B)
+            os.makedirs(rename_path)
+            with open(rename_file, 'w') as f:
+                f.write('file for rename operation\n')
+
+            ## copy or move
+            cp_path_A = os.path.join(files_path, self.copy_folder_A)
+            cp_path_C = os.path.join(files_path, self.copy_folder_C)
+            cp_file = os.path.join(files_path, self.copy_folder_A, self.copy_file_B)
+            os.makedirs(cp_path_A)
+            os.makedirs(cp_path_C)
+            with open(cp_file, 'w') as f:
+                f.write('file for copy or move operation\n')
+
+            # zip_path = self.zip_path_()
+            # if zip_path:
+            #     if os.path.exists(zip_path): os.remove(zip_path)
+            #     c_path, input_path = self.upload_c_file.path, self.upload_input_file.path
+            #     print(zip_path)
+            #     zf = zipfile.ZipFile(zip_path, 'w')
+            #     zf.write(c_path,'main.c')
+            #     zf.write(input_path,'input.txt')
+            #     zf.close()
+            
 
     # 新建文件（夹）
     # 题目示例：在考生文件夹中创建文件夹[A]，并在[A]中新建文件[B]

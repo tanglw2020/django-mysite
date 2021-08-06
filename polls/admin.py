@@ -59,7 +59,7 @@ class ChoiceQuestionAdmin(admin.ModelAdmin):
         list_display_links = ('question_text',)
 
 class EmailQuestionAdmin(admin.ModelAdmin):
-        list_display = ('__str__', 'des_name', 'cop_name','topic')
+        list_display = ('__str__', 'des_name', 'cop_name','topic','content')
 
 
 class FileOperationQuestionAdmin(admin.ModelAdmin):
