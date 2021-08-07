@@ -8,7 +8,7 @@ import re
 import shutil
 import zipfile
 from pathlib import Path
-# Create your models here.
+from .ziptools import *
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
@@ -152,10 +152,16 @@ class FileOperationQuestion(models.Model):
                 + format_html("</ol>")
     question_content.short_description = '题目内容'
 
+    def base_path_(self):
+        return os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id))
+
+    def zipfile_path_(self):
+        return os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id),'exam_system_operation.zip')
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  
-        dir_path = os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id))
-        files_path = os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id),'exam_system_operation')
+        dir_path = self.base_path_()
+        files_path = os.path.join(dir_path,'exam_system_operation')
         print(dir_path)
         if dir_path:
             if os.path.exists(dir_path): shutil.rmtree(dir_path)
@@ -192,15 +198,10 @@ class FileOperationQuestion(models.Model):
             with open(cp_file, 'w') as f:
                 f.write('file for copy or move operation\n')
 
-            # zip_path = self.zip_path_()
-            # if zip_path:
-            #     if os.path.exists(zip_path): os.remove(zip_path)
-            #     c_path, input_path = self.upload_c_file.path, self.upload_input_file.path
-            #     print(zip_path)
-            #     zf = zipfile.ZipFile(zip_path, 'w')
-            #     zf.write(c_path,'main.c')
-            #     zf.write(input_path,'input.txt')
-            #     zf.close()
+            zip_path = self.zipfile_path_()
+            if zip_path:
+                if os.path.exists(zip_path): os.remove(zip_path)
+                folder2zip(dir_path, 'exam_system_operation', zip_path)
             
 
     # 新建文件（夹）
