@@ -9,6 +9,8 @@ import shutil
 import zipfile
 from pathlib import Path
 from .ziptools import *
+import win32con 
+import win32api 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
@@ -136,6 +138,15 @@ class FileOperationQuestion(models.Model):
         return 5
     question_num.short_description='小题数量'
 
+    def base_path_(self):
+        return os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id))
+
+    def zipfile_path_(self):
+        return os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id),'exam_system_operation.zip')
+
+    def upload_path_(self):
+        return os.path.join(MEDIA_ROOT, 'upload_system_operations')
+
     #题目内容
     def question_content(self):
         result_list = []
@@ -152,11 +163,63 @@ class FileOperationQuestion(models.Model):
                 + format_html("</ol>")
     question_content.short_description = '题目内容'
 
-    def base_path_(self):
-        return os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id))
+    def score_(self, answer_folder_path):
+        result_list = []
+        ## check the files
+        if answer_folder_path and os.path.exists(answer_folder_path):
+            
+            ## create file
+            targeted_path = os.path.join(answer_folder_path, self.new_folder_dir_A)
+            targeted_file = os.path.join(answer_folder_path, self.new_folder_dir_A, self.new_file_B)
+            result = ''
+            if os.path.exists(targeted_file):
+                result = (self.new_file_B)
+            result_list.append(result)
 
-    def zipfile_path_(self):
-        return os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id),'exam_system_operation.zip')
+
+            ## delete file
+            targeted_path = os.path.join(answer_folder_path, self.del_folder_A, self.del_folder_B)
+            targeted_file = os.path.join(answer_folder_path, self.del_folder_A, self.del_folder_B, self.del_file_C)
+            result = ''
+            if os.path.exists(targeted_path) and (not os.path.exists(targeted_file)):
+                result = (self.del_file_C)
+            result_list.append(result)
+
+
+            ## modify file
+            targeted_file = os.path.join(answer_folder_path, self.modify_folder_A, self.modify_file_B)
+            result = ''
+            if os.path.exists(targeted_file):
+                attr = win32api.GetFileAttributes(targeted_file)
+                is_read_only = attr & win32con.FILE_ATTRIBUTE_READONLY
+                is_hidden = attr & win32con.FILE_ATTRIBUTE_HIDDEN
+                print(is_read_only, is_hidden)
+                if self.modify_file_attr == Modify_File_Attr_Choice[0][0] and is_read_only:
+                    result = self.modify_file_B+'-is_read_only'
+                elif self.modify_file_attr == Modify_File_Attr_Choice[1][0] and is_hidden:
+                    result = self.modify_file_B+'-is_hidden'
+                elif self.modify_file_attr == Modify_File_Attr_Choice[2][0] and is_read_only and is_hidden:
+                    result = self.modify_file_B+'-is_hidden-is_read_only'
+            result_list.append(result)
+
+            ## rename file
+            targeted_file_1 = os.path.join(answer_folder_path, self.rename_folder_A, self.rename_file_B)
+            targeted_file_2 = os.path.join(answer_folder_path, self.rename_folder_A, self.rename_file_C)
+            result = ''
+            if os.path.exists(targeted_file_2):
+                result = self.rename_file_C
+            result_list.append(result)
+
+            ## cp or mv file
+            targeted_file_1 = os.path.join(answer_folder_path, self.copy_folder_A, self.copy_file_B)
+            targeted_file_2 = os.path.join(answer_folder_path, self.copy_folder_C, self.copy_file_B)
+            result = ''
+            if os.path.exists(targeted_file_2):
+                result = (self.copy_file_B)
+            result_list.append(result)
+
+
+        return result_list
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  
