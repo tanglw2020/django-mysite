@@ -8,6 +8,7 @@ from .examModels import Exam, ExamPaper, EXAM_TYPE_CHOICES
 
 from .emailModels import EmailQuestion
 from .fileOperationlModels import FileOperationQuestion
+from .excellModels import ExcelQuestion
 
 import random
 
@@ -73,10 +74,19 @@ class FileOperationQuestionAdmin(admin.ModelAdmin):
                 ('将考生文件夹中[A]/[B]复制或移动到[C]', {'fields':('copy_folder_A', 'copy_file_B','copy_or_move','copy_folder_C')}),
         )
 
+
+class ExcelQuestionAdmin(admin.ModelAdmin):
+        fieldsets = (
+                ('重命名工作表Sheet1', {'fields':('rename_sheet_op', 'new_sheet_name')}),
+                ('合并单元格', {'fields':('merge_cell_op', 'merge_cell_position')}),
+        )
+
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
 admin.site.register(WordQuestion, WordQuestionAdmin)
 admin.site.register(EmailQuestion, EmailQuestionAdmin)
 admin.site.register(FileOperationQuestion, FileOperationQuestionAdmin)
+admin.site.register(ExcelQuestion, ExcelQuestionAdmin)
+
 admin.site.register([WordDocxFile, WordDocxFileTest, ])
 
 # admin.site.register(Student, StudentAdmin)
