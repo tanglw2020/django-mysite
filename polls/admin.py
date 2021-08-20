@@ -79,6 +79,14 @@ class ExcelQuestionAdmin(admin.ModelAdmin):
         fieldsets = (
                 ('重命名工作表Sheet1', {'fields':('rename_sheet_op', 'new_sheet_name')}),
                 ('合并单元格', {'fields':('merge_cell_op', 'merge_cell_position')}),
+                ('设置单元格颜色', {'fields':('color_cell_op', 'color_cell_position','color_cell_font','color_cell_filling')}),
+                ('单元格套用表格格式', {'fields':('table_style_op', 'table_style_position','table_style_choice')}),
+                ('插入数据图表', {'fields':('chart_op', 'chart_data_name','chart_data_position','chart_type','chart_tiltle','chart_position')}),
+                ('排序', {'fields':('sort_op', 'keyword_1','sort_type_1', 
+                'sort_data_position_1', 'sort_data_result_1', 
+                'keyword_2','sort_type_2',
+                'sort_data_position_2', 'sort_data_result_2', 
+                )}),
         )
 
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)

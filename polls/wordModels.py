@@ -15,8 +15,8 @@ class WordQuestion(models.Model):
         return '题目'+str(self.id)+':Word文件'+str(self.upload_docx.id)
 
     class Meta:
-        verbose_name = 'Word操作题目'
-        verbose_name_plural = 'Word操作题目'
+        verbose_name = 'Word操作题'
+        verbose_name_plural = 'Word操作题'
 
     def file_path(self):
         return self.upload_docx.upload.name

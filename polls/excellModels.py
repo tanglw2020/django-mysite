@@ -12,15 +12,47 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
 
-New_Folder_Name_Choice = [
-    ('new12', 'new12'),
+Standard_Color_Maps = [
+    ('FFC00000','深红'),
+    ('FFFF0000','红色'),
+    ('FFFFC000','橙色'),
+    ('FFFFFF00','黄色'),
+    ('FF92D050','浅绿'),
+    ('FF00B050','绿色'),
+    ('FF00B0F0','浅蓝'),
+    ('FF0070C0','蓝色'),
+    ('FF002060','深蓝'),
+    ('FF7030A0','紫色'),
+]
+
+Table_Style_Maps = [
+    ('TableStyleLight9', '蓝色,表样式浅色9'),
+    ('TableStyleLight12','金色,表样式浅色12'),
+    ('TableStyleMedium4','白色,表样式中等深浅4'),
+    ('TableStyleMedium8','浅灰色,表样式中等深浅8'),
+    ('TableStyleDark3','褐色,表样式深色3'),
+    ('TableStyleDark6','深蓝,表样式深色6'),
+]
+
+Chart_Type_Choice = [
+    ('barChart', '柱形图'),
+    ('lineChart', '折线图'),
+    ('pieChart', '饼图'),
+    ('areaChart', '面积图'),
+    ('scatterChart', 'XY散点图'),
+    ('radarChart', '雷达图'),
+]
+
+Sort_Type_Choice = [
+    ('升序','升序'),
+    ('降序','降序'),
 ]
 
 def is_cell_range_legal(p):
     reg = re.compile('([A-Z])(\d+):([A-Z])(\d+)')
     result = reg.match(p)
     if result is None:
-        return False, '地址应该符合格式 [大写字母][数字]:[大写字母][数字]，比如A2:B5'
+        return False, '地址格式 [大写字母][数字]:[大写字母][数字]，比如A2:B5'
     else:
         p1,p2,p3,p4 = result.group(1), int(result.group(2)), result.group(3), int(result.group(4))
         if p1>p3 or p2>p4 or (p1==p3 and p2==p4):
@@ -31,7 +63,7 @@ def is_cell_range_legal(p):
 
 ####################### Excel 题目 #########################
 class ExcelQuestion(models.Model):
-    # 控制 表项显示文字，默认按 类名object（n）显示
+    # 控制 表项显示文字，默认按类名object（n）显示
     def __str__(self):
         return 'Excel操作题' + str(self.id) 
 
@@ -74,17 +106,73 @@ class ExcelQuestion(models.Model):
         error_dict = {}
 
         if self.rename_sheet_op and self.new_sheet_name=='':
-            error_dict['new_sheet_name'] = _('必须填写工作表新名称')
+            error_dict['new_sheet_name'] = _('不能为空')
 
         if self.merge_cell_op:
             if self.merge_cell_position=='':
-                error_dict['merge_cell_position'] = _('必须填写单元格区域')
+                error_dict['merge_cell_position'] = _('不能为空')
             else:
                 is_legal, errors = is_cell_range_legal(self.merge_cell_position)
                 if not is_legal:
                     error_dict['merge_cell_position'] = _(errors)
 
-        
+        if self.color_cell_op:
+            if self.color_cell_position=='':
+                error_dict['color_cell_position'] = _('不能为空')
+            else:
+                is_legal, errors = is_cell_range_legal(self.color_cell_position)
+                if not is_legal:
+                    error_dict['color_cell_position'] = _(errors)
+
+            if self.color_cell_font == '':
+                error_dict['color_cell_font'] = _('必须选择一种颜色')
+            if self.color_cell_filling == '':
+                error_dict['color_cell_filling'] = _('必须选择一种颜色')
+            if self.color_cell_font and self.color_cell_font==self.color_cell_filling:
+                error_dict['color_cell_font'] = _('文字和填充不能用相同颜色')
+                error_dict['color_cell_filling'] = _('文字和填充不能用相同颜色')
+
+        if self.chart_op:
+            if self.chart_data_name == '': error_dict['chart_data_name'] = _('不能为空')
+            if self.chart_type == '': error_dict['chart_type'] = _('不能为空')
+            if self.chart_tiltle == '': error_dict['chart_tiltle'] = _('不能为空')
+
+            if self.chart_data_position == '':
+                error_dict['chart_data_position'] = _('不能为空')
+            else:
+                is_legal, errors = is_cell_range_legal(self.chart_data_position)
+                if not is_legal:
+                    error_dict['chart_data_position'] = _(errors)
+                
+            if self.chart_position == '':
+                error_dict['chart_position'] = _('不能为空')
+            else:
+                is_legal, errors = is_cell_range_legal(self.chart_position)
+                if not is_legal:
+                    error_dict['chart_position'] = _(errors)
+
+        if self.sort_op:
+            if self.keyword_1 == '': error_dict['keyword_1'] = _('不能为空')
+            if self.sort_type_1 == '': error_dict['sort_type_1'] = _('不能为空')
+            if self.sort_data_result_1 == '': error_dict['sort_data_result_1'] = _('不能为空')
+            if self.keyword_2 == '': error_dict['keyword_2'] = _('不能为空')
+            if self.sort_type_2 == '': error_dict['sort_type_2'] = _('不能为空')
+            if self.sort_data_result_2 == '': error_dict['sort_data_result_2'] = _('不能为空')
+            
+            if self.sort_data_position_1 == '': 
+                error_dict['sort_data_position_1'] = _('不能为空')
+            else:
+                is_legal, errors = is_cell_range_legal(self.sort_data_position_1)
+                if not is_legal:
+                    error_dict['sort_data_position_1'] = _(errors)
+
+            if self.sort_data_position_2 == '': 
+                error_dict['sort_data_position_2'] = _('不能为空')
+            else:
+                is_legal, errors = is_cell_range_legal(self.sort_data_position_2)
+                if not is_legal:
+                    error_dict['sort_data_position_2'] = _(errors)
+
         if len(error_dict)>0:
             raise ValidationError(error_dict)
 
@@ -98,4 +186,45 @@ class ExcelQuestion(models.Model):
     merge_cell_op = models.BooleanField('考查合并单元格？', default=False)
     merge_cell_position = models.CharField('合并单元格区域[Start:End]', max_length=20, blank=True, default='A1:F1')
 
-    
+    # 设置单元格颜色和填充色
+    # 题目示例：将工作表Start:End单元格文字设置成标准色X，填色设置成标准色Y
+    color_cell_op = models.BooleanField('考查单元格颜色设置？', default=False)
+    color_cell_position = models.CharField('单元格区域[Start:End]', max_length=20, blank=True, default='A2:A20')
+    color_cell_font = models.CharField('文字颜色', choices=Standard_Color_Maps, max_length=20, blank=True, default='') 
+    color_cell_filling = models.CharField('填充颜色', choices=Standard_Color_Maps, max_length=20, blank=True, default='') 
+
+
+    # 设置单元格条件格式
+    # 题目示例：将工作表Start:End单元格应用条件格式
+    conditional_formatting_op = models.BooleanField('考查单元格条件格式设置？', default=False)
+    conditional_formatting_position = models.CharField('单元格区域[Start:End]', max_length=20, blank=True, default='A2:A20')
+
+
+    # 单元格套用表格格式
+    # 题目示例：将工作表Start:End单元格套用表格格式
+    table_style_op = models.BooleanField('考查单元格套用表格格式？', default=False)
+    table_style_position = models.CharField('单元格区域[Start:End]', max_length=20, blank=True, default='A2:A20')
+    table_style_choice = models.CharField('套用表格格式', choices=Table_Style_Maps, max_length=20, blank=True, default='') 
+
+
+    # 插入图表
+    # 题目示例：为工作表数据列X建立曲线图表，
+    # 图表标题为Y，将图表插入表格区域Z
+    chart_op = models.BooleanField('考查插入图表？', default=False)
+    chart_data_name = models.CharField('数据列名称', max_length=20, blank=True, default='平均升学率')
+    chart_data_position = models.CharField('数据列位置', max_length=20, blank=True, default='F2:F50')
+    chart_type = models.CharField('图表类型', choices=Chart_Type_Choice, max_length=20, blank=True, default='') 
+    chart_tiltle = models.CharField('图表标题', max_length=20, blank=True, default='曲线图') 
+    chart_position = models.CharField('图表插入区域[Start:End]', max_length=20, blank=True, default='G2:K20')
+
+    # 排序
+    # 题目示例：将表格按关键字1升序、关键字2降序排序
+    sort_op = models.BooleanField('考查排序？', default=False)
+    keyword_1 = models.CharField('主关键字', max_length=20, blank=True, default='')
+    sort_type_1 = models.CharField('主关键字次序', choices=Sort_Type_Choice, max_length=20, blank=True, default='') 
+    sort_data_position_1 = models.CharField('主关键字数据列位置', max_length=20, blank=True, default='G3:G10')
+    sort_data_result_1 = models.TextField('主关键字数据列最终排序结果', blank=True, default='')
+    keyword_2 = models.CharField('次关键字', max_length=20, blank=True, default='')
+    sort_type_2 = models.CharField('次关键字次序', choices=Sort_Type_Choice, max_length=20, blank=True, default='') 
+    sort_data_position_2 = models.CharField('次关键字数据列位置', max_length=20, blank=True, default='F3:F10')
+    sort_data_result_2 = models.TextField('次关键字数据列最终排序结果', blank=True, default='')
