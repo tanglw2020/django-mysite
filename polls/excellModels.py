@@ -268,3 +268,25 @@ class ExcelQuestion(models.Model):
     sort_type_2 = models.CharField('次关键字次序', choices=Sort_Type_Choice, max_length=20, blank=True, default='') 
     sort_data_position_2 = models.CharField('次关键字数据区域', max_length=20, blank=True, default='F3:F10')
     sort_data_result_2 = models.TextField('次关键字数据列最终排序结果', blank=True, default='')
+
+
+    # 公式 max/min
+    # 题目示例：用公式计算工作表[Start:End单元格/]的最大值/最小值，将计算公式写在X单元格
+    formula_maxmin_op = models.BooleanField('考查公式max/min？', default=False)
+    formula_maxmin_description = models.TextField('题目文字描述', 
+        default='用公式计算工作表[Start:End单元格/]的最大值/最小值，将计算公式写在X单元格')
+    formula_maxmin_data_position = models.CharField('数据区域[Start:End]', max_length=20, blank=True, default='A2:A20')
+    formula_maxmin_result_position = models.CharField('公式填写在单元格', max_length=20, blank=True, default='') 
+    formula_maxmin_result_regex = models.CharField('公式匹配模式', max_length=50, 
+                blank=True, default='=MAX\(([A-Z])(\d+):([A-Z])(\d+)\)') 
+
+
+    # 公式 sum/average
+    # 题目示例：用公式计算工作表[Start:End单元格/]的总和/平均值，将计算公式写在X单元格
+    formula_sumavg_op = models.BooleanField('考查公式sum/average？', default=False)
+    formula_sumavg_description = models.TextField('题目文字描述', 
+        default='用公式计算工作表[Start:End单元格/]的总和/平均值，将计算公式写在X单元格')
+    formula_sumavg_data_position = models.CharField('数据区域[Start:End]', max_length=20, blank=True, default='A2:A20')
+    formula_sumavg_result_position = models.CharField('公式填写在单元格', max_length=20, blank=True, default='') 
+    formula_sumavg_result_regex = models.CharField('公式匹配模式', max_length=50, 
+                blank=True, default='=SUM\(([A-Z])(\d+):([A-Z])(\d+)\)') 
