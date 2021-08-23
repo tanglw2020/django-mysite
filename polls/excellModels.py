@@ -85,18 +85,30 @@ Conditional_Formatting_Coloring_Choice = [
     ('红色边框','红色边框'), 
 ]
 
+
 def is_cell_range_legal(p):
+    if p == '':
+        return False, '不能为空'
+        
     reg = re.compile('([A-Z])(\d+):([A-Z])(\d+)')
     result = reg.match(p)
-    if result is None:
-        return False, '地址格式 [大写字母][数字]:[大写字母][数字]，比如A2:B5'
-    else:
+    if result:
         p1,p2,p3,p4 = result.group(1), int(result.group(2)), result.group(3), int(result.group(4))
         if p1>p3 or p2>p4 or (p1==p3 and p2==p4):
             return False, '[起始地址] 应当小于 [结束地址]，比如A2:B5'
-    
+    else:
+        return False, '地址格式 [大写字母][数字]:[大写字母][数字]，比如A2:B5'
+
     return True, ''
 
+
+def clean_cell_range(position, errors_dict, target_key):
+    is_legal, errors = is_cell_range_legal(position)
+    if not is_legal:
+        errors_dict[target_key] = _(errors)
+
+def clean_empty_item(item, errors_dict, target_key):
+    if item == '': errors_dict[target_key] = _('不能为空')
 
 ####################### Excel 题目 #########################
 class ExcelQuestion(models.Model):
@@ -142,24 +154,14 @@ class ExcelQuestion(models.Model):
     def clean(self):
         error_dict = {}
 
-        if self.rename_sheet_op and self.new_sheet_name=='':
-            error_dict['new_sheet_name'] = _('不能为空')
+        if self.rename_sheet_op:
+            clean_empty_item(self.new_sheet_name, error_dict, 'new_sheet_name')
 
         if self.merge_cell_op:
-            if self.merge_cell_position=='':
-                error_dict['merge_cell_position'] = _('不能为空')
-            else:
-                is_legal, errors = is_cell_range_legal(self.merge_cell_position)
-                if not is_legal:
-                    error_dict['merge_cell_position'] = _(errors)
+            clean_cell_range(self.merge_cell_position, error_dict, 'merge_cell_position')
 
         if self.color_cell_op:
-            if self.color_cell_position=='':
-                error_dict['color_cell_position'] = _('不能为空')
-            else:
-                is_legal, errors = is_cell_range_legal(self.color_cell_position)
-                if not is_legal:
-                    error_dict['color_cell_position'] = _(errors)
+            clean_cell_range(self.color_cell_position, error_dict, 'color_cell_position')
 
             if self.color_cell_font == '':
                 error_dict['color_cell_font'] = _('必须选择一种颜色')
@@ -169,24 +171,25 @@ class ExcelQuestion(models.Model):
                 error_dict['color_cell_font'] = _('文字和填充不能用相同颜色')
                 error_dict['color_cell_filling'] = _('文字和填充不能用相同颜色')
 
-        if self.chart_op:
-            if self.chart_data_name == '': error_dict['chart_data_name'] = _('不能为空')
-            if self.chart_type == '': error_dict['chart_type'] = _('不能为空')
-            if self.chart_tiltle == '': error_dict['chart_tiltle'] = _('不能为空')
+        if self.conditional_formatting_op:
+            clean_empty_item(self.conditional_formatting_param, error_dict, 'conditional_formatting_param')
+            clean_empty_item(self.conditional_formatting_type, error_dict, 'conditional_formatting_type')
+            clean_empty_item(self.conditional_formatting_coloring, error_dict, 'conditional_formatting_coloring')
+            clean_cell_range(self.conditional_formatting_position, error_dict, 'conditional_formatting_position')
 
-            if self.chart_data_position == '':
-                error_dict['chart_data_position'] = _('不能为空')
-            else:
-                is_legal, errors = is_cell_range_legal(self.chart_data_position)
-                if not is_legal:
-                    error_dict['chart_data_position'] = _(errors)
-                
-            if self.chart_position == '':
-                error_dict['chart_position'] = _('不能为空')
-            else:
-                is_legal, errors = is_cell_range_legal(self.chart_position)
-                if not is_legal:
-                    error_dict['chart_position'] = _(errors)
+
+        if self.table_style_op:
+            clean_empty_item(self.table_style_choice, error_dict, 'table_style_choice')
+            clean_cell_range(self.table_style_position, error_dict, 'table_style_position')
+
+
+        if self.chart_op:
+            clean_empty_item(self.chart_data_name, error_dict, 'chart_data_name')
+            clean_empty_item(self.chart_type, error_dict, 'chart_type')
+            clean_empty_item(self.chart_tiltle, error_dict, 'chart_tiltle')
+            clean_cell_range(self.chart_data_position, error_dict, 'chart_data_position')
+            clean_cell_range(self.chart_position, error_dict, 'chart_position')
+        
 
         if self.sort_op:
             if self.keyword_1 == '': error_dict['keyword_1'] = _('不能为空')
@@ -195,20 +198,21 @@ class ExcelQuestion(models.Model):
             if self.keyword_2 == '': error_dict['keyword_2'] = _('不能为空')
             if self.sort_type_2 == '': error_dict['sort_type_2'] = _('不能为空')
             if self.sort_data_result_2 == '': error_dict['sort_data_result_2'] = _('不能为空')
-            
-            if self.sort_data_position_1 == '': 
-                error_dict['sort_data_position_1'] = _('不能为空')
-            else:
-                is_legal, errors = is_cell_range_legal(self.sort_data_position_1)
-                if not is_legal:
-                    error_dict['sort_data_position_1'] = _(errors)
+            clean_cell_range(self.sort_data_position_1, error_dict, 'sort_data_position_1')
+            clean_cell_range(self.sort_data_position_2, error_dict, 'sort_data_position_2')
 
-            if self.sort_data_position_2 == '': 
-                error_dict['sort_data_position_2'] = _('不能为空')
-            else:
-                is_legal, errors = is_cell_range_legal(self.sort_data_position_2)
-                if not is_legal:
-                    error_dict['sort_data_position_2'] = _(errors)
+
+        if self.formula_maxmin_op:
+            clean_empty_item(self.formula_maxmin_description, error_dict, 'formula_maxmin_description')
+            clean_empty_item(self.formula_maxmin_result_regex, error_dict, 'formula_maxmin_result_regex')
+            clean_cell_range(self.formula_maxmin_data_position, error_dict, 'formula_maxmin_data_position')
+            clean_cell_range(self.formula_maxmin_result_position, error_dict, 'formula_maxmin_result_position')
+
+        if self.formula_sumavg_op:
+            clean_empty_item(self.formula_sumavg_description, error_dict, 'formula_sumavg_description')
+            clean_empty_item(self.formula_sumavg_result_regex, error_dict, 'formula_sumavg_result_regex')
+            clean_cell_range(self.formula_sumavg_data_position, error_dict, 'formula_sumavg_data_position')
+            clean_cell_range(self.formula_sumavg_result_position, error_dict, 'formula_sumavg_result_position')
 
         if len(error_dict)>0:
             raise ValidationError(error_dict)
