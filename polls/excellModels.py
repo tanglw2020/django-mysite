@@ -25,6 +25,7 @@ Standard_Color_Maps = [
     ('FF7030A0','紫色'),
 ]
 
+## 套用套用表格格式
 Table_Style_Maps = [
     ('TableStyleLight9', '蓝色,表样式浅色9'),
     ('TableStyleLight12','金色,表样式浅色12'),
@@ -34,6 +35,7 @@ Table_Style_Maps = [
     ('TableStyleDark6','深蓝,表样式深色6'),
 ]
 
+## 图表类型
 Chart_Type_Choice = [
     ('barChart', '柱形图'),
     ('lineChart', '折线图'),
@@ -46,6 +48,41 @@ Chart_Type_Choice = [
 Sort_Type_Choice = [
     ('升序','升序'),
     ('降序','降序'),
+]
+
+
+## conditional_formatting
+## ["name", "type", "operator", "bottom", "percent", "aboveAverage"]
+# {
+# "greaterThan":["cellIs", "greaterThan", "None", "None", "None"],
+# "lessThan":["cellIs", "lessThan", "None", "None", "None"],
+# "equal":["cellIs", "equal", "None", "None", "None"],
+# "duplicateValues":["duplicateValues", "None", "None", "None", "None"],
+# "top10":["top10", "None", "None", "None", "None"],
+# "top10p":["top10", "None", "None", "True", "None"],
+# "tail10":["top10", "None", "True", "None", "None"],
+# "tail10p":["top10", "None", "True", "True", "None"],
+# "aboveAverage":["aboveAverage", "None", "None", "None", "None"],
+# "belowAverage":["aboveAverage", "None", "None", "None", "False"] 
+# }
+Conditional_Formatting_Type_Choice = [
+    ('greaterThan','突出显示单元格规则大于'),
+    ('lessThan','突出显示单元格规则小于'),
+    ('equal','突出显示单元格规则等于'),
+    ('duplicateValues','突出显示单元格规则重复值'),
+    ('top10','最前最后规则前10项'),
+    ('top10p','最前最后规则前10%'),
+    ('tail10','最前最后规则后10项'),
+    ('tail10p','最前最后规则后10%'),
+    ('aboveAverage','最前最后规则高于平均值'),
+    ('belowAverage','最前最后规则低于平均值'),
+]
+
+Conditional_Formatting_Coloring_Choice = [
+    ('浅红填充色深红色文本','浅红填充色深红色文本'), 
+    ('黄填充色深黄色文本','黄填充色深黄色文本'), 
+    ('绿填充色深绿色文本','绿填充色深绿色文本'), 
+    ('红色边框','红色边框'), 
 ]
 
 def is_cell_range_legal(p):
@@ -194,13 +231,16 @@ class ExcelQuestion(models.Model):
     color_cell_filling = models.CharField('填充颜色', choices=Standard_Color_Maps, max_length=20, blank=True, default='') 
 
 
-    # 设置单元格条件格式
-    # 题目示例：将工作表Start:End单元格应用条件格式
+    # 设置单元格 条件格式
+    # 题目示例：对工作表Start:End单元格区域应用条件格式
     conditional_formatting_op = models.BooleanField('考查单元格条件格式设置？', default=False)
     conditional_formatting_position = models.CharField('单元格区域[Start:End]', max_length=20, blank=True, default='A2:A20')
+    conditional_formatting_type = models.CharField('条件类型', choices=Conditional_Formatting_Type_Choice, max_length=50, blank=True, default='')
+    conditional_formatting_param = models.CharField('条件格式参数', max_length=10, blank=True, default='5')
+    conditional_formatting_coloring = models.CharField('颜色选项', choices=Conditional_Formatting_Coloring_Choice, max_length=50, blank=True, default='')
 
 
-    # 单元格套用表格格式
+    # 单元格 套用表格格式
     # 题目示例：将工作表Start:End单元格套用表格格式
     table_style_op = models.BooleanField('考查单元格套用表格格式？', default=False)
     table_style_position = models.CharField('单元格区域[Start:End]', max_length=20, blank=True, default='A2:A20')
@@ -217,14 +257,14 @@ class ExcelQuestion(models.Model):
     chart_tiltle = models.CharField('图表标题', max_length=20, blank=True, default='曲线图') 
     chart_position = models.CharField('图表插入区域[Start:End]', max_length=20, blank=True, default='G2:K20')
 
-    # 排序
+    # 双关键字排序
     # 题目示例：将表格按关键字1升序、关键字2降序排序
     sort_op = models.BooleanField('考查排序？', default=False)
     keyword_1 = models.CharField('主关键字', max_length=20, blank=True, default='')
     sort_type_1 = models.CharField('主关键字次序', choices=Sort_Type_Choice, max_length=20, blank=True, default='') 
-    sort_data_position_1 = models.CharField('主关键字数据列位置', max_length=20, blank=True, default='G3:G10')
+    sort_data_position_1 = models.CharField('主关键字数据区域', max_length=20, blank=True, default='G3:G10')
     sort_data_result_1 = models.TextField('主关键字数据列最终排序结果', blank=True, default='')
     keyword_2 = models.CharField('次关键字', max_length=20, blank=True, default='')
     sort_type_2 = models.CharField('次关键字次序', choices=Sort_Type_Choice, max_length=20, blank=True, default='') 
-    sort_data_position_2 = models.CharField('次关键字数据列位置', max_length=20, blank=True, default='F3:F10')
+    sort_data_position_2 = models.CharField('次关键字数据区域', max_length=20, blank=True, default='F3:F10')
     sort_data_result_2 = models.TextField('次关键字数据列最终排序结果', blank=True, default='')
