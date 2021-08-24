@@ -12,6 +12,11 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
 
+def find_2rd_item_in_maps(item, maps):
+    for item1, item2 in maps:
+        if item1 == item: 
+            return item2
+
 Standard_Color_Maps = [
     ('FFC00000','深红'),
     ('FFFF0000','红色'),
@@ -27,12 +32,12 @@ Standard_Color_Maps = [
 
 ## 套用套用表格格式
 Table_Style_Maps = [
-    ('TableStyleLight9', '蓝色,表样式浅色9'),
-    ('TableStyleLight12','金色,表样式浅色12'),
-    ('TableStyleMedium4','白色,表样式中等深浅4'),
-    ('TableStyleMedium8','浅灰色,表样式中等深浅8'),
-    ('TableStyleDark3','褐色,表样式深色3'),
-    ('TableStyleDark6','深蓝,表样式深色6'),
+    ('TableStyleLight9', '"蓝色,表样式浅色9"'),
+    ('TableStyleLight12','"金色,表样式浅色12"'),
+    ('TableStyleMedium4','"白色,表样式中等深浅4"'),
+    ('TableStyleMedium8','"浅灰色,表样式中等深浅8"'),
+    ('TableStyleDark3','"褐色,表样式深色3"'),
+    ('TableStyleDark6','"深蓝,表样式深色6"'),
 ]
 
 ## 图表类型
@@ -130,10 +135,53 @@ class ExcelQuestion(models.Model):
 
     #题目内容
     def question_content(self):
+        pre_description = '打开工作薄文件EXCEL.xlsx:\n'
         result_list = []
-        result_list.append('在考生文件夹下创建文件夹'+'，并在此文件夹中新建文件'+'.')
 
-        return format_html("<ol>") + \
+        if self.rename_sheet_op:
+            result_list.append('将工作表Sheet1重命名为'+self.new_sheet_name+'.')
+
+        if self.merge_cell_op:
+            result_list.append('将数据区域'+self.merge_cell_position+'合并为一个单元格，内容水平居中.')
+
+        if self.color_cell_op:
+            result_list.append('将数据区域'+self.color_cell_position+ \
+            '文字设置为标准'+find_2rd_item_in_maps(self.color_cell_font,Standard_Color_Maps) \
+            +', 填充设置为标准'+find_2rd_item_in_maps(self.color_cell_filling, Standard_Color_Maps)+'.')
+
+        if self.conditional_formatting_op:
+            if self.conditional_formatting_type not in ['greaterThan', 'lessThan', 'equal']:
+                result_list.append('将数据区域'+self.conditional_formatting_position+ \
+                '按"'+find_2rd_item_in_maps(self.conditional_formatting_type,Conditional_Formatting_Type_Choice)+ \
+                    '"设置为"'+self.conditional_formatting_coloring+'".')
+            else:
+                result_list.append('将数据区域'+self.conditional_formatting_position+ \
+                '按"'+find_2rd_item_in_maps(self.conditional_formatting_type,Conditional_Formatting_Type_Choice)+ \
+                   self.conditional_formatting_param+'"设置为"'+self.conditional_formatting_coloring+'".')
+        
+        if self.table_style_op:
+            result_list.append('将数据区域'+self.table_style_position+ \
+                '设置为套用表格格式'+find_2rd_item_in_maps(self.table_style_choice, Table_Style_Maps)+'.')
+
+        if self.chart_op:
+            result_list.append('选取数据列"'+self.chart_data_name+'"内容，建立"' \
+                +find_2rd_item_in_maps(self.chart_type, Chart_Type_Choice)+'"，图表标题为"'+self.chart_tiltle \
+                    +'"，将图表插入'+self.chart_position+'区域.')
+
+        if self.sort_op:
+            result_list.append('将工作表内容按主关键字"'+ \
+                self.keyword_1+'"的'+self.sort_type_1+'次序和次关键字"'+ \
+                self.keyword_2+'"的'+self.sort_type_2+'次序进行排序' \
+                +'.')
+
+        if self.formula_maxmin_op:
+            result_list.append(self.formula_maxmin_description)
+
+        if self.formula_sumavg_op:
+            result_list.append(self.formula_sumavg_description)
+
+        return format_html(pre_description) + \
+                format_html("<ol>") + \
                 format_html_join(
                 '\n', '<li style="color:black;">{}</li>',
                 ((x,) for x in result_list)

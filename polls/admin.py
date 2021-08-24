@@ -76,6 +76,10 @@ class FileOperationQuestionAdmin(admin.ModelAdmin):
 
 
 class ExcelQuestionAdmin(admin.ModelAdmin):
+
+        list_display = ('__str__', 'question_content',)
+
+
         fieldsets = (
                 ('1 重命名工作表Sheet1', {'fields':('rename_sheet_op', 'new_sheet_name')}),
                 ('2 合并单元格', {'fields':('merge_cell_op', 'merge_cell_position')}),
