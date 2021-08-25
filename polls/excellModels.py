@@ -8,6 +8,8 @@ import re
 import shutil
 import zipfile
 from pathlib import Path
+from openpyxl import load_workbook
+from openpyxl import cell
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
@@ -16,6 +18,14 @@ def find_2rd_item_in_maps(item, maps):
     for item1, item2 in maps:
         if item1 == item: 
             return item2
+
+def validate_xlsx(value):
+    extension = value.name.split('.')[-1]
+    if extension != 'xlsx':
+        raise ValidationError(
+            _(value.name+'不是excel文件(.xlsx)'),
+            params={'value': value.name},
+        )
 
 Standard_Color_Maps = [
     ('FFC00000','深红'),
@@ -125,21 +135,21 @@ class ExcelQuestion(models.Model):
         verbose_name_plural = 'Excel操作题'  
         verbose_name = 'Excel操作题' 
 
-    #包含小题数量
+    # 包含小题数量
     def question_num(self):
         return 5
     question_num.short_description='小题数量'
 
     def base_path_(self):
-        return os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id))
+        return os.path.join(MEDIA_ROOT, 'upload_xlsx', str(self.id))
 
-    #题目内容
+    # 题目内容
     def question_content(self):
         pre_description = '打开工作薄文件EXCEL.xlsx:\n'
         result_list = []
 
         if self.rename_sheet_op:
-            result_list.append('将工作表Sheet1重命名为'+self.new_sheet_name+'.')
+            result_list.append('将工作表Sheet1重命名为"'+self.new_sheet_name+'".')
 
         if self.merge_cell_op:
             result_list.append('将数据区域'+self.merge_cell_position+'合并为一个单元格，内容水平居中.')
@@ -189,12 +199,41 @@ class ExcelQuestion(models.Model):
                 + format_html("</ol>")
     question_content.short_description = '题目内容'
 
-    def score_(self, answer_folder_path):
+    def file_path_(self):
+        if self.upload_excel:
+            answer_file_path = self.upload_excel.path
+        else:
+            answer_file_path = ''
+        return answer_file_path
+    file_path_.short_description = '文件地址'
+
+
+    def score_(self, answer_file_path):
         result_list = []
         ## check the files
-        if answer_folder_path and os.path.exists(answer_folder_path):
+        if answer_file_path and os.path.exists(answer_file_path):
+            wb = load_workbook(answer_file_path)
+            ws = wb.active 
+
+            if self.rename_sheet_op:
+                result = ''
+                for name in wb.sheetnames:
+                    if name == self.new_sheet_name: result = name
+                if result:
+                    result_list.append(result)
+        else:
             result_list.append('Nothing to score')
         return result_list
+
+
+    def test_(self):
+        ## only for development
+        if self.upload_excel:
+            answer_file_path = self.upload_excel.path
+        else:
+            answer_file_path = ''
+        return '\n'.join(self.score_(answer_file_path))
+    test_.short_description = '测试结果'
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  
@@ -262,8 +301,17 @@ class ExcelQuestion(models.Model):
             clean_cell_range(self.formula_sumavg_data_position, error_dict, 'formula_sumavg_data_position')
             clean_cell_range(self.formula_sumavg_result_position, error_dict, 'formula_sumavg_result_position')
 
+        if self.upload_excel:
+            print('')
+        else:
+            error_dict['upload_excel'] = _('必须上传文件')
+
         if len(error_dict)>0:
             raise ValidationError(error_dict)
+
+    ## 
+    upload_excel = models.FileField(verbose_name='上传EXCEL文件', upload_to='upload_xlsx/', 
+        null=True, blank=True, validators=[validate_xlsx])
 
     # 重命名工作表Sheet1
     # 题目示例：将Sheet1重命名new_sheet_name
@@ -342,3 +390,5 @@ class ExcelQuestion(models.Model):
     formula_sumavg_result_position = models.CharField('公式填写在单元格', max_length=20, blank=True, default='') 
     formula_sumavg_result_regex = models.CharField('公式匹配模式', max_length=50, 
                 blank=True, default='=SUM\(([A-Z])(\d+):([A-Z])(\d+)\)') 
+
+                

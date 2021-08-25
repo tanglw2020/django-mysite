@@ -77,10 +77,10 @@ class FileOperationQuestionAdmin(admin.ModelAdmin):
 
 class ExcelQuestionAdmin(admin.ModelAdmin):
 
-        list_display = ('__str__', 'question_content',)
-
+        list_display = ('__str__', 'question_content', 'file_path_', 'test_')
 
         fieldsets = (
+                ('上传题目所需excel文件', {'fields':('upload_excel',)}),
                 ('1 重命名工作表Sheet1', {'fields':('rename_sheet_op', 'new_sheet_name')}),
                 ('2 合并单元格', {'fields':('merge_cell_op', 'merge_cell_position')}),
                 ('3 设置单元格颜色', {'fields':('color_cell_op', 'color_cell_position',
