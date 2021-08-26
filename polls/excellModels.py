@@ -480,11 +480,13 @@ class ExcelQuestion(models.Model):
     # 双关键字排序
     # 题目示例：将表格按关键字1升序、关键字2降序排序
     sort_op = models.BooleanField('考查排序？', default=False)
-    keyword_1 = models.CharField('主关键字', max_length=20, blank=True, default='')
+    keyword_1 = models.CharField('主关键字', max_length=20, blank=True, default='', 
+        help_text='注意：用公式生成的数据列不能用于排序')
     sort_type_1 = models.CharField('主关键字次序', choices=Sort_Type_Choice, max_length=20, blank=True, default='') 
     sort_data_position_1 = models.CharField('主关键字数据区域', max_length=20, blank=True, default='G3:G10')
     sort_data_result_1 = models.TextField('主关键字数据列最终排序结果', blank=True, default='')
-    keyword_2 = models.CharField('次关键字', max_length=20, blank=True, default='')
+    keyword_2 = models.CharField('次关键字', max_length=20, blank=True, default='', 
+        help_text='注意：用公式生成的数据列不能用于排序')
     sort_type_2 = models.CharField('次关键字次序', choices=Sort_Type_Choice, max_length=20, blank=True, default='') 
     sort_data_position_2 = models.CharField('次关键字数据区域', max_length=20, blank=True, default='F3:F10')
     sort_data_result_2 = models.TextField('次关键字数据列最终排序结果', blank=True, default='')
