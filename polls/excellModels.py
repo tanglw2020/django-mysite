@@ -42,12 +42,12 @@ Standard_Color_Maps = [
 
 ## 套用套用表格格式
 Table_Style_Maps = [
-    ('TableStyleLight9', '"蓝色,表样式浅色9"'),
-    ('TableStyleLight12','"金色,表样式浅色12"'),
-    ('TableStyleMedium4','"白色,表样式中等深浅4"'),
-    ('TableStyleMedium8','"浅灰色,表样式中等深浅8"'),
-    ('TableStyleDark3','"褐色,表样式深色3"'),
-    ('TableStyleDark6','"深蓝,表样式深色6"'),
+    ('TableStyleLight9', '"表样式浅色9"'),
+    ('TableStyleLight12','"表样式浅色12"'),
+    ('TableStyleMedium4','"表样式中等深浅4"'),
+    ('TableStyleMedium8','"表样式中等深浅8"'),
+    ('TableStyleDark3','"表样式深色3"'),
+    ('TableStyleDark6','"表样式深色6"'),
 ]
 
 ## 图表类型
@@ -245,63 +245,96 @@ class ExcelQuestion(models.Model):
             if self.conditional_formatting_op:
                 result = 'conditional_formatting::'
                 for condf in ws.conditional_formatting:
-                    print(condf.cells,)
+                    # print(condf.cells,)
                     rules = condf.rules
                     if str(condf.cells) != self.conditional_formatting_position:
                         continue
 
-                    for rule in rules:  #print(rule.type)
+                    for rule in rules:  
+                        # print(rule.type)
                         if self.conditional_formatting_type in ('greaterThan', 'lessThan', 'equal'):
                             if str(rule.operator) == self.conditional_formatting_type:
                                 result = result+self.conditional_formatting_position+'-'\
                                     +self.conditional_formatting_type+'-'+self.conditional_formatting_param
-                                break
+                                # break
                         elif self.conditional_formatting_type == 'top10':
                             if str(rule.type) == 'top10' \
                                 and str(rule.bottom) == 'None' \
                                     and str(rule.percent)== 'None':
                                 result = result+self.conditional_formatting_position+'-'\
                                     +self.conditional_formatting_type+'-'+self.conditional_formatting_param
-                                break
+                                # break
                         elif self.conditional_formatting_type == 'top10p':
                             if str(rule.type) == 'top10' \
                                 and str(rule.bottom) == 'None' \
                                     and str(rule.percent)== 'True':
                                 result = result+self.conditional_formatting_position+'-'\
                                     +self.conditional_formatting_type+'-'+self.conditional_formatting_param
-                                break
+                                # break
                         elif self.conditional_formatting_type == 'tail10':
                             if str(rule.type) == 'top10' \
                                 and str(rule.bottom) == 'True' \
                                     and str(rule.percent)== 'None':
                                 result = result+self.conditional_formatting_position+'-'\
                                     +self.conditional_formatting_type+'-'+self.conditional_formatting_param
-                                break
+                                # break
                         elif self.conditional_formatting_type == 'tail10p':
                             if str(rule.type) == 'top10' \
                                 and str(rule.bottom) == 'True' \
                                     and str(rule.percent)== 'True':
                                 result = result+self.conditional_formatting_position+'-'\
                                     +self.conditional_formatting_type+'-'+self.conditional_formatting_param
-                                break
+                                # break
                         elif self.conditional_formatting_type == 'duplicateValues':
                             if str(rule.type) == 'duplicateValues':
                                 result = result+self.conditional_formatting_position+'-'\
                                     +self.conditional_formatting_type+'-'+self.conditional_formatting_param
-                                break
+                                # break
                         elif self.conditional_formatting_type == 'aboveAverage':
                             if str(rule.type) == 'aboveAverage' \
                                 and str(rule.aboveAverage)=="None":
                                 result = result+self.conditional_formatting_position+'-'\
                                     +self.conditional_formatting_type+'-'+self.conditional_formatting_param
-                                break
+                                # break
                         elif self.conditional_formatting_type == 'belowAverage':
                             if str(rule.type) == 'aboveAverage' \
                                 and str(rule.aboveAverage)=="False":
                                 result = result+self.conditional_formatting_position+'-'\
                                     +self.conditional_formatting_type+'-'+self.conditional_formatting_param
-                                break
+                                # break
                 result_list.append(result)
+
+            if self.table_style_op:
+                result = 'table_style::'
+                for table in ws._tables:
+                    # print('套用表格格式:',table.name, table.ref, table.tableStyleInfo.name)
+                    if str(table.ref) == self.table_style_position \
+                        and table.tableStyleInfo.name == self.table_style_choice: 
+                        result = result+self.table_style_position+'-'+self.table_style_choice
+                result_list.append(result)
+
+            if self.chart_op:
+                result = 'chart::'
+                for chart in ws._charts:
+                    # print(chart.tagname, self.chart_type)
+                    if chart.tagname == self.chart_type:
+                        result = result+self.chart_type
+                result_list.append(result)
+
+            if self.sort_op:
+                result = 'sort::'
+                p1, p2 = self.sort_data_position_1.split(':')
+                p3, p4 = self.sort_data_position_2.split(':')
+                sort_result1 = [x.strip() for x in self.sort_data_result_1.split('\n')]
+                sort_result2 = [x.strip() for x in self.sort_data_result_2.split('\n')]
+                # print(ws[p1].value, ws[p2].value,ws[p3].value,ws[p4].value,)
+                # print(sort_result1[0], sort_result1[-1], sort_result2[0], sort_result2[-1])
+                if str(ws[p1].value)==sort_result1[0] and str(ws[p2].value)==sort_result1[-1] \
+                    and str(ws[p3].value)==sort_result2[0] and str(ws[p4].value)==sort_result2[-1]:
+                    result = result+self.keyword_1+'-'+self.sort_type_1
+                result_list.append(result)
+
+
 
         else:
             result_list.append('Nothing to score')
@@ -314,7 +347,12 @@ class ExcelQuestion(models.Model):
             answer_file_path = self.upload_excel.path
         else:
             answer_file_path = ''
-        return '\n'.join(self.score_(answer_file_path))
+        return format_html("<ol>") + \
+                format_html_join(
+                '\n', '<li style="color:black;">{}</li>',
+                ((x,) for x in self.score_(answer_file_path))
+                ) \
+                + format_html("</ol>")
     test_.short_description = '测试结果'
 
     def save(self, *args, **kwargs):
