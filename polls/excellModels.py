@@ -216,11 +216,93 @@ class ExcelQuestion(models.Model):
             ws = wb.active 
 
             if self.rename_sheet_op:
-                result = ''
+                result = 'rename_sheet::'
                 for name in wb.sheetnames:
-                    if name == self.new_sheet_name: result = name
-                if result:
-                    result_list.append(result)
+                    if name == self.new_sheet_name: 
+                        result = result+name
+                        break
+                result_list.append(result)
+
+            if self.merge_cell_op:
+                result = 'merge_cell::'
+                for cell in ws.merged_cells:
+                    if str(cell) == self.merge_cell_position: 
+                        result = result+self.merge_cell_position
+                        break
+                result_list.append(result)
+
+            if self.color_cell_op:
+                result = 'color_cell::'
+                positions = self.color_cell_position.split(':')
+                for cell in positions:
+                    fgcolor = ws[cell].fill.fgColor
+                    fontcolor = ws[cell].font.color
+                    if fgcolor.rgb == self.color_cell_filling \
+                        and fontcolor.rgb == self.color_cell_font:
+                        result = result+cell+self.color_cell_filling+self.color_cell_font+'-'
+                result_list.append(result)
+
+            if self.conditional_formatting_op:
+                result = 'conditional_formatting::'
+                for condf in ws.conditional_formatting:
+                    print(condf.cells,)
+                    rules = condf.rules
+                    if str(condf.cells) != self.conditional_formatting_position:
+                        continue
+
+                    for rule in rules:  #print(rule.type)
+                        if self.conditional_formatting_type in ('greaterThan', 'lessThan', 'equal'):
+                            if str(rule.operator) == self.conditional_formatting_type:
+                                result = result+self.conditional_formatting_position+'-'\
+                                    +self.conditional_formatting_type+'-'+self.conditional_formatting_param
+                                break
+                        elif self.conditional_formatting_type == 'top10':
+                            if str(rule.type) == 'top10' \
+                                and str(rule.bottom) == 'None' \
+                                    and str(rule.percent)== 'None':
+                                result = result+self.conditional_formatting_position+'-'\
+                                    +self.conditional_formatting_type+'-'+self.conditional_formatting_param
+                                break
+                        elif self.conditional_formatting_type == 'top10p':
+                            if str(rule.type) == 'top10' \
+                                and str(rule.bottom) == 'None' \
+                                    and str(rule.percent)== 'True':
+                                result = result+self.conditional_formatting_position+'-'\
+                                    +self.conditional_formatting_type+'-'+self.conditional_formatting_param
+                                break
+                        elif self.conditional_formatting_type == 'tail10':
+                            if str(rule.type) == 'top10' \
+                                and str(rule.bottom) == 'True' \
+                                    and str(rule.percent)== 'None':
+                                result = result+self.conditional_formatting_position+'-'\
+                                    +self.conditional_formatting_type+'-'+self.conditional_formatting_param
+                                break
+                        elif self.conditional_formatting_type == 'tail10p':
+                            if str(rule.type) == 'top10' \
+                                and str(rule.bottom) == 'True' \
+                                    and str(rule.percent)== 'True':
+                                result = result+self.conditional_formatting_position+'-'\
+                                    +self.conditional_formatting_type+'-'+self.conditional_formatting_param
+                                break
+                        elif self.conditional_formatting_type == 'duplicateValues':
+                            if str(rule.type) == 'duplicateValues':
+                                result = result+self.conditional_formatting_position+'-'\
+                                    +self.conditional_formatting_type+'-'+self.conditional_formatting_param
+                                break
+                        elif self.conditional_formatting_type == 'aboveAverage':
+                            if str(rule.type) == 'aboveAverage' \
+                                and str(rule.aboveAverage)=="None":
+                                result = result+self.conditional_formatting_position+'-'\
+                                    +self.conditional_formatting_type+'-'+self.conditional_formatting_param
+                                break
+                        elif self.conditional_formatting_type == 'belowAverage':
+                            if str(rule.type) == 'aboveAverage' \
+                                and str(rule.aboveAverage)=="False":
+                                result = result+self.conditional_formatting_position+'-'\
+                                    +self.conditional_formatting_type+'-'+self.conditional_formatting_param
+                                break
+                result_list.append(result)
+
         else:
             result_list.append('Nothing to score')
         return result_list
