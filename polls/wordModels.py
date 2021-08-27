@@ -7,88 +7,6 @@ from docx import Document
 from .wordChoices import *
 from .fileModels import *
 
-
-# Create your models here.
-class WordQuestion(models.Model):
-
-    def __str__(self):
-        return '题目'+str(self.id)+':Word文件'+str(self.upload_docx.id)
-
-    class Meta:
-        verbose_name = 'Word操作题'
-        verbose_name_plural = 'Word操作题'
-
-    def file_path(self):
-        return self.upload_docx.upload.name
-    file_path.short_description = '考查Word文件'
-
-    def word_op_numb(self):
-        op_numb = len(self.wordoperations_set.all())
-        if op_numb != 5:
-            return format_html(
-            '<b style="background-color:red;">{} [不等于5]</b>',
-            str(op_numb),
-            )
-        else:
-            return '5'
-    word_op_numb.short_description = '操作小题数目'
-
-    def word_op_description(self):
-        result_list = []
-        for x in self.wordoperations_set.all():
-            result_list.append(['black', x.operation_description_all()])
-
-        return format_html("<ol>") + \
-                format_html_join(
-                '\n', '<li style="color:{};">{}</li>',
-                ((x[0], x[1]) for x in result_list)
-                ) \
-                + format_html("</ol>")
-    word_op_description.short_description = '题目内容'
-
-    def word_test_result(self):
-        if self.upload_docx_test is not None:
-            # check valid docx file
-            try:
-                document_test = Document(self.upload_docx_test.upload.path)
-            except:
-                return self.upload_docx_test.upload.path+'打开异常'
-
-            result_list = []
-            for x in self.wordoperations_set.all():
-                result_list_str = [str(y) for y in x.compare_operation(document_test)]
-                result_list_str = ['black', '||'.join(result_list_str)]
-                result_list.append(result_list_str)
-
-            return format_html("<ol>") + \
-                format_html_join(
-                '\n', '<li style="color:{};">{}</li>',
-                ((x[0],x[1]) for x in result_list)
-                ) \
-                + format_html("</ol>")
-        else:
-            return '没有上传测试文件'
-        # return self.upload_docx.upload.name + "::" + self.upload_docx_test.upload.name
-    word_test_result.short_description = '测试文件评估结果'
-
-    # def clean(self):
-    #     op_list = [x for x in  self.wordoperations_set.all()]
-
-    #########
-    pub_date = models.DateTimeField('创建时间')
-
-    upload_docx =  models.ForeignKey(
-        WordDocxFile,
-        on_delete=models.CASCADE, null=True,
-        verbose_name='上传Word文件(.docx)'
-    ) 
-
-    upload_docx_test = models.ForeignKey(
-        WordDocxFileTest,
-        on_delete=models.CASCADE, null=True, blank=True, default='',
-        verbose_name='内部测试用word文件.docx'
-    )
-
 def getColororNone(c):
     if c is None:
         return c
@@ -112,6 +30,315 @@ def getLineorNone(sz1, sz2):
     if sz2 is not None:
         return ((sz2))
     return 0
+
+# Create your models here.
+class WordQuestion(models.Model):
+
+    def __str__(self):
+        return '题目'+str(self.id)
+
+    class Meta:
+        verbose_name = 'Word操作题'
+        verbose_name_plural = 'Word操作题'
+
+    def file_path(self):
+        return self.upload_docx.name
+    file_path.short_description = 'Word文件'
+
+    def word_op_numb(self):
+        op_list = []
+        if self.char_edit_op:
+            op_list.append('查找替换')
+        if self.font_op:
+            op_list.append('字体设置')
+        if self.paraformat_op:
+            op_list.append('段落设置')
+        if self.style_op:
+            op_list.append('样式设置')
+        if self.image_op:
+            op_list.append('图片插入')
+        if self.table_op:
+            op_list.append('表格插入')
+        return str(len(op_list))
+    word_op_numb.short_description = '操作数目'
+
+    def para_text_simple(self, origin_text):
+        if len(origin_text)<30:
+            return origin_text.strip()
+        else:
+            return origin_text[:15] +' ...... '+origin_text[-15:]
+    para_text_simple.short_description = '考查段落内容'
+    
+
+    def char_edit_description(self):
+        if self.char_edit_op:
+            desc_all = '将段落【'+self.para_text_simple(self.font_text)+'】'\
+                +'中所有“'+self.char_edit_origin+'”替换成“'+self.char_edit_replace+'”'+'.'
+            return desc_all
+        else:
+            return ''
+    char_edit_description.short_description = '查找替换文字描述'
+
+    def font_description(self):
+        if self.font_op:
+            setting_list=[]
+            if self.font_name_chinese !='': setting_list.append('中文'+self.font_name_chinese)
+            if self.font_name_ascii !='':  setting_list.append('西文'+self.font_name_ascii)
+            if self.font_size !='': setting_list.append('字号'+self.font_size+'磅')
+            if self.font_color !='': setting_list.append('标准色'+[x[1] for x in FONT_COLOR_CHOICES if x[0]==self.font_color][0])
+            if self.font_bold==True: setting_list.append('粗体')
+            if self.font_italic==True: setting_list.append('斜体')
+            if self.font_underline !='': 
+                setting_list.append([x[1] for x in FONT_UNDERLINE_CHOICES if x[0]==self.font_underline][0])
+            desc_all = '将段落【'+self.para_text_simple(self.font_text)+'】'\
+                +'字体设置成'+'、'.join(setting_list)+'.'
+            return desc_all
+        else:
+            return ''
+    font_description.short_description = '字体设置描述'
+
+    def paraformat_description(self):
+        if self.paraformat_op:
+            setting_list=[]
+            if self.para_alignment !='': 
+                setting_list.append([x[1] for x in PARA_ALIGNMENT_CHOICES if x[0]==self.para_alignment][0])
+                # setting_list.append(self.para_alignment)
+            if self.para_left_indent !='': setting_list.append('左缩进'+self.para_left_indent+'磅')
+            if self.para_right_indent !='': setting_list.append('右缩进'+self.para_right_indent+'磅')
+            if self.para_first_line_indent !='' and self.para_first_line_indent_size !='': 
+                setting_list.append(self.para_first_line_indent+self.para_first_line_indent_size+'磅')
+            if self.para_space_before !='': setting_list.append('段前'+self.para_space_before+'磅')
+            if self.para_space_after !='':  setting_list.append('段后'+self.para_space_after+'磅')
+            if self.para_line_spacing_rule !='': 
+                if self.para_line_spacing_rule in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:3]):
+                    setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.para_line_spacing_rule][0])
+                else:
+                    setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.para_line_spacing_rule][0]+self.para_line_spacing+'倍行距')
+            
+            # if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
+            #     if self.para_firstchardropcap == PARA_FIRSTCHARDROPCAP_CHOICES[0][0]:
+            #         setting_list.append('首字下沉'+self.para_firstchardropcaplines+'行')
+            #     if self.para_firstchardropcap == PARA_FIRSTCHARDROPCAP_CHOICES[1][0]:
+            #         setting_list.append('首字悬挂'+self.para_firstchardropcaplines+'行')
+                
+            if self.page_break_before==True: setting_list.append('段前分页')
+            if self.keep_with_next==True: setting_list.append('与下段同页')
+            if self.keep_together==True: setting_list.append('段中不分页')
+            if self.widow_control==True: setting_list.append('孤行控制')
+
+            desc_all = '将段落【'+self.para_text_simple(self.font_text)+'】'\
+                +'其段落格式设置成'+'、'.join(setting_list)+'.'
+            return desc_all
+        else:
+            return ''
+    paraformat_description.short_description = '段落设置描述'
+
+    def style_description(self):
+        if self.style_op:
+            style_des = ''
+            style_des_add = []
+            if self.style_name in ['新样式1', '新样式2']:
+                style_des = '创建并应用“'+self.style_name+'”'
+            else:
+                style_des = '应用样式“'+self.style_name+'”'
+
+            font_setting_list=[]
+            if self.style_font_name_chinese !='': font_setting_list.append('中文'+self.style_font_name_chinese)
+            if self.style_font_name_ascii !='':  font_setting_list.append('西文'+self.style_font_name_ascii)
+            if self.style_font_size !='': font_setting_list.append('字号'+self.style_font_size)
+            if self.style_font_color !='': font_setting_list.append(self.style_font_color)
+            if self.style_font_bold==True: font_setting_list.append('粗体')
+            if self.style_font_italic==True: font_setting_list.append('斜体')
+            if self.style_font_underline !='': font_setting_list.append(self.style_font_underline)
+            if len(font_setting_list)>0:
+                style_des_add.append('其字体设置成'+'、'.join(font_setting_list))
+
+            para_setting_list=[]
+            if self.style_para_alignment !='': para_setting_list.append(self.style_para_alignment)
+            if self.style_para_left_indent !='': para_setting_list.append('左缩进'+self.style_para_left_indent+'磅')
+            if self.style_para_right_indent !='': para_setting_list.append('右缩进'+self.style_para_right_indent+'磅')
+            if self.style_para_first_line_indent !='' and \
+               self.style_para_first_line_indent_size !='': 
+                para_setting_list.append(self.style_para_first_line_indent+self.style_para_first_line_indent_size+'磅')
+            if self.style_para_space_before !='': para_setting_list.append('段前'+self.style_para_space_before+'磅')
+            if self.style_para_space_after !='':  para_setting_list.append('段后'+self.style_para_space_before+'磅')
+            if self.style_para_line_spacing_rule !='': 
+                if self.style_para_line_spacing_rule in ('单倍行距','双倍行距','1.5倍行距'):
+                    para_setting_list.append(self.style_para_line_spacing_rule)
+                else:
+                    para_setting_list.append(self.style_para_line_spacing+'倍行距')
+            # if self.style_para_firstchardropcap !='' and self.style_para_firstchardropcaplines !='': 
+                # para_setting_list.append('首字'+self.style_para_firstchardropcap+self.style_para_firstchardropcaplines+'磅')
+            if self.style_page_break_before==True: para_setting_list.append('段前分页')
+            if self.style_keep_with_next==True: para_setting_list.append('与下段同页')
+            if self.style_keep_together==True: para_setting_list.append('段中不分页')
+            if self.style_widow_control==True: para_setting_list.append('孤行控制')
+
+            if len(para_setting_list)>0:
+                style_des_add.append('其段落格式设置成'+'、'.join(para_setting_list))
+            desc_all = '为段落【'+self.para_text_simple(self.font_text)+'】'\
+                +style_des+'('+'，'.join(style_des_add)+')'+'.'
+            return desc_all
+        else:
+            return ''
+    style_description.short_description = '样式设置描述'
+
+    def image_description(self):
+        if self.image_op:
+            image_desc = '在段落【'+self.para_text_simple(self.image_text)+'】后以"'+\
+                self.image_position_style+'"格式插入图片"'+self.upload_image_file.name.split('/')[-1]+'"'
+            if self.image_width !='':
+                image_desc = image_desc + '、宽度'+self.image_width+'厘米'
+            if self.image_height !='': 
+                image_desc = image_desc + '、高度'+self.image_height+'厘米'
+            return image_desc
+        else:
+            return ''
+    image_description.short_description = '图片插入描述'
+
+    def table_description(self):
+        if self.table_op:
+            table_desc = '将内容【'+self.para_text_simple(self.table_text)+'】生成表格'
+            if self.table_alignment!='':
+                table_desc = table_desc +'， 表格'+ [x[1] for x in TABLE_ALIGNMENT_CHOICES if x[0]==self.table_alignment][0]
+            if self.table_style!='':
+                table_desc = table_desc +'， 应用'+ [x[1] for x in TABLE_STYLE_CHOICES if x[0]==self.table_style][0] +'表格样式'
+            if self.table_autofit:
+                table_desc = table_desc +'， 宽度自动调整' 
+            return table_desc
+        else:
+            return ''
+    table_description.short_description = '表格插入描述'
+
+    def word_op_description(self):
+        result_list = []
+        # for x in self.wordoperations_set.all():
+            # result_list.append(['black', x.operation_description_all()])
+
+        return format_html("<ol>") + \
+                format_html_join(
+                '\n', '<li style="color:{};">{}</li>',
+                ((x[0], x[1]) for x in result_list)
+                ) \
+                + format_html("</ol>")
+    word_op_description.short_description = '题目内容'
+
+    # def word_test_result(self):
+    #     if self.upload_docx_test is not None:
+    #         # check valid docx file
+    #         try:
+    #             document_test = Document(self.upload_docx_test.upload.path)
+    #         except:
+    #             return self.upload_docx_test.upload.path+'打开异常'
+
+    #         result_list = []
+    #         for x in self.wordoperations_set.all():
+    #             result_list_str = [str(y) for y in x.compare_operation(document_test)]
+    #             result_list_str = ['black', '||'.join(result_list_str)]
+    #             result_list.append(result_list_str)
+
+    #         return format_html("<ol>") + \
+    #             format_html_join(
+    #             '\n', '<li style="color:{};">{}</li>',
+    #             ((x[0],x[1]) for x in result_list)
+    #             ) \
+    #             + format_html("</ol>")
+    #     else:
+    #         return '没有上传测试文件'
+    # word_test_result.short_description = '测试文件评估结果'
+
+    # def clean(self):
+    #     op_list = [x for x in  self.wordoperations_set.all()]
+
+    #########
+    pub_date = models.DateTimeField('创建时间')
+
+    upload_docx = models.FileField(verbose_name='上传word文件(.docx)',upload_to='upload_docx/',
+        validators=[validate_docx])
+
+    ############## 文字查找替换
+    char_edit_text = models.TextField('文字编辑要考查的文字内容', blank=True, default='')
+    char_edit_op = models.BooleanField('考查文字查找替换？', default=False)
+    char_edit_origin = models.CharField('原词', max_length=200, blank=True, default='')
+    char_edit_replace = models.CharField('替换为', max_length=200, blank=True, default='')
+
+    ############## 字体设置
+    font_text = models.TextField('字体要考查的文字内容', blank=True, default='')
+    font_op = models.BooleanField('考查字体设置？', default=False)
+    font_name_ascii = models.CharField('英文字体', choices=FONT_NAME_ASCII_CHOICES, max_length=200, blank=True, default='') 
+    font_name_chinese = models.CharField('中文字体', choices=FONT_NAME_CHINESE_CHOICES, max_length=200, blank=True, default='')
+    font_size = models.CharField('字号(磅)', choices=FONT_SIZE_CHOICES, max_length=200, blank=True, default='')
+    font_bold = models.BooleanField('粗体', blank=True, default='')
+    font_italic = models.BooleanField('斜体', blank=True, default='')
+    font_underline = models.CharField('下划线', choices=FONT_UNDERLINE_CHOICES, max_length=200, blank=True, default='')
+    font_color = models.CharField('字色(标准色)', choices=FONT_COLOR_CHOICES, max_length=200, blank=True, default='')
+
+    ############## 段落格式设置
+    paraformat_text = models.TextField('段落格式要考查的文字内容', blank=True, default='')
+    paraformat_op = models.BooleanField('考查段落格式设置？', default=False)
+    para_alignment = models.CharField('段落对齐', choices=PARA_ALIGNMENT_CHOICES, max_length=200, blank=True, default='')
+    para_left_indent = models.CharField('左侧缩进(磅)', choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    para_right_indent = models.CharField('右侧缩进(磅)', choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    para_first_line_indent = models.CharField('首行缩进', choices=PARA_FIRST_LINE_INDENT_CHOICES, max_length=200, blank=True, default='')
+    para_first_line_indent_size = models.CharField('首行缩进距离(磅)', choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+
+    para_space_before = models.CharField('段前间距(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    para_space_after = models.CharField('段后间距(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    para_line_spacing_rule = models.CharField('行距规则', choices=PARA_LINE_SPACING_RULE_CHOICES, max_length=200, blank=True, default='')
+    para_line_spacing = models.CharField('行距(行)',  choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
+
+    # para_firstchardropcap = models.CharField('首字下沉', choices=PARA_FIRSTCHARDROPCAP_CHOICES, max_length=200, blank=True, default='')
+    # para_firstchardropcaplines = models.CharField('下沉(行)',  choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
+
+    page_break_before = models.BooleanField('段前分页', default=False)
+    keep_with_next = models.BooleanField('与下段同页', default=False)
+    keep_together = models.BooleanField('段中不分页', default=False)
+    widow_control = models.BooleanField('孤行控制', default=False)
+
+    ############## 样式设置
+    stype_text = models.TextField('样式要考查的文字内容', blank=True, default='')
+    style_op = models.BooleanField('考查样式设置？', default=False)
+    style_name = models.CharField('样式名称', choices=STYLE_NAME_CHOICES, max_length=200, blank=True, default='') 
+    style_font_name_ascii = models.CharField('英文字体', choices=FONT_NAME_ASCII_CHOICES, max_length=200, blank=True, default='') 
+    style_font_name_chinese = models.CharField('中文字体', choices=FONT_NAME_CHINESE_CHOICES, max_length=200, blank=True, default='')
+    style_font_size = models.CharField('字号', choices=FONT_SIZE_CHOICES, max_length=200, blank=True, default='')
+    style_font_bold = models.BooleanField('粗体', default=False)
+    style_font_italic = models.BooleanField('斜体', default=False)
+    style_font_underline = models.CharField('下划线', choices=FONT_UNDERLINE_CHOICES, max_length=200, blank=True, default='')
+    style_font_color = models.CharField('字色(标准色)', choices=FONT_COLOR_CHOICES, max_length=200, blank=True, default='')
+
+    style_para_alignment = models.CharField('段落对齐', choices=PARA_ALIGNMENT_CHOICES, max_length=200, blank=True, default='')
+    style_para_left_indent = models.CharField('左侧缩进(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    style_para_right_indent = models.CharField('右侧缩进(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    style_para_first_line_indent = models.CharField('首行缩进', choices=PARA_FIRST_LINE_INDENT_CHOICES, max_length=200, blank=True, default='')
+    style_para_first_line_indent_size = models.CharField('首行缩进距离(磅)',  choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+
+    style_para_space_before = models.CharField('段前间距(磅)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    style_para_space_after = models.CharField('段后间距(磅)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    style_para_line_spacing_rule = models.CharField('行距规则', choices=PARA_LINE_SPACING_RULE_CHOICES, max_length=200, blank=True, default='')
+    style_para_line_spacing = models.CharField('行距(行)',   choices=LINE_NUM_CHOICES, max_length=200, blank=True, default='')
+
+    style_page_break_before = models.BooleanField('段前分页', default=False)
+    style_keep_with_next = models.BooleanField('与下段同页', default=False)
+    style_keep_together = models.BooleanField('段中不分页', default=False)
+    style_widow_control = models.BooleanField('孤行控制', default=False)
+
+    ############## 图片插入
+    image_text = models.TextField('图片插入的文字内容', blank=True, default='')
+    image_op = models.BooleanField('考查图片插入？', default=False)
+    image_position_style = models.CharField('位置类型', choices=IMAGE_POSITION_STYLE_CHOICES, max_length=20, default='嵌入文本行中')
+    image_width = models.CharField('图像宽(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    image_height = models.CharField('图像高(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    upload_image_file = models.FileField(upload_to='upload_image/', null=True, blank=True, 
+    validators=[validate_image], verbose_name='上传图片')
+
+    ############## 表格插入
+    table_text = models.TextField('表格要考查的文字内容', blank=True, default='')
+    table_op = models.BooleanField('考查表格插入？', default=False)
+    table_alignment = models.CharField('对齐方式', choices=TABLE_ALIGNMENT_CHOICES, max_length=10, default='')
+    table_autofit = models.BooleanField('表格宽度自动调整？', default=False)
+    table_style = models.CharField('表格样式', choices=TABLE_STYLE_CHOICES, max_length=30, default='')
+
 
 # Create your models here.
 class WordOperations(models.Model):
