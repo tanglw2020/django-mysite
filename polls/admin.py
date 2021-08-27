@@ -54,13 +54,14 @@ class WordQuestionAdmin(admin.ModelAdmin):
         # list_display = ('__str__','word_op_numb','word_op_description', 'word_test_result')
         list_display = ('__str__',
         # 'word_op_numb',
-        # 'word_op_description', 
-                'char_edit_description', 
-                'font_description', 
-                'paraformat_description', 
-                'style_description', 
-                'image_description', 
-                'table_description', 
+        'operation_description_all', 
+        'test_'
+                # 'char_edit_description', 
+                # 'font_description', 
+                # 'paraformat_description', 
+                # 'style_description', 
+                # 'image_description', 
+                # 'table_description', 
                 )
         
         fieldsets  = (
@@ -78,7 +79,7 @@ class WordQuestionAdmin(admin.ModelAdmin):
                                 ('para_first_line_indent','para_first_line_indent_size'),
                                 ('page_break_before','keep_with_next','keep_together','widow_control'),
                                 )}), 
-        ('样式设置', { 'classes': ( 'collapse',), 'fields': ('stype_text', 'style_name', 
+        ('样式设置', { 'classes': ( 'collapse',), 'fields': ('style_text', 'style_name', 
                                 ('style_font_name_chinese','style_font_name_ascii','style_font_size'),
                                   'style_font_color', ('style_font_underline', 'style_font_bold','style_font_italic'),
                                 'style_para_alignment', ('style_para_left_indent','style_para_right_indent'),

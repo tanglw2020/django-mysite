@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, format_html_join
 from docx import Document
+import Levenshtein
 from .wordChoices import *
 from .fileModels import *
 
@@ -69,10 +70,26 @@ class WordQuestion(models.Model):
             return origin_text[:15] +' ...... '+origin_text[-15:]
     para_text_simple.short_description = '考查段落内容'
     
+    def operation_description_all(self):
+        description_list = [self.char_edit_description(), 
+        self.font_description(),
+        self.paraformat_description(), 
+        self.style_description(),
+        self.image_description(),
+        self.table_description(),
+        ]
+        description_list = [x for x in description_list if len(x)>0]
+        return format_html("<ol>") + \
+                format_html_join(
+                '\n', '<li style="color:black;">{}</li>',
+                ((x,) for x in description_list)
+                ) \
+                + format_html("</ol>")
+    operation_description_all.short_description = '题目文字描述'
 
     def char_edit_description(self):
         if self.char_edit_op:
-            desc_all = '将段落【'+self.para_text_simple(self.font_text)+'】'\
+            desc_all = '将段落【'+self.para_text_simple(self.char_edit_text)+'】'\
                 +'中所有“'+self.char_edit_origin+'”替换成“'+self.char_edit_replace+'”'+'.'
             return desc_all
         else:
@@ -126,7 +143,7 @@ class WordQuestion(models.Model):
             if self.keep_together==True: setting_list.append('段中不分页')
             if self.widow_control==True: setting_list.append('孤行控制')
 
-            desc_all = '将段落【'+self.para_text_simple(self.font_text)+'】'\
+            desc_all = '将段落【'+self.para_text_simple(self.paraformat_text)+'】'\
                 +'其段落格式设置成'+'、'.join(setting_list)+'.'
             return desc_all
         else:
@@ -145,16 +162,20 @@ class WordQuestion(models.Model):
             font_setting_list=[]
             if self.style_font_name_chinese !='': font_setting_list.append('中文'+self.style_font_name_chinese)
             if self.style_font_name_ascii !='':  font_setting_list.append('西文'+self.style_font_name_ascii)
-            if self.style_font_size !='': font_setting_list.append('字号'+self.style_font_size)
-            if self.style_font_color !='': font_setting_list.append(self.style_font_color)
+            if self.style_font_size !='': font_setting_list.append('字号'+self.style_font_size+'磅')
+            if self.style_font_color !='': font_setting_list.append('标准色'+[x[1] for x in FONT_COLOR_CHOICES if x[0]==self.style_font_color][0])
             if self.style_font_bold==True: font_setting_list.append('粗体')
             if self.style_font_italic==True: font_setting_list.append('斜体')
-            if self.style_font_underline !='': font_setting_list.append(self.style_font_underline)
+            if self.style_font_underline !='': 
+                font_setting_list.append([x[1] for x in FONT_UNDERLINE_CHOICES if x[0]==self.style_font_underline][0])
             if len(font_setting_list)>0:
                 style_des_add.append('其字体设置成'+'、'.join(font_setting_list))
 
             para_setting_list=[]
-            if self.style_para_alignment !='': para_setting_list.append(self.style_para_alignment)
+            if self.style_para_alignment !='':
+                #  para_setting_list.append(self.style_para_alignment)
+                 para_setting_list.append([x[1] for x in PARA_ALIGNMENT_CHOICES if x[0]==self.style_para_alignment][0])
+
             if self.style_para_left_indent !='': para_setting_list.append('左缩进'+self.style_para_left_indent+'磅')
             if self.style_para_right_indent !='': para_setting_list.append('右缩进'+self.style_para_right_indent+'磅')
             if self.style_para_first_line_indent !='' and \
@@ -163,10 +184,15 @@ class WordQuestion(models.Model):
             if self.style_para_space_before !='': para_setting_list.append('段前'+self.style_para_space_before+'磅')
             if self.style_para_space_after !='':  para_setting_list.append('段后'+self.style_para_space_before+'磅')
             if self.style_para_line_spacing_rule !='': 
-                if self.style_para_line_spacing_rule in ('单倍行距','双倍行距','1.5倍行距'):
-                    para_setting_list.append(self.style_para_line_spacing_rule)
+                if self.style_para_line_spacing_rule in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:3]):
+                    para_setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.style_para_line_spacing_rule][0])
                 else:
-                    para_setting_list.append(self.style_para_line_spacing+'倍行距')
+                    para_setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.style_para_line_spacing_rule][0]+self.para_line_spacing+'倍行距')
+                # if self.style_para_line_spacing_rule in ('单倍行距','双倍行距','1.5倍行距'):
+                #     para_setting_list.append(self.style_para_line_spacing_rule)
+                # else:
+                #     para_setting_list.append(self.style_para_line_spacing+'倍行距')
+
             # if self.style_para_firstchardropcap !='' and self.style_para_firstchardropcaplines !='': 
                 # para_setting_list.append('首字'+self.style_para_firstchardropcap+self.style_para_firstchardropcaplines+'磅')
             if self.style_page_break_before==True: para_setting_list.append('段前分页')
@@ -176,7 +202,7 @@ class WordQuestion(models.Model):
 
             if len(para_setting_list)>0:
                 style_des_add.append('其段落格式设置成'+'、'.join(para_setting_list))
-            desc_all = '为段落【'+self.para_text_simple(self.font_text)+'】'\
+            desc_all = '为段落【'+self.para_text_simple(self.style_text)+'】'\
                 +style_des+'('+'，'.join(style_des_add)+')'+'.'
             return desc_all
         else:
@@ -188,10 +214,10 @@ class WordQuestion(models.Model):
             image_desc = '在段落【'+self.para_text_simple(self.image_text)+'】后以"'+\
                 self.image_position_style+'"格式插入图片"'+self.upload_image_file.name.split('/')[-1]+'"'
             if self.image_width !='':
-                image_desc = image_desc + '、宽度'+self.image_width+'厘米'
+                image_desc = image_desc + '、宽度设置为'+self.image_width+'厘米'
             if self.image_height !='': 
-                image_desc = image_desc + '、高度'+self.image_height+'厘米'
-            return image_desc
+                image_desc = image_desc + '、高度设置为'+self.image_height+'厘米'
+            return image_desc+'.'
         else:
             return ''
     image_description.short_description = '图片插入描述'
@@ -205,50 +231,344 @@ class WordQuestion(models.Model):
                 table_desc = table_desc +'， 应用'+ [x[1] for x in TABLE_STYLE_CHOICES if x[0]==self.table_style][0] +'表格样式'
             if self.table_autofit:
                 table_desc = table_desc +'， 宽度自动调整' 
-            return table_desc
+            return table_desc+'.'
         else:
             return ''
     table_description.short_description = '表格插入描述'
 
-    def word_op_description(self):
-        result_list = []
-        # for x in self.wordoperations_set.all():
-            # result_list.append(['black', x.operation_description_all()])
 
-        return format_html("<ol>") + \
+    def clean(self):
+        if not (self.char_edit_op or self.font_op or self.paraformat_op or self.style_op or self.image_op or self.table_op):
+            raise ValidationError(_('至少选择一个操作考查'))
+
+        # if self.table_op and (self.char_edit_op or self.font_op or self.paraformat_op or self.style_op or self.image_op):
+        #     raise ValidationError(_('插入表格不能和其他操作同时选择'))
+
+        # if (self.font_op or self.paraformat_op) and self.style_op:
+        #     raise ValidationError(_('样式和单独的字体和段落格式不应同时设置'))
+
+        # check word file
+        # print('file:', self.word_question.upload_docx.upload.path)
+        # try:
+        #     document = Document(self.upload_docx.upload.path)
+        # except:
+        #     raise ValidationError({'word_question':_('文件异常')})
+
+        # all_paras  = document.paragraphs
+        # para_text = self.para_text.strip()
+        # matched = 0
+        # for para in para_text.split('\n'):
+        #     for i in range(len(all_paras)):
+        #         if all_paras[i].text.strip()==para.strip():
+        #             matched = matched + 1
+        # if matched != len(para_text.split('\n')):
+        #     raise ValidationError({'para_text':_('未找到文章中对应内容，请检查是否输入正确内容')})
+
+        error_dict = {}
+
+        if self.char_edit_op and (self.char_edit_text==''):
+            error_dict['char_edit_text'] = _('不能为空')
+        if self.char_edit_op and (self.char_edit_origin==''):
+            error_dict['char_edit_origin'] = _('不能为空')
+        if self.char_edit_op and (self.char_edit_replace==''):
+            error_dict['char_edit_replace'] = _('不能为空')
+
+
+        if self.font_op and (self.font_text==''):
+            error_dict['font_text'] = _('不能为空')
+
+        if self.font_op and \
+        (self.font_name_ascii=='' and 
+        self.font_name_chinese=='' and 
+        self.font_size=='' and 
+        self.font_underline=='' and 
+        self.font_color=='' and
+        self.font_bold==False and
+        self.font_italic==False):
+            error_dict['font_name_chinese'] = _('至少设定一个字体相关设置')
+            error_dict['font_name_ascii'] = _('')
+            error_dict['font_size'] = _('')
+            error_dict['font_underline'] = _('')
+            error_dict['font_color'] = _('')
+
+
+        if self.paraformat_op and (self.paraformat_text==''):
+            error_dict['paraformat_text'] = _('不能为空')
+
+        if self.paraformat_op and \
+        (self.para_alignment=='' and 
+        self.para_left_indent=='' and 
+        self.para_right_indent=='' and 
+        self.para_first_line_indent=='' and 
+        self.para_first_line_indent_size=='' and 
+        self.para_space_before=='' and 
+        self.para_space_after=='' and 
+        self.para_line_spacing_rule=='' and 
+        self.para_line_spacing=='' and 
+        # self.para_firstchardropcap=='' and 
+        # self.para_firstchardropcaplines=='' and 
+        self.page_break_before==False and
+        self.keep_with_next==False and
+        self.keep_together==False and
+        self.widow_control==False):
+            error_dict['para_alignment'] = _('至少选择一个段落格式相关设置')
+            error_dict['para_left_indent'] = _('')
+            error_dict['para_right_indent'] = _('')
+            error_dict['para_first_line_indent'] = _('')
+            error_dict['para_first_line_indent_size'] = _('')
+            error_dict['para_space_before'] = _('')
+            error_dict['para_space_after'] = _('')
+            error_dict['para_line_spacing_rule'] = _('')
+            error_dict['para_line_spacing'] = _('')
+            # error_dict['para_firstchardropcap'] = _('')
+            # error_dict['para_firstchardropcaplines'] = _('')
+
+        if self.paraformat_op and (self.para_first_line_indent=='' and self.para_first_line_indent_size!=''):
+            error_dict['para_first_line_indent'] = _('不能为空')
+            error_dict['para_first_line_indent_size'] = _('*')
+        if self.paraformat_op and (self.para_first_line_indent !='' and self.para_first_line_indent_size==''):
+            error_dict['para_first_line_indent'] = _('*')
+            error_dict['para_first_line_indent_size'] = _('不能为空')
+
+        if self.paraformat_op and (self.para_line_spacing_rule=='' and self.para_line_spacing!=''):
+            error_dict['para_line_spacing_rule'] = _('不能为空')
+            error_dict['para_line_spacing'] = _('*')
+        if self.paraformat_op and (self.para_line_spacing_rule =='MULTIPLE (5)' and self.para_line_spacing==''):
+            error_dict['para_line_spacing_rule'] = _('*')
+            error_dict['para_line_spacing'] = _('不能为空')
+
+        # if self.paraformat_op and (self.para_firstchardropcap=='' and self.para_firstchardropcaplines!=''):
+        #     error_dict['para_firstchardropcap'] = _('不能为空')
+        #     error_dict['para_firstchardropcaplines'] = _('*')
+        # if self.paraformat_op and (self.para_firstchardropcap !='' and self.para_firstchardropcaplines==''):
+        #     error_dict['para_firstchardropcap'] = _('*')
+        #     error_dict['para_firstchardropcaplines'] = _('不能为空')
+
+
+        if self.style_op and self.style_name=='':
+            error_dict['style_name'] = _('内容不能为空')
+
+        if self.style_op and self.style_text=='':
+            error_dict['style_text'] = _('内容不能为空')
+
+        if self.style_op and self.style_name in ['新样式1', '新样式2'] and \
+               (self.style_font_name_ascii=='' and 
+                self.style_font_name_chinese=='' and 
+                self.style_font_size=='' and 
+                self.style_font_underline=='' and 
+                self.style_font_color=='' and
+                self.style_font_bold==False and
+                self.style_font_italic==False and
+                self.style_para_alignment=='' and 
+                self.style_para_left_indent=='' and 
+                self.style_para_right_indent=='' and 
+                self.style_para_first_line_indent=='' and 
+                self.style_para_first_line_indent_size=='' and 
+                self.style_para_space_before=='' and 
+                self.style_para_space_after=='' and 
+                self.style_para_line_spacing_rule=='' and 
+                self.style_para_line_spacing=='' and 
+                self.style_page_break_before==False and
+                self.style_keep_with_next==False and
+                self.style_keep_together==False and
+                self.style_widow_control==False
+                ):
+            error_dict['style_name'] = _('至少为新样式设定一个具体设置')
+            error_dict['style_font_name_chinese'] = _('')
+            error_dict['style_font_name_ascii'] = _('')
+            error_dict['style_font_size'] = _('')
+            error_dict['style_font_underline'] = _('')
+            error_dict['style_font_color'] = _('')
+            error_dict['style_para_alignment'] = _('')
+            error_dict['style_para_left_indent'] = _('')
+            error_dict['style_para_right_indent'] = _('')
+            error_dict['style_para_first_line_indent'] = _('')
+            error_dict['style_para_first_line_indent_size'] = _('')
+            error_dict['style_para_space_before'] = _('')
+            error_dict['style_para_space_after'] = _('')
+            error_dict['style_para_line_spacing_rule'] = _('')
+            error_dict['style_para_line_spacing'] = _('')
+
+        if self.style_op and \
+        (self.style_para_first_line_indent=='' and 
+         self.style_para_first_line_indent_size!=''):
+            error_dict['style_para_first_line_indent'] = _('不能为空')
+            error_dict['style_para_first_line_indent_size'] = _('*')
+
+        if self.style_op and \
+            (self.style_para_first_line_indent !='' and 
+             self.style_para_first_line_indent_size==''):
+            error_dict['style_para_first_line_indent'] = _('*')
+            error_dict['style_para_first_line_indent_size'] = _('不能为空')
+
+        if self.style_op and (self.style_para_line_spacing_rule=='' and self.style_para_line_spacing!=''):
+            error_dict['style_para_line_spacing'] = _('*')
+            error_dict['style_para_line_spacing_rule'] = _('不能为空')
+        if self.style_op and (self.style_para_line_spacing_rule !='' and self.style_para_line_spacing==''):
+            error_dict['style_para_line_spacing'] = _('不能为空')
+            error_dict['style_para_line_spacing_rule'] = _('*')
+
+        # print('self.upload_image_file',  self.upload_image_file.name)
+        if self.image_op:
+            if self.upload_image_file.name=='':
+                error_dict['upload_image_file'] = _('必须上传图片(jpg,bmp,png)')
+            if self.image_text=='':
+                error_dict['image_text'] = _('不能为空')
+        
+        if self.table_op:
+            if self.table_text=='':
+                error_dict['table_text'] = _('不能为空')
+
+        if len(error_dict)>0:
+            raise ValidationError(error_dict)
+
+    def compare_operation(self, docx_test):
+        all_paras  = docx_test.paragraphs
+        # print(all_paras)
+        para_text_list = self.char_edit_text.strip().split('\n')
+        print(para_text_list)
+        matched_list = []
+        for para in para_text_list:
+            for i in range(len(all_paras)):
+                print(all_paras[i].text)
+                if Levenshtein.ratio(all_paras[i].text, para)>0.6:
+                    matched_list.append(i)
+        if len(matched_list) != len(para_text_list):
+            return [['red', '未找到文章中对应考查段落']]
+
+        result_list = []
+        # 
+        if self.char_edit_op:
+            count_origin, count_replace = 0, 0
+            for para in para_text_list:
+                count_origin += para.count(self.char_edit_origin)
+            for ind in  matched_list:
+                count_replace += all_paras[ind].text.count(self.char_edit_replace)
+            result_list.append(['替换',str(count_origin),str(count_replace)])
+
+        if self.font_op:
+            r0 = all_paras[matched_list[0]].runs[0]
+            pstyle_font = all_paras[matched_list[0]].style.font
+            if self.font_name_chinese !='': 
+                result_list.append(['中文', self.font_name_chinese, r0.font.name_eastasia or pstyle_font.name_eastasia, r0.font.name_eastasia, pstyle_font.name_eastasia])
+            if self.font_name_ascii !='':  
+                result_list.append(['西文', self.font_name_ascii, r0.font.name or pstyle_font.name, r0.font.name, pstyle_font.name])
+            if self.font_size !='': 
+                result_list.append(['字号', float(self.font_size), getPtorNone(r0.font.size) or getPtorNone(pstyle_font.size) ,getPtorNone(r0.font.size), getPtorNone(pstyle_font.size)])
+            if self.font_color !='': 
+                result_list.append(['字色', self.font_color, str(r0.font.color.rgb or pstyle_font.color.rgb), str(r0.font.color.rgb), str(pstyle_font.color.rgb)])
+            if self.font_bold==True: 
+                result_list.append(['粗体', self.font_bold, r0.font.bold or pstyle_font.bold, r0.font.bold, pstyle_font.bold])
+            if self.font_italic==True: 
+                result_list.append(['斜体', self.font_italic, r0.font.italic or pstyle_font.italic, r0.font.italic, pstyle_font.italic])
+            if self.font_underline !='': 
+                result_list.append(['下划线', self.font_underline, str(r0.font.underline or pstyle_font.underline) ,str(r0.font.underline), str(pstyle_font.underline)])
+
+        if self.paraformat_op:
+            p_format = all_paras[matched_list[0]].paragraph_format
+            pstyle_format = all_paras[matched_list[0]].style.paragraph_format
+
+            if self.para_alignment !='': 
+                para_alignment = PARA_ALIGNMENT_CHOICES[0][0]  ## 'LEFT (0)'
+                if p_format.alignment is not None:
+                    para_alignment = p_format.alignment
+                elif pstyle_format.alignment is not None:
+                    para_alignment = pstyle_format.alignment
+
+                result_list.append(['对齐', self.para_alignment, str(para_alignment), str(pstyle_format.alignment)])
+            if self.para_left_indent !='': 
+                result_list.append(['左缩进', 
+                float(self.para_left_indent), getSzorNone(p_format.left_indent, pstyle_format.left_indent), 
+                getPtorNone(p_format.left_indent), 
+                getPtorNone(pstyle_format.left_indent)])
+            if self.para_right_indent !='': 
+                result_list.append(['右缩进', 
+                float(self.para_left_indent), getSzorNone(p_format.right_indent, pstyle_format.right_indent), 
+                getPtorNone(p_format.right_indent), 
+                getPtorNone(pstyle_format.right_indent)])
+
+            if self.para_first_line_indent !='' and self.para_first_line_indent_size !='':
+                if self.para_first_line_indent == PARA_FIRST_LINE_INDENT_CHOICES[0][0]:  ## +
+                    result_list.append(['首行缩进', float(self.para_first_line_indent_size), 
+                    getSzorNone(p_format.first_line_indent, pstyle_format.first_line_indent),
+                        p_format.first_line_indent, pstyle_format.first_line_indent])
+                else:  ## -
+                    result_list.append(['首行缩进', float(self.para_first_line_indent_size), 
+                    -getSzorNone(p_format.first_line_indent, pstyle_format.first_line_indent),
+                        p_format.first_line_indent, pstyle_format.first_line_indent])
+
+            if self.para_space_before !='': 
+                result_list.append(['段前', float(self.para_space_before), 
+                getSzorNone(p_format.space_before, pstyle_format.space_before), 
+                getPtorNone(p_format.space_before), 
+                getPtorNone(pstyle_format.space_before)])
+            if self.para_space_after !='':  
+                result_list.append(['段后', float(self.para_space_after), 
+                getSzorNone(p_format.space_after, pstyle_format.space_after), 
+                getPtorNone(p_format.space_after), 
+                getPtorNone(pstyle_format.space_after)])
+
+            # if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
+            #     result_list.append(['首字下沉', self.para_firstchardropcap, str(p_format.first_char_dropcap)])
+            #     result_list.append(['首字下沉行数', 
+            #         self.para_firstchardropcaplines, str(p_format.first_char_dropcap_lines)])
+
+            if self.para_line_spacing_rule !='': 
+                result_list.append(['行间距规则', self.para_line_spacing_rule, str(p_format.line_spacing_rule or pstyle_format.line_spacing_rule), \
+                    str(pstyle_format.line_spacing_rule)])
+                if self.para_line_spacing_rule not in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:3]):
+                    result_list.append(['行距', float(self.para_line_spacing), getLineorNone(p_format.line_spacing, pstyle_format.line_spacing), 
+                    pstyle_format.line_spacing])
+
+            if self.page_break_before==True: 
+                result_list.append(['段前分页', self.page_break_before, p_format.page_break_before or pstyle_format.page_break_before])
+            if self.keep_with_next==True: 
+                result_list.append(['与下段同页',self.keep_with_next, p_format.keep_with_next or pstyle_format.keep_with_next])
+            if self.keep_together==True: 
+                result_list.append(['段中不分页',self.keep_together, p_format.keep_together or pstyle_format.keep_together])
+            if self.widow_control==True:
+                widow_control = True
+                if p_format.widow_control==False or (p_format.widow_control is None and pstyle_format.widow_control==False):
+                    widow_control = False
+                result_list.append(['孤行控制', True, widow_control, p_format.widow_control , pstyle_format.widow_control])
+
+        if self.image_op:
+            all_images = docx_test.inline_shapes
+            if len(all_images)>0:
+                result_list.append(['插入图片','True','True',])
+                if self.image_width !='':
+                    result_list.append(['图片宽度', float(self.image_width), all_images[0].width.cm,])
+                if self.image_height !='': 
+                    result_list.append(['图片高度', float(self.image_height), all_images[0].height.cm,])
+            else:
+                result_list.append(['插入图片','True','False',])
+                if self.image_width !='':
+                    result_list.append(['图片宽度', float(self.image_width), 0,])
+                if self.image_height !='': 
+                    result_list.append(['图片高度', float(self.image_height), 0,])
+
+        return result_list
+        
+    def test_(self):
+        if self.upload_docx is not None:
+            # check valid docx file
+            try:
+                document_test = Document(self.upload_docx.path)
+            except:
+                return self.upload_docx.path+'打开异常'
+
+            result_list = self.compare_operation(document_test)
+            print(result_list)
+
+            return format_html("<ol>") + \
                 format_html_join(
                 '\n', '<li style="color:{};">{}</li>',
-                ((x[0], x[1]) for x in result_list)
+                ((x[0],x[1]) for x in result_list)
                 ) \
                 + format_html("</ol>")
-    word_op_description.short_description = '题目内容'
-
-    # def word_test_result(self):
-    #     if self.upload_docx_test is not None:
-    #         # check valid docx file
-    #         try:
-    #             document_test = Document(self.upload_docx_test.upload.path)
-    #         except:
-    #             return self.upload_docx_test.upload.path+'打开异常'
-
-    #         result_list = []
-    #         for x in self.wordoperations_set.all():
-    #             result_list_str = [str(y) for y in x.compare_operation(document_test)]
-    #             result_list_str = ['black', '||'.join(result_list_str)]
-    #             result_list.append(result_list_str)
-
-    #         return format_html("<ol>") + \
-    #             format_html_join(
-    #             '\n', '<li style="color:{};">{}</li>',
-    #             ((x[0],x[1]) for x in result_list)
-    #             ) \
-    #             + format_html("</ol>")
-    #     else:
-    #         return '没有上传测试文件'
-    # word_test_result.short_description = '测试文件评估结果'
-
-    # def clean(self):
-    #     op_list = [x for x in  self.wordoperations_set.all()]
+        else:
+            return '没有上传测试文件'
+    test_.short_description = '测试结果'
 
     #########
     pub_date = models.DateTimeField('创建时间')
@@ -296,7 +616,7 @@ class WordQuestion(models.Model):
     widow_control = models.BooleanField('孤行控制', default=False)
 
     ############## 样式设置
-    stype_text = models.TextField('样式要考查的文字内容', blank=True, default='')
+    style_text = models.TextField('样式要考查的文字内容', blank=True, default='')
     style_op = models.BooleanField('考查样式设置？', default=False)
     style_name = models.CharField('样式名称', choices=STYLE_NAME_CHOICES, max_length=200, blank=True, default='') 
     style_font_name_ascii = models.CharField('英文字体', choices=FONT_NAME_ASCII_CHOICES, max_length=200, blank=True, default='') 
