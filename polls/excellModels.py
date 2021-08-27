@@ -212,8 +212,11 @@ class ExcelQuestion(models.Model):
         result_list = []
         ## check the files
         if answer_file_path and os.path.exists(answer_file_path):
-            wb = load_workbook(answer_file_path)
-            ws = wb.active 
+            try:
+                wb = load_workbook(answer_file_path)
+                ws = wb.active 
+            except:
+                return ['文件打开异常']
 
             if self.rename_sheet_op:
                 result = 'rename_sheet::'
@@ -334,7 +337,27 @@ class ExcelQuestion(models.Model):
                     result = result+self.keyword_1+'-'+self.sort_type_1
                 result_list.append(result)
 
+            if self.formula_maxmin_op:
+                result = 'formula_maxmin::'
+                reg = re.compile(self.formula_maxmin_result_regex)
+                p1, p2 = self.formula_maxmin_result_position.split(':')
+                formula1 = str(ws[p1].value)
+                formula2 = str(ws[p2].value)
+                # print(formula1, formula2)
+                if reg.match(formula1) and reg.match(formula2):
+                    result = result+formula1+'-'+formula2
+                result_list.append(result)
 
+            if self.formula_sumavg_op:
+                result = 'formula_sumavg::'
+                reg = re.compile(self.formula_sumavg_result_regex)
+                p1, p2 = self.formula_sumavg_result_position.split(':')
+                formula1 = str(ws[p1].value)
+                formula2 = str(ws[p2].value)
+                # print(formula1, formula2)
+                if reg.match(formula1) and reg.match(formula2):
+                    result = result+formula1+'-'+formula2
+                result_list.append(result)
 
         else:
             result_list.append('Nothing to score')
@@ -355,8 +378,9 @@ class ExcelQuestion(models.Model):
                 + format_html("</ol>")
     test_.short_description = '测试结果'
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  
+
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)  
         
     def clean(self):
         error_dict = {}
@@ -429,6 +453,10 @@ class ExcelQuestion(models.Model):
         if len(error_dict)>0:
             raise ValidationError(error_dict)
 
+
+    #########
+    pub_date = models.DateTimeField('创建时间', null=True, blank=True, )
+
     ## 
     upload_excel = models.FileField(verbose_name='上传EXCEL文件', upload_to='upload_xlsx/', 
         null=True, blank=True, validators=[validate_xlsx])
@@ -496,9 +524,9 @@ class ExcelQuestion(models.Model):
     # 题目示例：用公式计算工作表[Start:End单元格/]的最大值/最小值，将计算公式写在X单元格
     formula_maxmin_op = models.BooleanField('考查公式max/min？', default=False)
     formula_maxmin_description = models.TextField('题目文字描述', 
-        default='用公式计算工作表[Start:End单元格/]的最大值/最小值，将计算公式写在X单元格')
+        default='计算工作表[Start:End单元格/]数据的最大值/最小值(使用MAX/MIN函数)，将相应公式写在X单元格')
     formula_maxmin_data_position = models.CharField('数据区域[Start:End]', max_length=20, blank=True, default='A2:A20')
-    formula_maxmin_result_position = models.CharField('公式填写在单元格', max_length=20, blank=True, default='') 
+    formula_maxmin_result_position = models.CharField('公式填写单元格', max_length=20, blank=True, default='') 
     formula_maxmin_result_regex = models.CharField('公式匹配模式', max_length=50, 
                 blank=True, default='=MAX\(([A-Z])(\d+):([A-Z])(\d+)\)') 
 
