@@ -83,7 +83,7 @@ PARA_FIRST_LINE_INDENT_CHOICES = [
 ]
 
 PARA_LINE_SPACING_RULE_CHOICES = [
-    ('SINGLE (0)', '单倍行距'),
+    # ('SINGLE (0)', '单倍行距'),
     ('ONE_POINT_FIVE (1)', '1.5倍行距'),
     ('DOUBLE (2)', '双倍行距'),
     # ('AT_LEAST (3)', '行距最小值'),   ##  单位 磅

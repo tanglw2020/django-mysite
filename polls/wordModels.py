@@ -228,9 +228,9 @@ class WordQuestion(models.Model):
             if self.table_alignment!='':
                 table_desc = table_desc +'， 表格'+ [x[1] for x in TABLE_ALIGNMENT_CHOICES if x[0]==self.table_alignment][0]
             if self.table_style!='':
-                table_desc = table_desc +'， 应用'+ [x[1] for x in TABLE_STYLE_CHOICES if x[0]==self.table_style][0] +'表格样式'
+                table_desc = table_desc +'， 应用"'+ [x[1] for x in TABLE_STYLE_CHOICES if x[0]==self.table_style][0] +'"表格样式'
             if self.table_autofit:
-                table_desc = table_desc +'， 宽度自动调整' 
+                table_desc = table_desc +'，根据内容自动调整表格' 
             return table_desc+'.'
         else:
             return ''
@@ -422,115 +422,129 @@ class WordQuestion(models.Model):
         if len(error_dict)>0:
             raise ValidationError(error_dict)
 
+    def find_text_para_index(self, all_paras_, para_text_list_):
+        matched_index_list = []
+        i = 0
+        for para in para_text_list_:
+            while i < (len(all_paras_)):
+                if Levenshtein.ratio(all_paras_[i].text, para)>0.6:
+                    matched_index_list.append(i)
+                    break
+                i = i + 1
+        return matched_index_list
+
     def compare_operation(self, docx_test):
         all_paras  = docx_test.paragraphs
-        # print(all_paras)
-        para_text_list = self.char_edit_text.strip().split('\n')
-        print(para_text_list)
-        matched_list = []
-        for para in para_text_list:
-            for i in range(len(all_paras)):
-                print(all_paras[i].text)
-                if Levenshtein.ratio(all_paras[i].text, para)>0.6:
-                    matched_list.append(i)
-        if len(matched_list) != len(para_text_list):
-            return [['red', '未找到文章中对应考查段落']]
-
         result_list = []
+
         # 
         if self.char_edit_op:
-            count_origin, count_replace = 0, 0
-            for para in para_text_list:
-                count_origin += para.count(self.char_edit_origin)
-            for ind in  matched_list:
-                count_replace += all_paras[ind].text.count(self.char_edit_replace)
-            result_list.append(['替换',str(count_origin),str(count_replace)])
+            para_text_list = self.char_edit_text.strip().split('\n')
+            matched_list = self.find_text_para_index(all_paras, para_text_list)
+            if len(matched_list) != len(para_text_list):
+                result_list.append(['文字编辑', '未找到文章中对应段落', '']) 
+            else:
+                count_origin, count_replace = 0, 0
+                count_origin = self.char_edit_text.count(self.char_edit_origin)
+                for ind in  matched_list:
+                    count_replace += all_paras[ind].text.count(self.char_edit_replace)
+                result_list.append(['替换',str(count_origin),str(count_replace)])
 
         if self.font_op:
-            r0 = all_paras[matched_list[0]].runs[0]
-            pstyle_font = all_paras[matched_list[0]].style.font
-            if self.font_name_chinese !='': 
-                result_list.append(['中文', self.font_name_chinese, r0.font.name_eastasia or pstyle_font.name_eastasia, r0.font.name_eastasia, pstyle_font.name_eastasia])
-            if self.font_name_ascii !='':  
-                result_list.append(['西文', self.font_name_ascii, r0.font.name or pstyle_font.name, r0.font.name, pstyle_font.name])
-            if self.font_size !='': 
-                result_list.append(['字号', float(self.font_size), getPtorNone(r0.font.size) or getPtorNone(pstyle_font.size) ,getPtorNone(r0.font.size), getPtorNone(pstyle_font.size)])
-            if self.font_color !='': 
-                result_list.append(['字色', self.font_color, str(r0.font.color.rgb or pstyle_font.color.rgb), str(r0.font.color.rgb), str(pstyle_font.color.rgb)])
-            if self.font_bold==True: 
-                result_list.append(['粗体', self.font_bold, r0.font.bold or pstyle_font.bold, r0.font.bold, pstyle_font.bold])
-            if self.font_italic==True: 
-                result_list.append(['斜体', self.font_italic, r0.font.italic or pstyle_font.italic, r0.font.italic, pstyle_font.italic])
-            if self.font_underline !='': 
-                result_list.append(['下划线', self.font_underline, str(r0.font.underline or pstyle_font.underline) ,str(r0.font.underline), str(pstyle_font.underline)])
+            para_text_list = self.font_text.strip().split('\n')
+            matched_list = self.find_text_para_index(all_paras, para_text_list)
+            if len(matched_list) != len(para_text_list):
+                result_list.append(['字体设置', '未找到文章中对应段落', '']) 
+            else:
+                r0 = all_paras[matched_list[0]].runs[0]
+                pstyle_font = all_paras[matched_list[0]].style.font
+                if self.font_name_chinese !='': 
+                    result_list.append(['中文', self.font_name_chinese, r0.font.name_eastasia or pstyle_font.name_eastasia, r0.font.name_eastasia, pstyle_font.name_eastasia])
+                if self.font_name_ascii !='':  
+                    result_list.append(['西文', self.font_name_ascii, r0.font.name or pstyle_font.name, r0.font.name, pstyle_font.name])
+                if self.font_size !='': 
+                    result_list.append(['字号', float(self.font_size), getPtorNone(r0.font.size) or getPtorNone(pstyle_font.size) ,getPtorNone(r0.font.size), getPtorNone(pstyle_font.size)])
+                if self.font_color !='': 
+                    result_list.append(['字色', self.font_color, str(r0.font.color.rgb or pstyle_font.color.rgb), str(r0.font.color.rgb), str(pstyle_font.color.rgb)])
+                if self.font_bold==True: 
+                    result_list.append(['粗体', self.font_bold, r0.font.bold or pstyle_font.bold, r0.font.bold, pstyle_font.bold])
+                if self.font_italic==True: 
+                    result_list.append(['斜体', self.font_italic, r0.font.italic or pstyle_font.italic, r0.font.italic, pstyle_font.italic])
+                if self.font_underline !='': 
+                    result_list.append(['下划线', self.font_underline, str(r0.font.underline or pstyle_font.underline) ,str(r0.font.underline), str(pstyle_font.underline)])
 
         if self.paraformat_op:
-            p_format = all_paras[matched_list[0]].paragraph_format
-            pstyle_format = all_paras[matched_list[0]].style.paragraph_format
+            para_text_list = self.paraformat_text.strip().split('\n')
+            matched_list = self.find_text_para_index(all_paras, para_text_list)
+            if len(matched_list) != len(para_text_list):
+                result_list.append(['段落设置', '未找到文章中对应段落', '']) 
+            else:
+                p_format = all_paras[matched_list[0]].paragraph_format
+                pstyle_format = all_paras[matched_list[0]].style.paragraph_format
 
-            if self.para_alignment !='': 
-                para_alignment = PARA_ALIGNMENT_CHOICES[0][0]  ## 'LEFT (0)'
-                if p_format.alignment is not None:
-                    para_alignment = p_format.alignment
-                elif pstyle_format.alignment is not None:
-                    para_alignment = pstyle_format.alignment
+                if self.para_alignment !='': 
+                    para_alignment = PARA_ALIGNMENT_CHOICES[0][0]  ## 'LEFT (0)'
+                    if p_format.alignment is not None:
+                        para_alignment = p_format.alignment
+                    elif pstyle_format.alignment is not None:
+                        para_alignment = pstyle_format.alignment
+                    result_list.append(['对齐', self.para_alignment, str(para_alignment), str(pstyle_format.alignment)])
 
-                result_list.append(['对齐', self.para_alignment, str(para_alignment), str(pstyle_format.alignment)])
-            if self.para_left_indent !='': 
-                result_list.append(['左缩进', 
-                float(self.para_left_indent), getSzorNone(p_format.left_indent, pstyle_format.left_indent), 
-                getPtorNone(p_format.left_indent), 
-                getPtorNone(pstyle_format.left_indent)])
-            if self.para_right_indent !='': 
-                result_list.append(['右缩进', 
-                float(self.para_left_indent), getSzorNone(p_format.right_indent, pstyle_format.right_indent), 
-                getPtorNone(p_format.right_indent), 
-                getPtorNone(pstyle_format.right_indent)])
+                if self.para_left_indent !='': 
+                    result_list.append(['左缩进', 
+                    float(self.para_left_indent), getSzorNone(p_format.left_indent, pstyle_format.left_indent), 
+                    getPtorNone(p_format.left_indent), 
+                    getPtorNone(pstyle_format.left_indent)])
+                if self.para_right_indent !='': 
+                    result_list.append(['右缩进', 
+                    float(self.para_left_indent), getSzorNone(p_format.right_indent, pstyle_format.right_indent), 
+                    getPtorNone(p_format.right_indent), 
+                    getPtorNone(pstyle_format.right_indent)])
 
-            if self.para_first_line_indent !='' and self.para_first_line_indent_size !='':
-                if self.para_first_line_indent == PARA_FIRST_LINE_INDENT_CHOICES[0][0]:  ## +
-                    result_list.append(['首行缩进', float(self.para_first_line_indent_size), 
-                    getSzorNone(p_format.first_line_indent, pstyle_format.first_line_indent),
-                        p_format.first_line_indent, pstyle_format.first_line_indent])
-                else:  ## -
-                    result_list.append(['首行缩进', float(self.para_first_line_indent_size), 
-                    -getSzorNone(p_format.first_line_indent, pstyle_format.first_line_indent),
-                        p_format.first_line_indent, pstyle_format.first_line_indent])
+                if self.para_first_line_indent !='' and self.para_first_line_indent_size !='':
+                    if self.para_first_line_indent == PARA_FIRST_LINE_INDENT_CHOICES[0][0]:  ## +
+                        result_list.append(['首行缩进', float(self.para_first_line_indent_size), 
+                        getSzorNone(p_format.first_line_indent, pstyle_format.first_line_indent),
+                            p_format.first_line_indent, pstyle_format.first_line_indent])
+                    else:  ## -
+                        result_list.append(['首行缩进', float(self.para_first_line_indent_size), 
+                        -getSzorNone(p_format.first_line_indent, pstyle_format.first_line_indent),
+                            p_format.first_line_indent, pstyle_format.first_line_indent])
 
-            if self.para_space_before !='': 
-                result_list.append(['段前', float(self.para_space_before), 
-                getSzorNone(p_format.space_before, pstyle_format.space_before), 
-                getPtorNone(p_format.space_before), 
-                getPtorNone(pstyle_format.space_before)])
-            if self.para_space_after !='':  
-                result_list.append(['段后', float(self.para_space_after), 
-                getSzorNone(p_format.space_after, pstyle_format.space_after), 
-                getPtorNone(p_format.space_after), 
-                getPtorNone(pstyle_format.space_after)])
+                if self.para_space_before !='': 
+                    result_list.append(['段前', float(self.para_space_before), 
+                    getSzorNone(p_format.space_before, pstyle_format.space_before), 
+                    getPtorNone(p_format.space_before), 
+                    getPtorNone(pstyle_format.space_before)])
+                if self.para_space_after !='':  
+                    result_list.append(['段后', float(self.para_space_after), 
+                    getSzorNone(p_format.space_after, pstyle_format.space_after), 
+                    getPtorNone(p_format.space_after), 
+                    getPtorNone(pstyle_format.space_after)])
 
-            # if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
-            #     result_list.append(['首字下沉', self.para_firstchardropcap, str(p_format.first_char_dropcap)])
-            #     result_list.append(['首字下沉行数', 
-            #         self.para_firstchardropcaplines, str(p_format.first_char_dropcap_lines)])
+                # if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
+                #     result_list.append(['首字下沉', self.para_firstchardropcap, str(p_format.first_char_dropcap)])
+                #     result_list.append(['首字下沉行数', 
+                #         self.para_firstchardropcaplines, str(p_format.first_char_dropcap_lines)])
 
-            if self.para_line_spacing_rule !='': 
-                result_list.append(['行间距规则', self.para_line_spacing_rule, str(p_format.line_spacing_rule or pstyle_format.line_spacing_rule), \
-                    str(pstyle_format.line_spacing_rule)])
-                if self.para_line_spacing_rule not in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:3]):
-                    result_list.append(['行距', float(self.para_line_spacing), getLineorNone(p_format.line_spacing, pstyle_format.line_spacing), 
-                    pstyle_format.line_spacing])
+                if self.para_line_spacing_rule !='': 
+                    result_list.append(['行间距规则', self.para_line_spacing_rule, str(p_format.line_spacing_rule or pstyle_format.line_spacing_rule), \
+                        str(pstyle_format.line_spacing_rule)])
+                    if self.para_line_spacing_rule not in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:3]):
+                        result_list.append(['行距', float(self.para_line_spacing), getLineorNone(p_format.line_spacing, pstyle_format.line_spacing), 
+                        pstyle_format.line_spacing])
 
-            if self.page_break_before==True: 
-                result_list.append(['段前分页', self.page_break_before, p_format.page_break_before or pstyle_format.page_break_before])
-            if self.keep_with_next==True: 
-                result_list.append(['与下段同页',self.keep_with_next, p_format.keep_with_next or pstyle_format.keep_with_next])
-            if self.keep_together==True: 
-                result_list.append(['段中不分页',self.keep_together, p_format.keep_together or pstyle_format.keep_together])
-            if self.widow_control==True:
-                widow_control = True
-                if p_format.widow_control==False or (p_format.widow_control is None and pstyle_format.widow_control==False):
-                    widow_control = False
-                result_list.append(['孤行控制', True, widow_control, p_format.widow_control , pstyle_format.widow_control])
+                if self.page_break_before==True: 
+                    result_list.append(['段前分页', self.page_break_before, p_format.page_break_before or pstyle_format.page_break_before])
+                if self.keep_with_next==True: 
+                    result_list.append(['与下段同页',self.keep_with_next, p_format.keep_with_next or pstyle_format.keep_with_next])
+                if self.keep_together==True: 
+                    result_list.append(['段中不分页',self.keep_together, p_format.keep_together or pstyle_format.keep_together])
+                if self.widow_control==True:
+                    widow_control = True
+                    if p_format.widow_control==False or (p_format.widow_control is None and pstyle_format.widow_control==False):
+                        widow_control = False
+                    result_list.append(['孤行控制', True, widow_control, p_format.widow_control , pstyle_format.widow_control])
 
         if self.image_op:
             all_images = docx_test.inline_shapes
@@ -547,6 +561,25 @@ class WordQuestion(models.Model):
                 if self.image_height !='': 
                     result_list.append(['图片高度', float(self.image_height), 0,])
 
+        if  self.table_op:
+            all_tables = docx_test.tables
+            if len(all_tables):
+                result_list.append(['插入表格','True','True',])
+                if self.table_autofit:
+                    result_list.append(['表格自动调整', 'True', str(all_tables[0].autofit),])
+                if self.table_alignment!='':
+                    result_list.append(['表格对齐', self.table_alignment, str(all_tables[0].alignment),])
+                if self.table_style!='':
+                    result_list.append(['表格样式', self.table_style, str(all_tables[0].style.name),])
+            else:
+                result_list.append(['插入表格','True','False',])
+                if self.table_autofit:
+                    result_list.append(['表格自动调整', 'True', '--',])
+                if self.table_alignment!='':
+                    result_list.append(['表格对齐', self.table_alignment, '--',])
+                if self.table_style!='':
+                    result_list.append(['表格样式', self.table_style, '--',])
+
         return result_list
         
     def test_(self):
@@ -562,8 +595,8 @@ class WordQuestion(models.Model):
 
             return format_html("<ol>") + \
                 format_html_join(
-                '\n', '<li style="color:{};">{}</li>',
-                ((x[0],x[1]) for x in result_list)
+                '\n', '<li style="color:black;">{} {} {}</li>',
+                (x for x in result_list)
                 ) \
                 + format_html("</ol>")
         else:
