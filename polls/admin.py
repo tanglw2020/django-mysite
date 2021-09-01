@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .wordModels import WordOperations, WordQuestion
-from .fileModels import  WordDocxFile, WordDocxFileTest
+import random
+from .wordModels import WordQuestion
+# from .fileModels import  WordDocxFile, WordDocxFileTest
 from .choiceQuestionModels import ChoiceQuestion
 
 from .studentModels import Student
@@ -10,45 +11,8 @@ from .emailModels import EmailQuestion
 from .fileOperationlModels import FileOperationQuestion
 from .excellModels import ExcelQuestion
 
-import random
 
 # Register your models here.
-# class WordOperationsInline(admin.StackedInline):
-#     model = WordOperations
-#     extra = 0
-
-#     fieldsets  = (
-#         ('', { 'fields': ('para_text',('char_edit_op','font_op','paraformat_op','style_op','image_op','table_op'),)}), 
-#         ('文字编辑', { 'classes': ('collapse',), 'fields': ('char_edit_origin','char_edit_replace')}), 
-#         ('字体设置', { 'classes': ('collapse',),'fields': ( 'font_name_chinese', 'font_name_ascii','font_size',
-#                                  'font_color', 'font_underline',('font_bold','font_italic'),
-#                                 )}), 
-#                                 # ('para_firstchardropcap','para_firstchardropcaplines'),
-#         ('段落格式设置', { 'classes': ('collapse',), 'fields': ('para_alignment', 
-#                                 ('para_left_indent','para_right_indent'), 
-#                                 ('para_space_before','para_space_after'),
-#                                 ('para_line_spacing_rule','para_line_spacing'),
-#                                 ('para_first_line_indent','para_first_line_indent_size'),
-#                                 ('page_break_before','keep_with_next','keep_together','widow_control'),
-#                                 )}), 
-#         ('样式设置', { 'classes': ( 'collapse',), 'fields': ( 'style_name', 
-#                                 ('style_font_name_chinese','style_font_name_ascii','style_font_size'),
-#                                   'style_font_color', ('style_font_underline', 'style_font_bold','style_font_italic'),
-#                                 'style_para_alignment', ('style_para_left_indent','style_para_right_indent'),
-#                                 ('style_para_space_before','style_para_space_after'),
-#                                 ('style_para_line_spacing_rule','style_para_line_spacing'),
-#                                 ('style_para_first_line_indent','style_para_first_line_indent_size'),
-#                                 ('style_page_break_before','style_keep_with_next','style_keep_together','style_widow_control'),
-#                                 )}), 
-#         ('图像插入(默认原文档无图片)', { 'classes': ( 'collapse',), 'fields': ('upload_image_file',
-#                                 'image_position_style',
-#                                 ('image_width', 'image_height'), 
-#                                 )}), 
-#         ('表格插入', { 'classes': ( 'collapse',), 'fields': (
-#                                 'table_autofit', 'table_alignment',  'table_style', 
-#                                 )}), 
-#         )
-
 
 class WordQuestionAdmin(admin.ModelAdmin):
         # list_display = ('__str__','word_op_numb','word_op_description', 'word_test_result')
@@ -163,7 +127,6 @@ admin.site.register(FileOperationQuestion, FileOperationQuestionAdmin)
 admin.site.register(ExcelQuestion, ExcelQuestionAdmin)
 
 # admin.site.register([WordDocxFile, WordDocxFileTest, ])
-
 # admin.site.register(Student, StudentAdmin)
 # admin.site.register(Exam, ExamAdmin)
 # admin.site.register(ExamPaper, ExamPaperAdmin)
@@ -228,3 +191,38 @@ admin.site.register(ExcelQuestion, ExcelQuestionAdmin)
 #                                 )}), 
 #         )
 
+# class WordOperationsInline(admin.StackedInline):
+#     model = WordOperations
+#     extra = 0
+
+#     fieldsets  = (
+#         ('', { 'fields': ('para_text',('char_edit_op','font_op','paraformat_op','style_op','image_op','table_op'),)}), 
+#         ('文字编辑', { 'classes': ('collapse',), 'fields': ('char_edit_origin','char_edit_replace')}), 
+#         ('字体设置', { 'classes': ('collapse',),'fields': ( 'font_name_chinese', 'font_name_ascii','font_size',
+#                                  'font_color', 'font_underline',('font_bold','font_italic'),
+#                                 )}), 
+#                                 # ('para_firstchardropcap','para_firstchardropcaplines'),
+#         ('段落格式设置', { 'classes': ('collapse',), 'fields': ('para_alignment', 
+#                                 ('para_left_indent','para_right_indent'), 
+#                                 ('para_space_before','para_space_after'),
+#                                 ('para_line_spacing_rule','para_line_spacing'),
+#                                 ('para_first_line_indent','para_first_line_indent_size'),
+#                                 ('page_break_before','keep_with_next','keep_together','widow_control'),
+#                                 )}), 
+#         ('样式设置', { 'classes': ( 'collapse',), 'fields': ( 'style_name', 
+#                                 ('style_font_name_chinese','style_font_name_ascii','style_font_size'),
+#                                   'style_font_color', ('style_font_underline', 'style_font_bold','style_font_italic'),
+#                                 'style_para_alignment', ('style_para_left_indent','style_para_right_indent'),
+#                                 ('style_para_space_before','style_para_space_after'),
+#                                 ('style_para_line_spacing_rule','style_para_line_spacing'),
+#                                 ('style_para_first_line_indent','style_para_first_line_indent_size'),
+#                                 ('style_page_break_before','style_keep_with_next','style_keep_together','style_widow_control'),
+#                                 )}), 
+#         ('图像插入(默认原文档无图片)', { 'classes': ( 'collapse',), 'fields': ('upload_image_file',
+#                                 'image_position_style',
+#                                 ('image_width', 'image_height'), 
+#                                 )}), 
+#         ('表格插入', { 'classes': ( 'collapse',), 'fields': (
+#                                 'table_autofit', 'table_alignment',  'table_style', 
+#                                 )}), 
+#         )
