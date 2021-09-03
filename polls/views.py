@@ -4,10 +4,6 @@ from django.urls import reverse
 from django import forms
 from django.http import Http404
 
-from .forms import StudentForm
-from .studentModels import Student
-from .examModels import Exam, ExamPaper
-from .choiceQuestionModels import ChoiceQuestion
 
 def index(request):
     action_list = [

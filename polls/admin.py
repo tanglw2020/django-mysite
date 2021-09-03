@@ -1,18 +1,24 @@
 from django.contrib import admin
 import random
-from .wordModels import WordQuestion
-# from .fileModels import  WordDocxFile, WordDocxFileTest
+
 from .choiceQuestionModels import ChoiceQuestion
-
-from .studentModels import Student
-from .examModels import Exam, ExamPaper, EXAM_TYPE_CHOICES
-
 from .emailModels import EmailQuestion
 from .fileOperationlModels import FileOperationQuestion
+from .wordModels import WordQuestion
 from .excellModels import ExcelQuestion
+
+from .examModels import *
+
 
 
 # Register your models here.
+class StudentAdmin(admin.ModelAdmin):
+        list_display = ('class_name', 'student_name', 'student_id', )
+
+
+class ExamAdmin(admin.ModelAdmin):
+        list_display = ('id_', 'problem_type', 'info_text','all_question_stat_','out_link_',)
+
 
 class WordQuestionAdmin(admin.ModelAdmin):
         # list_display = ('__str__','word_op_numb','word_op_description', 'word_test_result')
@@ -119,6 +125,10 @@ admin.site.register(WordQuestion, WordQuestionAdmin)
 admin.site.register(EmailQuestion, EmailQuestionAdmin)
 admin.site.register(FileOperationQuestion, FileOperationQuestionAdmin)
 admin.site.register(ExcelQuestion, ExcelQuestionAdmin)
+
+admin.site.register(Exam, ExamAdmin)
+admin.site.register(Student, StudentAdmin)
+admin.site.register([StudentInfoImporter])
 
 # admin.site.register([WordDocxFile, WordDocxFileTest, ])
 # admin.site.register(Student, StudentAdmin)
