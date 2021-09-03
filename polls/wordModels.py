@@ -36,7 +36,7 @@ def getLineorNone(sz1, sz2):
 class WordQuestion(models.Model):
 
     def __str__(self):
-        return '题目'+str(self.id)
+        return 'Word操作题目'+str(self.id)
 
     class Meta:
         verbose_name = 'Word操作题'
