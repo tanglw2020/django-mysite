@@ -143,6 +143,7 @@ class FileOperationQuestion(models.Model):
 
     def zipfile_path_(self):
         return os.path.join(MEDIA_ROOT, 'system_operation_files',str(self.id),'exam_system_operation.zip')
+    zipfile_path_.short_description='生成文件地址' 
 
     def upload_path_(self):
         return os.path.join(MEDIA_ROOT, 'upload_system_operations')

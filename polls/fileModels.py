@@ -30,23 +30,23 @@ def validate_docx(value):
     #     )
         # print(file_path+'不是有效的docx文件')
 
-class WordDocxFile(models.Model):
+# class WordDocxFile(models.Model):
 
-    upload = models.FileField(upload_to='uploads_docx/', null=True, blank=True, 
-    validators=[validate_docx])
-    class Meta:
-        verbose_name = '考试用Word文件'
-        verbose_name_plural = '考试用Word文件'
-    def __str__(self):
-        return 'Word文件'+str(self.id)+':'+self.upload.name
+#     upload = models.FileField(upload_to='uploads_docx/', null=True, blank=True, 
+#     validators=[validate_docx])
+#     class Meta:
+#         verbose_name = '考试用Word文件'
+#         verbose_name_plural = '考试用Word文件'
+#     def __str__(self):
+#         return 'Word文件'+str(self.id)+':'+self.upload.name
 
-class WordDocxFileTest(models.Model):
+# class WordDocxFileTest(models.Model):
     
-    upload = models.FileField(upload_to='uploads_docx_test/', null=True, blank=True, 
-    validators=[validate_docx])
+#     upload = models.FileField(upload_to='uploads_docx_test/', null=True, blank=True, 
+#     validators=[validate_docx])
 
-    class Meta:
-        verbose_name = '内部测试用word文件'
-        verbose_name_plural = '内部测试用word文件'
-    def __str__(self):
-        return '测试Word文件'+str(self.id)+':'+self.upload.name
+#     class Meta:
+#         verbose_name = '内部测试用word文件'
+#         verbose_name_plural = '内部测试用word文件'
+#     def __str__(self):
+#         return '测试Word文件'+str(self.id)+':'+self.upload.name

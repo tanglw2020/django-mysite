@@ -683,6 +683,14 @@ class WordQuestion(models.Model):
             return '没有上传测试文件'
     test_.short_description = '测试结果'
 
+    def docx_path_(self):
+        if self.upload_docx:
+            return self.upload_docx.path
+        else:
+            return 'None'
+    docx_path_.short_description = 'Word文件地址'
+
+
     #########
     pub_date = models.DateTimeField('创建时间')
 

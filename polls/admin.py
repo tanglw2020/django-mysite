@@ -17,16 +17,10 @@ from .excellModels import ExcelQuestion
 class WordQuestionAdmin(admin.ModelAdmin):
         # list_display = ('__str__','word_op_numb','word_op_description', 'word_test_result')
         list_display = ('__str__',
-        # 'word_op_numb',
-        'operation_description_all', 
-        'test_'
-                # 'char_edit_description', 
-                # 'font_description', 
-                # 'paraformat_description', 
-                # 'style_description', 
-                # 'image_description', 
-                # 'table_description', 
-                )
+                        'operation_description_all', 
+                        'test_', 
+                        'docx_path_',
+                        )
         
         fieldsets  = (
         ('上传Word文件', { 'fields': ('pub_date','upload_docx',)}), 
@@ -72,7 +66,7 @@ class EmailQuestionAdmin(admin.ModelAdmin):
 
 
 class FileOperationQuestionAdmin(admin.ModelAdmin):
-        list_display = ('__str__', 'question_content',)
+        list_display = ('__str__', 'question_content','zipfile_path_')
 
         fieldsets = (
                 ('在考生文件夹中创建文件夹[A]，并在[A]中新建文件[B]', {'fields':('new_folder_dir_A', 'new_file_B')}),
@@ -85,34 +79,34 @@ class FileOperationQuestionAdmin(admin.ModelAdmin):
 
 class ExcelQuestionAdmin(admin.ModelAdmin):
 
-        list_display = ('__str__', 'question_content', 'file_path_', 'test_')
+        list_display = ('__str__', 'question_content', 'test_', 'file_path_',)
 
         fieldsets = (
                 ('上传题目所需excel文件', {'fields':('pub_date', 'upload_excel',)}),
-                ('1 重命名工作表Sheet1', {'fields':('rename_sheet_op', 'new_sheet_name')}),
-                ('2 合并单元格', {'fields':('merge_cell_op', 'merge_cell_position')}),
-                ('3 设置单元格颜色', {'fields':('color_cell_op', 'color_cell_position',
+                ('1 重命名工作表Sheet1', {'classes': ( 'collapse',),'fields':('rename_sheet_op', 'new_sheet_name')}),
+                ('2 合并单元格', {'classes': ( 'collapse',),'fields':('merge_cell_op', 'merge_cell_position')}),
+                ('3 设置单元格颜色', {'classes': ( 'collapse',),'fields':('color_cell_op', 'color_cell_position',
                         ('color_cell_font','color_cell_filling') )}),
-                ('4 设置单元格条件格式', {'fields':('conditional_formatting_op',
+                ('4 设置单元格条件格式', {'classes': ( 'collapse',),'fields':('conditional_formatting_op',
                         'conditional_formatting_position',
                         ('conditional_formatting_type',
                         'conditional_formatting_param'), 'conditional_formatting_coloring')}),
-                ('5 单元格套用表格格式', {'fields':('table_style_op', 
+                ('5 单元格套用表格格式', {'classes': ( 'collapse',),'fields':('table_style_op', 
                         ('table_style_position','table_style_choice'))}),
-                ('6 插入数据图表', {'fields':('chart_op', 
+                ('6 插入数据图表', {'classes': ( 'collapse',),'fields':('chart_op', 
                         ('chart_data_name','chart_data_position'),
                         ('chart_type','chart_tiltle'),'chart_position')}),
-                ('7 双关键字排序', {'fields':('sort_op', ('keyword_1','sort_type_1'), 
+                ('7 双关键字排序', {'classes': ( 'collapse',),'fields':('sort_op', ('keyword_1','sort_type_1'), 
                         ('sort_data_position_1', 'sort_data_result_1'), 
                         ('keyword_2','sort_type_2'),
                         ('sort_data_position_2', 'sort_data_result_2'), 
                         )}),
-                ('8 公式max/min', {'fields':('formula_maxmin_op', 
+                ('8 公式max/min', {'classes': ( 'collapse',),'fields':('formula_maxmin_op', 
                         'formula_maxmin_data_position',
                         ('formula_maxmin_result_position', 'formula_maxmin_result_regex'),
                         'formula_maxmin_description',
                         ) }),
-                ('9 公式sum/average', {'fields':('formula_sumavg_op', 
+                ('9 公式sum/average', {'classes': ( 'collapse',),'fields':('formula_sumavg_op', 
                         'formula_sumavg_data_position',
                         ('formula_sumavg_result_position', 'formula_sumavg_result_regex'),
                         'formula_sumavg_description',
