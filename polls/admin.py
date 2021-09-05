@@ -5,11 +5,9 @@ from .choiceQuestionModels import ChoiceQuestion
 from .emailModels import EmailQuestion
 from .fileOperationlModels import FileOperationQuestion
 from .wordModels import WordQuestion
-from .excellModels import ExcelQuestion
-
+from .excelModels import ExcelQuestion
+from .pptModels import PPTQuestion
 from .examModels import *
-
-
 
 # Register your models here.
 class StudentAdmin(admin.ModelAdmin):
@@ -18,6 +16,9 @@ class StudentAdmin(admin.ModelAdmin):
 
 class ExamAdmin(admin.ModelAdmin):
         list_display = ('id_', 'problem_type', 'info_text','all_question_stat_','out_link_',)
+
+class ExamPaperAdmin(admin.ModelAdmin):
+        list_display = ('__str__', 'problem_type', 'student', 'exam', 'start_time_')
 
 
 class WordQuestionAdmin(admin.ModelAdmin):
@@ -128,7 +129,8 @@ admin.site.register(ExcelQuestion, ExcelQuestionAdmin)
 
 admin.site.register(Exam, ExamAdmin)
 admin.site.register(Student, StudentAdmin)
-admin.site.register([StudentInfoImporter])
+admin.site.register(ExamPaper, ExamPaperAdmin)
+admin.site.register([StudentInfoImporter, PPTQuestion, ])
 
 # admin.site.register([WordDocxFile, WordDocxFileTest, ])
 # admin.site.register(Student, StudentAdmin)

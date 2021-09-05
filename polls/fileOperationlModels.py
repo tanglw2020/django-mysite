@@ -126,12 +126,12 @@ Copy_Or_Move_Choice = [
 class FileOperationQuestion(models.Model):
     # 控制 表项显示文字，默认按 类名object（n）显示
     def __str__(self):
-        return '文件操作题' + str(self.id) #题目序号
+        return '系统操作' + str(self.id) #题目序号
 
     # 内部标签，项目显示名  项目详细名等
     class Meta:
-        verbose_name_plural = '文件操作题'  # 项目名
-        verbose_name = '文件操作'  # 详细名称
+        verbose_name_plural = '题目-系统操作'  # 项目名
+        verbose_name = '题目-系统操作'  # 详细名称
 
     #包含小题数量
     def question_num(self):

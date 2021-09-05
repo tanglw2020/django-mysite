@@ -36,11 +36,11 @@ def getLineorNone(sz1, sz2):
 class WordQuestion(models.Model):
 
     def __str__(self):
-        return 'Word操作题目'+str(self.id)
+        return 'Word操作'+str(self.id)
 
     class Meta:
-        verbose_name = 'Word操作题'
-        verbose_name_plural = 'Word操作题'
+        verbose_name = '题目-Word操作'
+        verbose_name_plural = '题目-Word操作'
 
     def file_path(self):
         return self.upload_docx.name

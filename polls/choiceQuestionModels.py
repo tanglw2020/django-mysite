@@ -13,8 +13,8 @@ ANSWER_CHOICES = [
 class ChoiceQuestion(models.Model):
 
     class Meta:
-        verbose_name = '选择题'
-        verbose_name_plural = '选择题'
+        verbose_name = '题目-选择题'
+        verbose_name_plural = '题目-选择题'
 
     def __str__(self):
         return '选择题'+str(self.id)

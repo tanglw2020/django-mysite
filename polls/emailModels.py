@@ -12,18 +12,14 @@ DesEmail=[
 
 # Create your models here.
 class EmailQuestion(models.Model):
-    # 控制 表项显示文字，默认按 类名object（n）显示
     def __str__(self):
-        return '电子邮件题' + str(self.id)
+        return '电子邮件' + str(self.id)
 
-    # 内部标签，表名 项目显示名  项目详细名等
     class Meta:
-        db_table = 'email_table'  # 表名
-        verbose_name_plural = '电子邮件题'  # 项目名
-        verbose_name = '电子邮件题'  # 详细名称
+        db_table = 'email_table'  
+        verbose_name_plural = '题目-电子邮件' 
+        verbose_name = '题目-电子邮件题'  
 
-    # 题型
-    # 建立选择下拉框
     des_name = models.CharField('收件人', choices=DesEmail, max_length=50,  default='')
     cop_name = models.CharField('抄 送', choices=DesEmail, max_length=50,  default='')
     topic = models.CharField('主  题', max_length=50, default='')
