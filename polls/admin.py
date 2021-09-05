@@ -69,7 +69,7 @@ class ChoiceQuestionAdmin(admin.ModelAdmin):
 
 
 class EmailQuestionAdmin(admin.ModelAdmin):
-        list_display = ('__str__', 'des_name', 'cop_name','topic','content')
+        list_display = ('__str__', 'question_content',)
 
 
 class FileOperationQuestionAdmin(admin.ModelAdmin):
