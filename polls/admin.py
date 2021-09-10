@@ -121,16 +121,66 @@ class ExcelQuestionAdmin(admin.ModelAdmin):
         )
 
 
+class PPTQuestionAdmin(admin.ModelAdmin):
+
+        list_display = ('__str__', 'question_content', 'test_', 'file_path_',)
+
+        fieldsets = (
+                ('上传题目所需ppt文件', {'fields':('pub_date', 'upload_pptx',)}),
+                ('1 选择版式', 
+                {'classes': ('collapse',),
+                'fields':( 'slide_layout_op', 
+                'slide_layout_target_slide',
+                'slide_layout_name')}),
+                ('2 修改文字内容', 
+                {'classes': ('collapse',),
+                'fields':( 'text_op', 
+                'text_target_slide', 
+                'text_target_shape_1', 'text_target_content_1', 
+                'text_target_shape_2', 'text_target_content_2', 
+                )}),
+                ('3 修改字体格式', 
+                {'classes': ('collapse',),
+                'fields':( 'font_op', 
+                'font_target_slide', 
+                'font_target_shape', 'font_target_content', 
+                ('font_name', 'font_size', 'font_color'),('font_bold', 'font_italic')
+                )}),
+                ('4 设置幻灯片背景格式', 
+                {'classes': ('collapse',),
+                'fields':( 'slide_background_op', 
+                'slide_background_slide', 
+                'slide_background_type',
+                ('slide_background_back', 'slide_background_fore', ),
+                )}),
+                ('5 添加备注', 
+                {'classes': ('collapse',),
+                'fields':( 'notes_slide_op', 
+                'notes_slide_target_slide', 
+                'notes_slide_content',
+                )}),
+                ('6 插入表格及内容', 
+                {'classes': ('collapse',),
+                'fields':( 'table_op', 
+                'table_target_slide', 
+                'table_target_shape',('table_rows','table_columns'),
+                'table_content',
+                )}),
+        )
+
+
+
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
 admin.site.register(WordQuestion, WordQuestionAdmin)
 admin.site.register(EmailQuestion, EmailQuestionAdmin)
 admin.site.register(FileOperationQuestion, FileOperationQuestionAdmin)
 admin.site.register(ExcelQuestion, ExcelQuestionAdmin)
+admin.site.register(PPTQuestion, PPTQuestionAdmin)
 
 admin.site.register(Exam, ExamAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(ExamPaper, ExamPaperAdmin)
-admin.site.register([StudentInfoImporter, PPTQuestion, ])
+admin.site.register([StudentInfoImporter, ])
 
 # admin.site.register([WordDocxFile, WordDocxFileTest, ])
 # admin.site.register(Student, StudentAdmin)

@@ -41,6 +41,13 @@ Standard_Color_Choices = [
     ('7030A0','紫色'),
 ]
 
+LINE_NUM_CHOICES = [
+    ('2','2'),
+    ('3','3'),
+    ('4','4'),
+    ('5','5'),
+    ('6','6'),
+]
 
 Slide_Layout_Names = [
     ("标题幻灯片", "标题幻灯片"),
@@ -49,9 +56,9 @@ Slide_Layout_Names = [
     ("两栏内容", "两栏内容"),
     ("比较", "比较"),
     ("仅标题", "仅标题"),
-    # ("空白", "空白"),
     ("内容与标题", "内容与标题"),
     ("图片与标题", "图片与标题"),
+    # ("空白", "空白"),
     # ("标题和竖排文字", "标题和竖排文字"),
     # ("竖排标题与文本", "竖排标题与文本"),
 ]
@@ -196,26 +203,26 @@ class PPTQuestion(models.Model):
     # 题目示例：第X页幻灯片的版式改为“XXXX”。
     slide_layout_op = models.BooleanField('考查版式设置？', default=False)
     slide_layout_target_slide = models.CharField('要操作的幻灯片', choices=Slide_Names ,max_length=50, blank=True, default='0')
-    slide_layout_name = models.CharField('版式名称', choices=Slide_Layout_Names ,max_length=50, blank=True, default='数据汇总表')
+    slide_layout_name = models.CharField('版式名称', choices=Slide_Layout_Names ,max_length=50, blank=True, default='标题幻灯片')
 
 
     # 修改文字内容
     text_op = models.BooleanField('考查修改文字内容？', default=False)
     text_target_slide = models.CharField('要操作的幻灯片', choices=Slide_Names ,max_length=50, blank=True, default='0')
-    text_target_shape_1 = models.CharField('区域1', choices=Shape_Names ,max_length=50, blank=True, default='0')
+    text_target_shape_1 = models.CharField('区域1', choices=Shape_Names ,max_length=50, blank=True, default='标题')
     text_target_content_1 = models.TextField('区域1内容',  blank=True, default='大标题')
-    text_target_shape_2 = models.CharField('区域2', choices=Shape_Names ,max_length=50, blank=True, default='0')
+    text_target_shape_2 = models.CharField('区域2', choices=Shape_Names ,max_length=50, blank=True, default='内容')
     text_target_content_2 = models.TextField('区域2内容',  blank=True, default='小标题')
 
 
     # 修改字体格式
     font_op = models.BooleanField('考查修改字体格式？', default=False)
     font_target_slide = models.CharField('要操作的幻灯片', choices=Slide_Names ,max_length=50, blank=True, default='0')
-    font_target_shape = models.CharField('文字区域', choices=Shape_Names ,max_length=50, blank=True, default='0')
+    font_target_shape = models.CharField('文字区域', choices=Shape_Names ,max_length=50, blank=True, default='标题')
     font_target_content = models.TextField('文字内容', blank=True, default='')
-    font_name = models.CharField('字体', choices=FONT_NAME_CHOICES ,max_length=50, blank=True,)
-    font_size = models.CharField('字号[磅]', choices=FONT_SIZE_CHOICES ,max_length=50, blank=True,)
-    font_color = models.CharField('颜色', choices=Standard_Color_Choices ,max_length=50, blank=True,)
+    font_name = models.CharField('字体', choices=FONT_NAME_CHOICES ,max_length=50, blank=True, )
+    font_size = models.CharField('字号[磅]', choices=FONT_SIZE_CHOICES ,max_length=50, blank=True, )
+    font_color = models.CharField('颜色', choices=Standard_Color_Choices ,max_length=50, blank=True,default='红色')
     font_bold = models.BooleanField('是否粗体？', default=False)
     font_italic = models.BooleanField('是否斜体？', default=False)
 
@@ -223,17 +230,24 @@ class PPTQuestion(models.Model):
     # 设置幻灯片背景格式
     # 题目示例：第X页幻灯片设置背景格式为"XX",标准色“XXXX”。
     slide_background_op = models.BooleanField('考查幻灯片背景格式？', default=False)
-    slide_background_slide = models.CharField('要操作的幻灯片', choices=Slide_Names, max_length=50, blank=True, default='0')
-    slide_background_type = models.CharField('背景类型',  choices=Background_Types, max_length=50, blank=True, default='')
-    slide_background_fore = models.CharField('前景颜色',  choices=Standard_Color_Choices, max_length=50, blank=True,)
-    slide_background_back = models.CharField('背景颜色',  choices=Standard_Color_Choices, max_length=50, blank=True,)
+    slide_background_slide = models.CharField('要操作的幻灯片', choices=Slide_Names, max_length=50, blank=True, default='1')
+    slide_background_type = models.CharField('背景类型',  choices=Background_Types, max_length=50, blank=True, default='PATTERNED (2)')
+    slide_background_fore = models.CharField('前景颜色',  choices=Standard_Color_Choices, max_length=50, blank=True,default='黄色')
+    slide_background_back = models.CharField('背景颜色',  choices=Standard_Color_Choices, max_length=50, blank=True,default='浅蓝')
 
 
     # 添加备注
     # 题目示例：第X页幻灯片添加备注，内容为“XXXX”。
     notes_slide_op = models.BooleanField('考查添加备注页？', default=False)
-    notes_slide_target_slide = models.CharField('要操作的幻灯片', choices=Slide_Names ,max_length=50, blank=True, default='0')
+    notes_slide_target_slide = models.CharField('要操作的幻灯片', choices=Slide_Names ,max_length=50, blank=True, default='1')
     notes_slide_content = models.TextField('备注内容',  blank=True, default='备注内容1')
 
-    # 添加表格及内容
+    # 插入表格及内容
+    table_op = models.BooleanField('考查插入表格？', default=False)
+    table_target_slide = models.CharField('要操作的幻灯片', choices=Slide_Names ,max_length=50, blank=True, default='1')
+    table_target_shape = models.CharField('表格插入区域', choices=Shape_Names ,max_length=50, blank=True, default='左侧内容')
+    table_rows = models.CharField('表格高',max_length=50, choices=LINE_NUM_CHOICES, blank=True, default='2')
+    table_columns = models.CharField('表格宽',max_length=50, choices=LINE_NUM_CHOICES, blank=True, default='4')
+    table_content = models.TextField('表格内容[用逗号和换行分割]',  blank=True, default='橘子,苹果,香蕉,桃子\n黄色,红色,黄色,红色')
+
 
