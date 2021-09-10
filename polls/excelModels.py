@@ -3,6 +3,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, format_html_join
+from django.utils import timezone
 
 import re
 import shutil
@@ -455,11 +456,11 @@ class ExcelQuestion(models.Model):
 
 
     #########
-    pub_date = models.DateTimeField('创建时间', null=True, blank=True, )
+    pub_date = models.DateTimeField('创建时间', default=timezone.now)
 
     ## 
     upload_excel = models.FileField(verbose_name='上传EXCEL文件', upload_to='upload_xlsx/', 
-        null=True, blank=True, validators=[validate_xlsx])
+        validators=[validate_xlsx], null=True)
 
     # 重命名工作表Sheet1
     # 题目示例：将Sheet1重命名new_sheet_name
