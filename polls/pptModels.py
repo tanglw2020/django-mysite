@@ -103,6 +103,10 @@ FONT_SIZE_CHOICES = [
     ('72','72' ),
 ]
 
+
+def clean_empty_item(item, errors_dict, target_key):
+    if item == '': errors_dict[target_key] = _('不能为空')
+
 ####################### PPT 题目 #########################
 class PPTQuestion(models.Model):
 
@@ -185,8 +189,55 @@ class PPTQuestion(models.Model):
     def clean(self):
         error_dict = {}
 
-        # if self.rename_sheet_op:
-        #     clean_empty_item(self.new_sheet_name, error_dict, 'new_sheet_name')
+        if self.slide_layout_op:
+            clean_empty_item(self.slide_layout_target_slide, error_dict, 'slide_layout_target_slide')
+            clean_empty_item(self.slide_layout_name, error_dict, 'slide_layout_name')
+
+        if self.text_op:
+            clean_empty_item(self.text_target_slide, error_dict, 'text_target_slide')
+            clean_empty_item(self.text_target_shape_1, error_dict, 'text_target_shape_1')
+            clean_empty_item(self.text_target_content_1, error_dict, 'text_target_content_1')
+            clean_empty_item(self.text_target_shape_2, error_dict, 'text_target_shape_2')
+            clean_empty_item(self.text_target_content_2, error_dict, 'text_target_content_2')
+
+        if self.font_op:
+            clean_empty_item(self.font_target_slide, error_dict, 'font_target_slide')
+            clean_empty_item(self.font_target_shape, error_dict, 'font_target_shape')
+            clean_empty_item(self.font_target_content, error_dict, 'font_target_content')
+            clean_empty_item(self.font_name, error_dict, 'font_name')
+            clean_empty_item(self.font_size, error_dict, 'font_size')
+            clean_empty_item(self.font_color, error_dict, 'font_color')
+
+        if self.slide_background_op:
+            clean_empty_item(self.slide_background_slide, error_dict, 'slide_background_slide')
+            clean_empty_item(self.slide_background_type, error_dict, 'slide_background_type')
+            clean_empty_item(self.slide_background_fore, error_dict, 'slide_background_fore')
+            clean_empty_item(self.slide_background_back, error_dict, 'slide_background_back')
+            if self.slide_background_fore == self.slide_background_back:
+                error_dict['slide_background_fore'] = _('前景和背景颜色不能相同')
+                error_dict['slide_background_back'] = _('前景和背景颜色不能相同')
+
+
+        if self.notes_slide_op:
+            clean_empty_item(self.notes_slide_target_slide, error_dict, 'notes_slide_target_slide')
+            clean_empty_item(self.notes_slide_content, error_dict, 'notes_slide_content')
+
+        if self.table_op:
+            clean_empty_item(self.table_target_slide, error_dict, 'table_target_slide')
+            clean_empty_item(self.table_target_shape, error_dict, 'table_target_shape')
+            clean_empty_item(self.notes_slide_content, error_dict, 'notes_slide_content')
+            clean_empty_item(self.table_rows, error_dict, 'table_rows')
+            clean_empty_item(self.table_columns, error_dict, 'table_columns')
+            clean_empty_item(self.table_content, error_dict, 'table_content')
+            contents = self.table_content.split('\n')
+            if len(contents) != int(self.table_rows):
+                error_dict['table_content'] = _('表格内容和行数不相等')
+            for c in contents:
+                c = [x for x in c.split(',') if x]
+                if len(c) == int(self.table_columns): continue
+                error_dict['table_content'] = _('表格内容和列数不相等')
+                break
+
 
         if len(error_dict)>0:
             raise ValidationError(error_dict)
@@ -246,8 +297,8 @@ class PPTQuestion(models.Model):
     table_op = models.BooleanField('考查插入表格？', default=False)
     table_target_slide = models.CharField('要操作的幻灯片', choices=Slide_Names ,max_length=50, blank=True, default='1')
     table_target_shape = models.CharField('表格插入区域', choices=Shape_Names ,max_length=50, blank=True, default='左侧内容')
-    table_rows = models.CharField('表格高',max_length=50, choices=LINE_NUM_CHOICES, blank=True, default='2')
-    table_columns = models.CharField('表格宽',max_length=50, choices=LINE_NUM_CHOICES, blank=True, default='4')
+    table_rows = models.CharField('表格行数',max_length=50, choices=LINE_NUM_CHOICES, blank=True, default='2')
+    table_columns = models.CharField('表格列数',max_length=50, choices=LINE_NUM_CHOICES, blank=True, default='4')
     table_content = models.TextField('表格内容[用逗号和换行分割]',  blank=True, default='橘子,苹果,香蕉,桃子\n黄色,红色,黄色,红色')
 
 
