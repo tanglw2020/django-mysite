@@ -76,11 +76,11 @@ Background_Types = [
 ]
 
 Shape_Names = [
-    ('标题','标题'),
-    ('副标题','副标题'),
-    ('内容','内容'),
-    ('左侧内容','左侧内容'),
-    ('右侧内容','右侧内容'),
+    ('标题区域','标题区域'),
+    ('副标题区域','副标题区域'),
+    ('内容区域','内容区域'),
+    ('左侧内容区域','左侧内容区域'),
+    ('右侧内容区域','右侧内容区域'),
 ]
 
 
@@ -123,8 +123,52 @@ class PPTQuestion(models.Model):
 
     # 题目内容
     def question_content(self):
-        pre_description = 'ppt.pptx:\n'
+        pre_description = '打开下载的ppt.pptx,执行以下操作:\n'
         result_list = []
+        if self.slide_layout_op:
+            result_list.append(find_2rd_item_in_maps(self.slide_layout_target_slide,Slide_Names)+'的版式设置为"'+\
+                self.slide_layout_name+'".')
+
+        if self.text_op:
+            result_list.append(find_2rd_item_in_maps(self.text_target_slide,Slide_Names)+\
+                self.text_target_shape_1+'输入"'+self.text_target_content_1+'", '+\
+                self.text_target_shape_2+'输入"'+self.text_target_content_2+'"'+\
+                '.')
+
+        if self.font_op:
+            additions = ''
+            if self.font_bold: additions = additions + '、粗体'
+            if self.font_italic: additions = additions + '、斜体'
+            result_list.append('设置'+find_2rd_item_in_maps(self.font_target_slide,Slide_Names)+\
+                '"'+self.font_target_content+'"内容的字体为'+self.font_name+'、'+\
+                '字号为'+self.font_size+'、'+ \
+                '颜色为标准色'+ find_2rd_item_in_maps(self.font_color, Standard_Color_Choices) +\
+                additions + '.')
+
+        if self.slide_background_op:
+            if self.slide_background_type == 'PATTERNED (2)':
+                result_list.append(find_2rd_item_in_maps(self.slide_background_slide,Slide_Names)+\
+                    '的背景格式设为图案填充，前景标准色'+\
+                find_2rd_item_in_maps(self.slide_background_fore, Standard_Color_Choices)+\
+                    '，背景标准色'+\
+                find_2rd_item_in_maps(self.slide_background_back, Standard_Color_Choices)+\
+                    '.')
+            elif self.slide_background_type != 'PATTERNED (2)':
+                result_list.append(find_2rd_item_in_maps(self.slide_background_slide,Slide_Names)+\
+                    '的背景格式设为纯色填充，标准色'+\
+                find_2rd_item_in_maps(self.slide_background_fore, Standard_Color_Choices)+\
+                    '.')
+
+        if self.notes_slide_op:
+            result_list.append(find_2rd_item_in_maps(self.notes_slide_target_slide,Slide_Names)+\
+                '添加备注，内容是"'+self.notes_slide_content+\
+                '".')
+
+        if self.table_op:
+            result_list.append(find_2rd_item_in_maps(self.table_target_slide,Slide_Names)+\
+                self.table_target_shape+'中插入'+self.table_rows+'行'+self.table_columns+'列表格，'+\
+                    '具体内容是【' +self.table_content+\
+                '】.')   
 
         return format_html(pre_description) + \
                 format_html("<ol>") + \
@@ -199,6 +243,10 @@ class PPTQuestion(models.Model):
             clean_empty_item(self.text_target_content_1, error_dict, 'text_target_content_1')
             clean_empty_item(self.text_target_shape_2, error_dict, 'text_target_shape_2')
             clean_empty_item(self.text_target_content_2, error_dict, 'text_target_content_2')
+            if self.text_target_shape_1 == self.text_target_shape_2:
+                error_dict['text_target_shape_1'] = _('两个区域不能相同')
+                error_dict['text_target_shape_2'] = _('两个区域不能相同')
+
 
         if self.font_op:
             clean_empty_item(self.font_target_slide, error_dict, 'font_target_slide')
@@ -237,7 +285,6 @@ class PPTQuestion(models.Model):
                 if len(c) == int(self.table_columns): continue
                 error_dict['table_content'] = _('表格内容和列数不相等')
                 break
-
 
         if len(error_dict)>0:
             raise ValidationError(error_dict)
