@@ -2,6 +2,8 @@ import os
 import re
 import shutil
 import zipfile
+from pptx import Presentation
+from pptx.text.text import Font
 from pathlib import Path
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -26,6 +28,14 @@ def validate_pptx(value):
             _(value.name+'不是ppt文件(.pptx)'),
             params={'value': value.name},
         )
+
+## text_frame: family, size, bold, italic
+def get_rPr_font(text_frame):
+    txBody = text_frame._txBody
+    # print(len(txBody.p_lst))
+    for p in txBody.p_lst:
+        for elm in p.content_children:
+            return Font(elm.get_or_add_rPr())
 
 
 Standard_Color_Choices = [
@@ -85,8 +95,6 @@ Shape_Names = [
 
 
 FONT_NAME_CHOICES = [
-    ('Arial Black', 'Arial Black'),
-    ('Bahnschrift', 'Bahnschrift'),
     ('黑体', '黑体'),
     ('华文仿宋', '华文仿宋'),
     ('楷体', '楷体'),
@@ -200,22 +208,89 @@ class PPTQuestion(models.Model):
     def score_(self, answer_file_path):
         result_list = []
         ## check the files
-        # if answer_file_path and os.path.exists(answer_file_path):
-        #     try:
-        #         wb = load_workbook(answer_file_path)
-        #         ws = wb.active 
-        #     except:
-        #         return ['文件打开异常']
+        if answer_file_path and os.path.exists(answer_file_path):
+            try:
+                prs = Presentation(answer_file_path)
+                slides_len = len(prs.slides)
+            except:
+                return ['文件打开异常']
 
-        #     if self.rename_sheet_op:
-        #         result = 'rename_sheet::'
-        #         for name in wb.sheetnames:
-        #             if name == self.new_sheet_name: 
-        #                 result = result+name
-        #                 break
-        #         result_list.append(result)
-        # else:
-        #     result_list.append('Nothing to score')
+            if self.slide_layout_op:
+                slide_id = int(self.slide_layout_target_slide)
+                result = 'slide_layout::'+str(slide_id)+'::'
+                if slide_id+1 <= slides_len:
+                    if self.slide_layout_name == prs.slides[slide_id].slide_layout.name:
+                        result = result + self.slide_layout_name
+                result_list.append(result)
+
+
+            if self.text_op:
+                slide_id = int(self.text_target_slide)
+                result = 'text::'+str(slide_id)+'::'
+                contents = [self.text_target_content_1, self.text_target_content_2]
+                if slide_id+1 <= slides_len:
+                    for shape in prs.slides[slide_id].shapes:
+                        if shape.has_text_frame:
+                            if (shape.text_frame.text in contents):
+                                result = result + shape.text_frame.text + '+'
+                result_list.append(result)
+
+
+            if self.font_op:
+                slide_id = int(self.font_target_slide)
+                result = 'font::'+str(slide_id)+'::'
+                if slide_id+1 <= slides_len:
+                     for shape in prs.slides[slide_id].shapes:
+                        if shape.has_text_frame and (shape.text_frame.text==self.font_target_content):
+                            f = get_rPr_font(shape.text_frame)
+                            name, size, bold, color = f.name, f.size, f.bold, f.color
+                            # print(name, self.font_name)
+                            # print(str(int(size.pt)), self.font_size)
+                            if name == self.font_name:
+                                result = result + name + '+'
+                            if size and str(int(size.pt)) == self.font_size:
+                                result = result + self.font_size + '+'
+                            if bold and self.font_bold:
+                                result = result + '粗体' + '+'
+                            if str(color.type) == 'RGB (1)' and str(color.rgb)==self.font_color:
+                                result = result + self.font_color
+                            break
+                result_list.append(result)
+
+
+            if self.slide_background_op:
+                slide_id = int(self.slide_background_slide)
+                result = 'slide_background::'+str(slide_id)+'::'
+                if slide_id+1 <= slides_len:
+                    fill = prs.slides[slide_id].background.fill
+                    if self.slide_background_type == str(fill.type):
+                        result = result + self.slide_background_type + '+'
+                        if str(fill.type) == 'PATTERNED (2)':
+                            if str(fill.fore_color.type) == 'RGB (1)' and  \
+                                self.slide_background_fore == str(fill.fore_color.rgb):
+                                result = result + self.slide_background_fore + '+'
+                            if str(fill.back_color.type) == 'RGB (1)' and  \
+                                self.slide_background_back == str(fill.back_color.rgb):
+                                result = result + self.slide_background_back + '+'
+                        elif str(fill.type) == 'SOLID (1)':
+                            if str(fill.fore_color.type) == 'RGB (1)' and  \
+                                self.slide_background_fore == str(fill.fore_color.rgb):
+                                result = result + self.slide_background_fore
+                result_list.append(result)
+
+
+            if self.notes_slide_op:
+                slide_id = int(self.notes_slide_target_slide)
+                result = 'notes_slide::'+str(slide_id)+'::'
+                if slide_id+1 <= slides_len:
+                    if self.notes_slide_content == prs.slides[slide_id].notes_slide.notes_text_frame.text:
+                        result = result + self.notes_slide_content
+                result_list.append(result)
+
+
+        else:
+            result_list.append('Nothing to score')
+
         return result_list
 
 
