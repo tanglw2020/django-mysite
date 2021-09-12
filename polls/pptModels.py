@@ -271,7 +271,7 @@ class PPTQuestion(models.Model):
                                 result = result + self.slide_background_fore + '+'
                             if str(fill.back_color.type) == 'RGB (1)' and  \
                                 self.slide_background_back == str(fill.back_color.rgb):
-                                result = result + self.slide_background_back + '+'
+                                result = result + self.slide_background_back
                         elif str(fill.type) == 'SOLID (1)':
                             if str(fill.fore_color.type) == 'RGB (1)' and  \
                                 self.slide_background_fore == str(fill.fore_color.rgb):
@@ -287,6 +287,16 @@ class PPTQuestion(models.Model):
                         result = result + self.notes_slide_content
                 result_list.append(result)
 
+
+            if self.table_op:
+                slide_id = int(self.table_target_slide)
+                result = 'table::'+str(slide_id)+'::'
+                if slide_id+1 <= slides_len:
+                    for shape in prs.slides[slide_id].shapes:
+                        if shape.has_table:
+                            result = result + str(len(shape.table.columns))+'+'+\
+                                str(len(shape.table.rows))+'+'+shape.table.cell(0,0).text
+                result_list.append(result)
 
         else:
             result_list.append('Nothing to score')
