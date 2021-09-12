@@ -140,9 +140,9 @@ class PPTQuestion(models.Model):
             if self.font_bold: additions = additions + '、粗体'
             if self.font_italic: additions = additions + '、斜体'
             result_list.append('设置'+find_2rd_item_in_maps(self.font_target_slide,Slide_Names)+\
-                '"'+self.font_target_content+'"内容的字体为'+self.font_name+'、'+\
-                '字号为'+self.font_size+'、'+ \
-                '颜色为标准色'+ find_2rd_item_in_maps(self.font_color, Standard_Color_Choices) +\
+                '"'+self.font_target_content+'"内容的字体'+self.font_name+'、'+\
+                '字号'+self.font_size+'、'+ \
+                '颜色标准色'+ find_2rd_item_in_maps(self.font_color, Standard_Color_Choices) +\
                 additions + '.')
 
         if self.slide_background_op:
@@ -164,11 +164,19 @@ class PPTQuestion(models.Model):
                 '添加备注，内容是"'+self.notes_slide_content+\
                 '".')
 
+        html_table = format_html("")
         if self.table_op:
             result_list.append(find_2rd_item_in_maps(self.table_target_slide,Slide_Names)+\
                 self.table_target_shape+'中插入'+self.table_rows+'行'+self.table_columns+'列表格，'+\
-                    '具体内容是【' +self.table_content+\
-                '】.')   
+                    '具体内容是如下：')
+
+            html_table = format_html("<table border='2'>")
+            for rows in self.table_content.split('\n'):
+                html_table = html_table+ format_html("<tr>")
+                for item in rows.split(','):
+                    html_table = html_table+ format_html("<td>"+item+"</td>")
+                html_table = html_table+ format_html("</tr>")
+            html_table = html_table+ format_html("</table>")
 
         return format_html(pre_description) + \
                 format_html("<ol>") + \
@@ -176,7 +184,7 @@ class PPTQuestion(models.Model):
                 '\n', '<li style="color:black;">{}</li>',
                 ((x,) for x in result_list)
                 ) \
-                + format_html("</ol>")
+                + format_html("</ol>") + html_table
     question_content.short_description = '题目内容'
 
 
