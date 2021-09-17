@@ -3,18 +3,18 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>考生登录页面</title>
+    <title>计算机等级考试登录页面</title>
     <style type="text/css">
         .login {
             height: 80%;
             padding: 15px 16px;
-            background-color:cadetblue;
+            background-color: cadetblue;
             text-align: center;
         }
 
         .login h1 {
             text-align: center;
-            color:darkgreen;
+            color: darkgreen;
         }
 
         .login .form-row {
@@ -36,22 +36,24 @@
 
 <body>
     <div class="login">
-    <h1>欢迎登陆考试系统</h1>
-    <form action="{% url 'polls:login' %}" method="POST">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-        <div class="form-row">
-        {% include "polls/form_item.html" with form_item=form.exam_id %}
-        </div>
-        <div class="form-row">
-        {% include "polls/form_item.html" with form_item=form.name %}
-        </div>
-        <div class="form-row">
-        {% include "polls/form_item.html" with form_item=form.student_id %}
-        </div>
+        <h2>欢迎登陆</h2>
+        <h1>计算机等级考试系统</h1>
+        <form action="{% url 'exam:login' %}" method="POST">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="form-row">
+                {% include "polls/form_item.html" with form_item=form.exam_id %}
+            </div>
+            <div class="form-row">
+                {% include "polls/form_item.html" with form_item=form.name %}
+            </div>
+            <div class="form-row">
+                {% include "polls/form_item.html" with form_item=form.student_id %}
+            </div>
 
-        <input type="submit" value="登录" class="login-submit">
-    </form></div>
+            <input type="submit" value="登录" class="login-submit">
+        </form>
+    </div>
 </body>
 
 </html>
