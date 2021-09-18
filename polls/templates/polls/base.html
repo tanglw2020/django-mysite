@@ -32,21 +32,26 @@
 <body>
 
   <nav class="navbar navbar-inverse navbar-fixed-top">
-    {% block navbar %}
     <div class="container">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-          aria-expanded="false" aria-controls="navbar">
-        </button>
-        <a class="navbar-brand" href="#">计算机等级考试</a>
-      </div>
-      <div id="navbar" class="collapse navbar-collapse">
+        aria-expanded="false" aria-controls="navbar">
+      </button>
+      <a class="navbar-brand" href="{% url 'exam:exampage'  exam_page.id %}">计算机等级考试</a>
+    </div>
+    <div id="navbar" class="collapse navbar-collapse">
+        {% block navbar %}
         <ul class="nav navbar-nav">
-          <li class="active"><a href="{% url 'exam:exampage'  exam_page.id %}">首页</a></li>
+          <li><a href="{% url 'exam:exampage-choicequestion'  exam_page.id  1 %}">选择题</a></li>
+          <li><a href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">系统操作题</a></li>
+          <li><a href="{% url 'exam:exampage-emailquestion'  exam_page.id  %}">上网题</a></li>
+          <li><a href="{% url 'exam:exampage-wordquestion'  exam_page.id  %}">Word题</a></li>
+          <li><a href="{% url 'exam:exampage-excelquestion'  exam_page.id  %}">Excel题</a></li>
+          <li><a href="{% url 'exam:exampage-pptquestion'  exam_page.id  %}">PPT题</a></li>
         </ul>
+        {% endblock %}
       </div>
     </div>
-    {% endblock %}
   </nav>
 
   <div class="container">
@@ -88,6 +93,27 @@
   <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 
   {% block script %} {% endblock script %}
+
+  <script type="text/javascript">
+    function refreshTime() {
+      $.ajax({
+        url: '/exam/api/getservertime/{{ exam_page.id }}',
+        type: 'POST',
+        data: {},
+        dataType: 'json',
+        timeout: 10000,
+        success: function (result) {
+          if (result.result) {
+            $("#serverTime").html("考试用时：" + result.result);
+          } else {
+            $("#serverTime").html("无效数据");
+          }
+        }
+      });
+      setTimeout('refreshTime()', 1000);
+    }
+    setTimeout('refreshTime()', 1000);
+  </script>
 
 </body>
 

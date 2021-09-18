@@ -3,8 +3,9 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django import forms
 from django.utils.html import format_html, format_html_join
-import datetime
 from django.utils import timezone
+
+import datetime
 import re
 import os
 import shutil
@@ -12,7 +13,13 @@ import zipfile
 from pathlib import Path
 
 from docx import Document
-from .fileModels import *
+from polls.fileModels import *
+from polls.choiceQuestionModels import ChoiceQuestion
+from polls.emailModels import EmailQuestion
+from polls.fileOperationlModels import FileOperationQuestion
+from polls.wordModels import WordQuestion
+from polls.excelModels import ExcelQuestion
+from polls.pptModels import PPTQuestion
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
@@ -181,10 +188,6 @@ class ExamPaper(models.Model):
         return (self.start_time)
     start_time_.short_description = '开考时间'
 
-    def coding_question_answers_(self):
-        return self.coding_question_answers.split(',')
-    coding_question_answers_.short_description = '编程题答案'
-
     def choice_question_answers_(self):
         return self.choice_question_answers.split(',')
     choice_question_answers_.short_description = '选择题答案'
@@ -205,21 +208,11 @@ class ExamPaper(models.Model):
     #     return coding_questions_all
     # coding_questions_all_.short_description = '全部编程题'
 
-    # ## question_id start from 1 to n
-    # def choice_questions_pk_(self, question_id):
-    #     question_database_id = int(self.choice_questions.split(',')[question_id-1])
-    #     return ChoiceQuestion.objects.get(pk=question_database_id)
-    # choice_questions_pk_.short_description = 'pk选择题'
-
-    # def coding_questions_pk_(self, question_id):
-    #     question_database_id = int(self.coding_questions.split(',')[question_id-1])
-    #     return CodingQuestion.objects.get(pk=question_database_id)
-    # coding_questions_pk_.short_description = 'pk编程题'
-
-    def coding_output_path_(self, question_id):
-        output_save_path = os.path.join(MEDIA_ROOT, 'upload_output','coding_output_{}_{}.txt'.format(self.id, question_id))
-        return output_save_path
-    coding_output_path_.short_description = '上传结果保存目录'
+    ## question_id start from 1 to n
+    def choice_questions_pk_(self, question_id):
+        question_database_id = int(self.choice_questions.split(',')[question_id-1])
+        return ChoiceQuestion.objects.get(pk=question_database_id)
+    choice_questions_pk_.short_description = 'pk选择题'
 
     def update_choice_question_answer_result_(self, question_id, choice_id):
         old_answers = self.choice_question_answers.split(',')

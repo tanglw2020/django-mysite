@@ -30,7 +30,7 @@ def exampage(request, exampage_id):
     try:
         exam_page = ExamPaper.objects.get(id=exampage_id)
     except ExamPaper.DoesNotExist:
-        return HttpResponseRedirect(reverse('c:login'))
+        return HttpResponseRedirect(reverse('exam:login'))
 
     context = {
         'exam': exam_page.exam,
@@ -39,6 +39,107 @@ def exampage(request, exampage_id):
         'choice_questions_answers': exam_page.choice_question_answers_(),
         }
     return render(request, 'polls/exam_page.html', context)
+
+
+def exampage(request, exampage_id):
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('exam:login'))
+
+    context = {
+        'exam': exam_page.exam,
+        'student': exam_page.student,
+        'exam_page': exam_page,
+        'choice_questions_answers': exam_page.choice_question_answers_(),
+        }
+    return render(request, 'polls/exam_page.html', context)
+
+def exampage_choice_question(request, exampage_id, choice_question_id):
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('exam:login'))
+
+    context = {
+        'exam': exam_page.exam,
+        'student': exam_page.student,
+        'exam_page': exam_page,
+        'choice_questions_answers': exam_page.choice_question_answers_(),
+        'choice_question': exam_page.choice_questions_pk_(choice_question_id),
+        'choice_question_id': choice_question_id,
+        }
+    return render(request, 'polls/exam_page_choice_question.html', context)
+
+
+def exampage_email_question(request, exampage_id):
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('exam:login'))
+
+    context = {
+        'exam': exam_page.exam,
+        'student': exam_page.student,
+        'exam_page': exam_page,
+        }
+    return render(request, 'polls/exam_page_email_question.html', context)
+
+
+def exampage_system_question(request, exampage_id):
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('exam:login'))
+
+    context = {
+        'exam': exam_page.exam,
+        'student': exam_page.student,
+        'exam_page': exam_page,
+        }
+    return render(request, 'polls/exam_page_system_question.html', context)
+
+
+def exampage_word_question(request, exampage_id):
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('exam:login'))
+
+    context = {
+        'exam': exam_page.exam,
+        'student': exam_page.student,
+        'exam_page': exam_page,
+        }
+    return render(request, 'polls/exam_page_word_question.html', context)
+
+
+def exampage_excel_question(request, exampage_id):
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('exam:login'))
+
+    context = {
+        'exam': exam_page.exam,
+        'student': exam_page.student,
+        'exam_page': exam_page,
+        }
+    return render(request, 'polls/exam_page_excel_question.html', context)
+
+
+def exampage_ppt_question(request, exampage_id):
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('exam:login'))
+
+    context = {
+        'exam': exam_page.exam,
+        'student': exam_page.student,
+        'exam_page': exam_page,
+        }
+    return render(request, 'polls/exam_page_ppt_question.html', context)
 
 
 def get_host_ip():
@@ -173,4 +274,21 @@ def api_get_server_time(request, exampage_id):
     diff = int(timezone.now().timestamp() - exam_page.start_time.timestamp())
     a = {}
     a["result"] = str(int(diff/60))+'分钟'+str(diff%60)+'秒'  ##"post_success"
+    return HttpResponse(json.dumps(a), content_type='application/json')
+
+
+@csrf_exempt
+def api_handle_choice_answer(request, exampage_id, choice_question_id, choice_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    # old_answers = exam_page.choice_question_answers.split(',')
+    # old_answers[choice_question_id-1] = str(choice_id)
+    # exam_page.choice_question_answers = ','.join(old_answers)
+    # exam_page.save()
+    exam_page.update_choice_question_answer_result_(choice_question_id, choice_id)
+    a = {}
     return HttpResponse(json.dumps(a), content_type='application/json')
