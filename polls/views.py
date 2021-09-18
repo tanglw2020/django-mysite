@@ -26,6 +26,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
 
 
+def exampage(request, exampage_id):
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('c:login'))
+
+    context = {
+        'exam': exam_page.exam,
+        'student': exam_page.student,
+        'exam_page': exam_page,
+        'choice_questions_answers': exam_page.choice_question_answers_(),
+        }
+    return render(request, 'polls/exam_page.html', context)
+
+
 def get_host_ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -144,3 +159,18 @@ def api_download_scorelist(request, exam_id):
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="scorelist{}.txt"'.format(exam_id)
     return response
+
+
+@csrf_exempt
+def api_get_server_time(request, exampage_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+
+    diff = int(timezone.now().timestamp() - exam_page.start_time.timestamp())
+    a = {}
+    a["result"] = str(int(diff/60))+'分钟'+str(diff%60)+'秒'  ##"post_success"
+    return HttpResponse(json.dumps(a), content_type='application/json')
