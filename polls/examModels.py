@@ -188,6 +188,10 @@ class ExamPaper(models.Model):
         return (self.start_time)
     start_time_.short_description = '开考时间'
 
+    def system_questions_pk_(self):
+        return FileOperationQuestion.objects.get(pk=int(self.system_operation_question))
+    system_questions_pk_.short_description = 'pk操作系统题'
+
     def choice_question_answers_(self):
         return self.choice_question_answers.split(',')
     choice_question_answers_.short_description = '选择题答案'

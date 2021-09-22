@@ -6,6 +6,7 @@ from django.utils import timezone
 import datetime
 
 from .examModels import *
+from polls.fileModels import *
 
 class StudentForm(forms.Form):
     exam_id = forms.IntegerField(label='考场编号')
@@ -22,4 +23,12 @@ class StudentForm(forms.Form):
         if not Student.objects.filter(student_id=student_id).exists():
             self.add_error('student_id', '学号不存在')
 
-        
+class UploadZipFileForm(forms.Form):
+    file = forms.FileField(label='upload-zip-file', validators=[validate_zipfile]) 
+
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     filename = cleaned_data['file']
+        # if filename[-4:] != '.zip':
+        #     # self.add_error('file', '只能上传.zip文件')
+        #     raise ValidationError(_('只能上传.zip文件'))

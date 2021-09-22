@@ -11,7 +11,7 @@ import time
 import random
 from pathlib import Path
 
-from polls.forms import StudentForm
+from polls.forms import StudentForm, UploadZipFileForm
 from polls.examModels import *
 from polls.choiceQuestionModels import ChoiceQuestion
 from polls.emailModels import EmailQuestion
@@ -92,10 +92,25 @@ def exampage_system_question(request, exampage_id):
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
+    uploadsucc = False
+    if request.method == 'POST':
+        form = UploadZipFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            output_save_path = ''
+            # output_save_path = exam_page.coding_output_path_(coding_question_id)
+            # handle_uploaded_file(request.FILES['file'], output_save_path)
+            # exam_page.update_coding_question_answer_result_(coding_question_id, output_save_path)
+            uploadsucc = True
+    else:
+        form = UploadZipFileForm()
+
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
         'exam_page': exam_page,
+        'system_question': exam_page.system_questions_pk_(),
+        'form': form,
+        'uploadsucc': uploadsucc,
         }
     return render(request, 'polls/exam_page_system_question.html', context)
 
@@ -292,3 +307,25 @@ def api_handle_choice_answer(request, exampage_id, choice_question_id, choice_id
     exam_page.update_choice_question_answer_result_(choice_question_id, choice_id)
     a = {}
     return HttpResponse(json.dumps(a), content_type='application/json')
+
+
+@csrf_exempt
+def api_download_system_zipfile(request, exampage_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    
+    system_question = exam_page.system_questions_pk_()
+
+    file_path = system_question.zipfile_path_()
+    if file_path:
+        response = FileResponse(open(file_path, 'rb'))
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="operation-system.zip"'
+        return response
+    else:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
