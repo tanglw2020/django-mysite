@@ -9,10 +9,11 @@ import json
 import datetime
 import time
 import random
+import socket
 from zipfile import ZipFile
 from pathlib import Path
 
-from polls.forms import StudentForm, UploadZipFileForm
+from polls.forms import *
 from polls.examModels import *
 from polls.choiceQuestionModels import ChoiceQuestion
 from polls.emailModels import EmailQuestion
@@ -20,8 +21,6 @@ from polls.fileOperationlModels import FileOperationQuestion
 from polls.wordModels import WordQuestion
 from polls.excelModels import ExcelQuestion
 from polls.pptModels import PPTQuestion
-
-import socket
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
@@ -84,10 +83,22 @@ def exampage_email_question(request, exampage_id):
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
+    uploadsucc = False
+    email_question = exam_page.email_questions_pk_()
+    if request.method == 'POST':
+        form = SendEmailForm(request.POST, request.FILES)
+        if form.is_valid():
+            uploadsucc = True
+    else:
+        form = SendEmailForm()
+
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
         'exam_page': exam_page,
+        'email_question': email_question,
+        'form': form,
+        'uploadsucc': uploadsucc,
         }
     return render(request, 'polls/exam_page_email_question.html', context)
 

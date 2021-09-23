@@ -192,6 +192,10 @@ class ExamPaper(models.Model):
         return FileOperationQuestion.objects.get(pk=int(self.system_operation_question))
     system_questions_pk_.short_description = 'pk操作系统题'
 
+    def email_questions_pk_(self):
+        return EmailQuestion.objects.get(pk=int(self.email_question))
+    system_questions_pk_.short_description = 'pk上网题'
+
     def base_path_(self):
         return os.path.join(MEDIA_ROOT, 'upload_exam_answer', str(self.id))
 

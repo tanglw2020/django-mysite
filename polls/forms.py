@@ -23,6 +23,7 @@ class StudentForm(forms.Form):
         if not Student.objects.filter(student_id=student_id).exists():
             self.add_error('student_id', '学号不存在')
 
+
 class UploadZipFileForm(forms.Form):
     file = forms.FileField(label='upload-zip-file', validators=[validate_zipfile]) 
 
@@ -32,3 +33,10 @@ class UploadZipFileForm(forms.Form):
         # if filename[-4:] != '.zip':
         #     # self.add_error('file', '只能上传.zip文件')
         #     raise ValidationError(_('只能上传.zip文件'))
+
+
+class SendEmailForm(forms.Form):
+    name1 = forms.CharField(label='收件人:',  max_length=200)
+    name2 = forms.CharField(label='抄送人:',  max_length=200)
+    topic = forms.CharField(label='主  题:',  max_length=200)
+    content = forms.CharField(label='内  容:',  widget=forms.Textarea)
