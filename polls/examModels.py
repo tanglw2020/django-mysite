@@ -25,8 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
 
 EXAM_TYPE_CHOICES = [
-    ('1','计算等级考试1级'),
-    ('2','计算等级考试2级'),
+    ('1','计算机等级考试1级'),
+    ('2','计算机等级考试2级'),
 ]
 
 PERIOD_CHOICES = [
@@ -55,7 +55,7 @@ class Exam(models.Model):
 
     choice_question_num = models.IntegerField(verbose_name="选择题个数", default=20)
     choice_question_score = models.IntegerField(verbose_name="选择题分值", default=1)
-    file_operation_score = models.IntegerField(verbose_name="系统操作题分值", default=10)
+    file_operation_score = models.IntegerField(verbose_name="操作系统题分值", default=10)
     email_score = models.IntegerField(verbose_name="上网题分值", default=10)
     word_score = models.IntegerField(verbose_name="Word操作题分值", default=20)
     excel_score = models.IntegerField(verbose_name="Excel操作题分值", default=20)
@@ -71,7 +71,7 @@ class Exam(models.Model):
     def all_question_stat_(self):
         result_list = [
                         ['选择题'+str(self.choice_question_num)+'X'+str(self.choice_question_score)],
-                        ['系统操作题1X'+str(self.file_operation_score)],
+                        ['操作系统题1X'+str(self.file_operation_score)],
                         ['上网题1X'+str(self.email_score)],
                         ['Word操作题1X'+str(self.word_score)],
                         ['Excel操作题1X'+str(self.excel_score)],
@@ -191,6 +191,12 @@ class ExamPaper(models.Model):
     def system_questions_pk_(self):
         return FileOperationQuestion.objects.get(pk=int(self.system_operation_question))
     system_questions_pk_.short_description = 'pk操作系统题'
+
+    def base_path_(self):
+        return os.path.join(MEDIA_ROOT, 'upload_exam_answer', str(self.id))
+
+    def system_operation_answer_save_path_(self):
+        return os.path.join(self.base_path_(), 'system-operation-{}'.format(self.system_operation_question))
 
     def choice_question_answers_(self):
         return self.choice_question_answers.split(',')

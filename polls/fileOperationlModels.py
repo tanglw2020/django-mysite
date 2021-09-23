@@ -147,11 +147,11 @@ class FileOperationQuestion(models.Model):
     #题目内容
     def question_content(self):
         result_list = []
-        result_list.append('在考生文件夹下创建文件夹'+self.new_folder_dir_A+'，并在此文件夹中新建文件'+self.new_file_B+'.')
-        result_list.append('在考生文件夹下的'+self.del_folder_A+'/'+self.del_folder_B+'文件夹中，删除文件'+self.del_file_C+'.')
-        result_list.append('将考生文件夹下的'+self.modify_folder_A+'中的文件'+self.modify_file_B+'的属性修改为'+self.modify_file_attr+'.')
-        result_list.append('将考生文件夹下的' + self.rename_folder_A + '中文件' + self.rename_file_B+'重命名为'+self.rename_file_C+'.')
-        result_list.append('将考生文件夹下的'+self.copy_folder_A+'中的文件'+self.copy_file_B+self.copy_or_move+'到文件夹'+self.copy_folder_C+'.')
+        result_list.append('在文件夹下创建新文件夹'+self.new_folder_dir_A+'，并在此文件夹中新建文件'+self.new_file_B+'。')
+        result_list.append('在文件夹下'+self.del_folder_A+'/'+self.del_folder_B+'文件夹中，删除文件'+self.del_file_C+'。')
+        result_list.append('将文件夹下'+self.modify_folder_A+'中的文件'+self.modify_file_B+'的属性修改为'+self.modify_file_attr+'。')
+        result_list.append('将文件夹下' + self.rename_folder_A + '中文件' + self.rename_file_B+'重命名为'+self.rename_file_C+'。')
+        result_list.append('将文件夹下'+self.copy_folder_A+'中的文件'+self.copy_file_B+self.copy_or_move+'到文件夹'+self.copy_folder_C+'。')
         return format_html("<ol>") + \
                 format_html_join(
                 '\n', '<li style="color:black;">{}</li>',
@@ -214,8 +214,6 @@ class FileOperationQuestion(models.Model):
             if os.path.exists(targeted_file_2):
                 result = (self.copy_file_B)
             result_list.append(result)
-
-
         return result_list
 
     def save(self, *args, **kwargs):

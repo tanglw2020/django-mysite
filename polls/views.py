@@ -3,12 +3,13 @@ from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.urls import reverse
 from django import forms
 from django.http import Http404
-
 from django.views.decorators.csrf import csrf_exempt
+
 import json
 import datetime
 import time
 import random
+from zipfile import ZipFile
 from pathlib import Path
 
 from polls.forms import StudentForm, UploadZipFileForm
@@ -25,6 +26,11 @@ import socket
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
 
+def handle_uploaded_file(f, output_save_path):
+    # print(os.path.join(root_path,filename))
+    with open(output_save_path, 'wb') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
 
 def exampage(request, exampage_id):
     try:
@@ -93,13 +99,30 @@ def exampage_system_question(request, exampage_id):
         return HttpResponseRedirect(reverse('exam:login'))
 
     uploadsucc = False
+    system_question = exam_page.system_questions_pk_()
     if request.method == 'POST':
         form = UploadZipFileForm(request.POST, request.FILES)
         if form.is_valid():
-            output_save_path = ''
-            # output_save_path = exam_page.coding_output_path_(coding_question_id)
-            # handle_uploaded_file(request.FILES['file'], output_save_path)
-            # exam_page.update_coding_question_answer_result_(coding_question_id, output_save_path)
+            output_save_path = exam_page.system_operation_answer_save_path_()
+            if os.path.exists(output_save_path): shutil.rmtree(output_save_path)
+            os.makedirs(output_save_path)
+
+            output_save_file = os.path.join(output_save_path, 'files.zip')
+            handle_uploaded_file(request.FILES['file'], output_save_file)
+
+            with ZipFile(output_save_file) as myzip:
+                myzip.extractall(output_save_path)
+
+            exam_page.system_operation_answer = output_save_file
+            results = system_question.score_(os.path.join(output_save_path, 'exam_system_operation'))
+            if len(results)==0:
+                exam_page.system_operation_result = 0
+            else:
+                corrects_ = [x for x in results if x]
+                exam_page.system_operation_result = exam_page.exam.file_operation_score * len(corrects_) / len(results)
+            print(exam_page.system_operation_result)
+            exam_page.save()
+            
             uploadsucc = True
     else:
         form = UploadZipFileForm()
@@ -108,7 +131,7 @@ def exampage_system_question(request, exampage_id):
         'exam': exam_page.exam,
         'student': exam_page.student,
         'exam_page': exam_page,
-        'system_question': exam_page.system_questions_pk_(),
+        'system_question': system_question,
         'form': form,
         'uploadsucc': uploadsucc,
         }
