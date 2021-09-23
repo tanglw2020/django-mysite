@@ -24,7 +24,7 @@
 <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width="100%" color=#987 cb 9 SIZE=20>
   
   <div class='emailsender' 
-    style="padding: 1% 2%; background-color: gray;">
+    style="padding: 1% 2%; background-color:lightgrey;">
     <h3>邮件编辑</h3>
     <form method='POST' action='' enctype='multipart/form-data'>
       {% csrf_token %}
@@ -37,10 +37,10 @@
       <div class="form-row" style="padding: 10px 10px; background-color:darkgray;">
         {% include "polls/form_item.html" with form_item=form.name2 %}
       </div>
-      <div class="form-row" style="padding: 10px 10px; background-color:darkgray;">
+      <div class="form-row" style="padding: 10px 20px; background-color:gray;">
         {% include "polls/form_item.html" with form_item=form.topic %}
       </div>
-      <div class="form-row" style="padding: 10px 10px; background-color:darkgray;">
+      <div style="padding: 10px 20px; background-color:gray;">
         {% include "polls/form_item.html" with form_item=form.content %}
       </div>
       <div class='form-group' style=" margin-top: 10px">
