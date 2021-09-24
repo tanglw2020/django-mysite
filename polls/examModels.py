@@ -119,7 +119,7 @@ class StudentInfoImporter(models.Model):
     def __str__(self):
         return '导入考生信息'+str(self.id)
 
-    upload_description_file = models.FileField(upload_to='upload_student_list/', null=True, blank=True, 
+    upload_description_file = models.FileField(upload_to='upload_import_files/', null=True, blank=True, 
     validators=[validate_txtfile], verbose_name='上传考生信息文件[.txt]')
 
     def save(self, *args, **kwargs):

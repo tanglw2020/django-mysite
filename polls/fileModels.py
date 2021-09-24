@@ -21,6 +21,16 @@ def validate_docx(value):
             params={'value': value.name},
         )
 
+def validate_xlsx(value):
+
+    extension = value.name.split('.')[-1]
+    if extension != 'xlsx':
+        raise ValidationError(
+            _(value.name+'不是xlsx文件'),
+            params={'value': value.name},
+        )
+
+
 def validate_zipfile(value):
     extension = value.name.split('.')[-1]
     if extension not in ['zip',]:
