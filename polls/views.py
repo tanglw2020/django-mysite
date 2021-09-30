@@ -89,6 +89,16 @@ def exampage_email_question(request, exampage_id):
         form = SendEmailForm(request.POST, request.FILES)
         if form.is_valid():
             uploadsucc = True
+            cleaned_data = form.cleaned_data
+            # print(cleaned_data)
+            score = 0
+            if cleaned_data['name1'] == email_question.des_name: score = score + 1
+            if cleaned_data['name2'] == email_question.cop_name: score = score + 1
+            if cleaned_data['topic'] == email_question.topic: score = score + 1
+            if cleaned_data['content'] == email_question.content: score = score + 1
+            exam_page.email_result = exam_page.exam.email_score * score / 4
+            exam_page.email_answer = cleaned_data['topic']+':'+cleaned_data['content']
+            exam_page.save()
     else:
         form = SendEmailForm()
 
