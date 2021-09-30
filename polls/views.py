@@ -164,11 +164,42 @@ def exampage_word_question(request, exampage_id):
         exam_page = ExamPaper.objects.get(id=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
+    
+    uploadsucc = False
+    word_question = exam_page.word_questions_pk_()
+    if request.method == 'POST':
+        form = UploadWordForm(request.POST, request.FILES)
+        if form.is_valid():
+            output_save_path = exam_page.word_answer_save_path_()
+            if os.path.exists(output_save_path): shutil.rmtree(output_save_path)
+            os.makedirs(output_save_path)
+
+            output_save_file = os.path.join(output_save_path, 'word.docx')
+            handle_uploaded_file(request.FILES['file'], output_save_file)
+
+            # with ZipFile(output_save_file) as myzip:
+            #     myzip.extractall(output_save_path)
+
+            # exam_page.system_operation_answer = output_save_file
+            # if len(results)==0:
+            #     exam_page.system_operation_result = 0
+            # else:
+            #     corrects_ = [x for x in results if x]
+            #     exam_page.system_operation_result = exam_page.exam.file_operation_score * len(corrects_) / len(results)
+            # print(exam_page.system_operation_result)
+            # exam_page.save()
+            
+            uploadsucc = True
+    else:
+        form = UploadWordForm()
 
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
         'exam_page': exam_page,
+        'word_question': word_question,
+        'form': form,
+        'uploadsucc': uploadsucc,
         }
     return render(request, 'polls/exam_page_word_question.html', context)
 

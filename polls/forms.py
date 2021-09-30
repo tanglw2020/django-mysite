@@ -24,16 +24,17 @@ class StudentForm(forms.Form):
             self.add_error('student_id', '学号不存在')
 
 
+class UploadWordForm(forms.Form):
+    file = forms.FileField(label='upload-word-file', validators=[validate_docx, validate_file_size]) 
+
+class UploadExcelForm(forms.Form):
+    file = forms.FileField(label='upload-excel-file', validators=[validate_xlsx, validate_file_size]) 
+
+class UploadPPTForm(forms.Form):
+    file = forms.FileField(label='upload-ppt-file', validators=[validate_pptx, validate_file_size]) 
+
 class UploadZipFileForm(forms.Form):
-    file = forms.FileField(label='upload-zip-file', validators=[validate_zipfile]) 
-
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     filename = cleaned_data['file']
-        # if filename[-4:] != '.zip':
-        #     # self.add_error('file', '只能上传.zip文件')
-        #     raise ValidationError(_('只能上传.zip文件'))
-
+    file = forms.FileField(label='upload-zip-file', validators=[validate_zipfile, validate_file_size]) 
 
 class SendEmailForm(forms.Form):
     name1 = forms.CharField(label='收件人:',  max_length=200)

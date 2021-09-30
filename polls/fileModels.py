@@ -4,6 +4,15 @@ from django.utils.translation import gettext_lazy as _
 from docx import Document
 import os
 
+
+def validate_file_size(value):
+    filesize= value.size
+    
+    if filesize > 10485760:
+        raise ValidationError("上传文件不能超过10MB")
+    else:
+        return value
+
 def validate_image(value):
     extension = value.name.split('.')[-1]
     if extension not in ['jpg','jpeg','png','bmp']:
@@ -30,6 +39,14 @@ def validate_xlsx(value):
             params={'value': value.name},
         )
 
+def validate_pptx(value):
+
+    extension = value.name.split('.')[-1]
+    if extension != 'pptx':
+        raise ValidationError(
+            _(value.name+'不是pptx文件'),
+            params={'value': value.name},
+        )
 
 def validate_zipfile(value):
     extension = value.name.split('.')[-1]

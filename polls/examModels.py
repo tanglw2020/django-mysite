@@ -196,11 +196,33 @@ class ExamPaper(models.Model):
         return EmailQuestion.objects.get(pk=int(self.email_question))
     system_questions_pk_.short_description = 'pk上网题'
 
+    def word_questions_pk_(self):
+        return WordQuestion.objects.get(pk=int(self.word_question))
+    word_questions_pk_.short_description = 'pk Word题目'
+
+    def excel_questions_pk_(self):
+        return ExcelQuestion.objects.get(pk=int(self.excel_question))
+    excel_questions_pk_.short_description = 'pk Excel题目'
+
+    def ppt_questions_pk_(self):
+        return PPTQuestion.objects.get(pk=int(self.ppt_question))
+    ppt_questions_pk_.short_description = 'pk PPT题目'
+
+
     def base_path_(self):
         return os.path.join(MEDIA_ROOT, 'upload_exam_answer', str(self.id))
 
     def system_operation_answer_save_path_(self):
         return os.path.join(self.base_path_(), 'system-operation-{}'.format(self.system_operation_question))
+
+    def word_answer_save_path_(self):
+        return os.path.join(self.base_path_(), 'word-{}'.format(self.word_question))
+
+    def excel_answer_save_path_(self):
+        return os.path.join(self.base_path_(), 'excel-{}'.format(self.excel_question))
+
+    def ppt_answer_save_path_(self):
+        return os.path.join(self.base_path_(), 'ppt-{}'.format(self.ppt_question))
 
     def choice_question_answers_(self):
         return self.choice_question_answers.split(',')
