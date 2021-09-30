@@ -4,9 +4,15 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, format_html_join
 from docx import Document
+import zipfile
 import Levenshtein
 from .wordChoices import *
 from .fileModels import *
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_ROOT  = BASE_DIR / 'media'
+
 
 def getColororNone(c):
     if c:
@@ -45,6 +51,25 @@ class WordQuestion(models.Model):
     def file_path(self):
         return self.upload_docx.name
     file_path.short_description = 'Word文件'
+
+    def base_path_(self):
+        return os.path.join(MEDIA_ROOT, 'upload_docx',str(self.id))
+
+    def zip_path_(self):
+        return os.path.join(MEDIA_ROOT, 'upload_docx',str(self.id),'word操作题目.zip')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  
+        if not os.path.exists(self.base_path_()):  os.mkdir(self.base_path_())
+
+        zip_path = self.zip_path_()
+        if zip_path:
+            if os.path.exists(zip_path): os.remove(zip_path)
+            zf = zipfile.ZipFile(zip_path, 'w')
+            zf.write(self.upload_docx.path,'{}/word.docx'.format('word操作题目'))
+            if self.image_op:
+                zf.write(self.upload_image_file.path,'{}/{}'.format('word操作题目', self.upload_image_file.name.split('/')[-1]))
+            zf.close()
 
     def word_op_numb(self):
         op_list = []

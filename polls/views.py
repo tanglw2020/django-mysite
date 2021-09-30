@@ -404,3 +404,26 @@ def api_download_system_zipfile(request, exampage_id):
     else:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
+
+
+
+@csrf_exempt
+def api_download_word_zipfile(request, exampage_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    
+    word_question = exam_page.word_questions_pk_()
+
+    file_path = word_question.zip_path_()
+    if file_path:
+        response = FileResponse(open(file_path, 'rb'))
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="word.zip"'
+        return response
+    else:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
