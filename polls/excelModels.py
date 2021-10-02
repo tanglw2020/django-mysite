@@ -144,6 +144,20 @@ class ExcelQuestion(models.Model):
     def base_path_(self):
         return os.path.join(MEDIA_ROOT, 'upload_xlsx', str(self.id))
 
+    def zip_path_(self):
+        return os.path.join(MEDIA_ROOT, 'upload_xlsx',str(self.id),'excel操作题目.zip')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  
+        if not os.path.exists(self.base_path_()):  os.mkdir(self.base_path_())
+
+        zip_path = self.zip_path_()
+        if zip_path:
+            if os.path.exists(zip_path): os.remove(zip_path)
+            zf = zipfile.ZipFile(zip_path, 'w')
+            zf.write(self.upload_excel.path,'{}/excel.xlsx'.format('excel操作题目'))
+            zf.close()
+
     # 题目内容
     def question_content(self):
         pre_description = '打开工作薄文件EXCEL.xlsx:\n'

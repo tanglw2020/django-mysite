@@ -708,6 +708,24 @@ class WordQuestion(models.Model):
             return '没有上传测试文件'
     test_.short_description = '测试结果'
 
+    def score_(self, file_docx):
+        if file_docx:
+            # check valid docx file
+            try:
+                document_test = Document(file_docx)
+            except:
+                return 0
+
+            result_list = self.compare_operation(document_test)
+            # print(result_list)
+            scores = [(len(x)>2 and x[1]==x[2])*1 for x in result_list]
+            # print(scores)
+            s = 0
+            for i in scores:
+                s = s + i
+
+            return s*1.0/len(scores)
+
     def docx_path_(self):
         if self.upload_docx:
             return self.upload_docx.path

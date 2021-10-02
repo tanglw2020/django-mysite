@@ -177,17 +177,9 @@ def exampage_word_question(request, exampage_id):
             output_save_file = os.path.join(output_save_path, 'word.docx')
             handle_uploaded_file(request.FILES['file'], output_save_file)
 
-            # with ZipFile(output_save_file) as myzip:
-            #     myzip.extractall(output_save_path)
-
-            # exam_page.system_operation_answer = output_save_file
-            # if len(results)==0:
-            #     exam_page.system_operation_result = 0
-            # else:
-            #     corrects_ = [x for x in results if x]
-            #     exam_page.system_operation_result = exam_page.exam.file_operation_score * len(corrects_) / len(results)
-            # print(exam_page.system_operation_result)
-            # exam_page.save()
+            exam_page.word_answer = output_save_file
+            exam_page.word_result = exam_page.exam.word_score * word_question.score_(output_save_file)
+            exam_page.save()
             
             uploadsucc = True
     else:
@@ -245,7 +237,7 @@ def exam_room(request, exam_id):
     try:
         exam = Exam.objects.get(id=exam_id)
     except Exam.DoesNotExist:
-        raise Http404("exam does not exist")
+        raise Http404("exam {} does not exist".format(exam_id))
     
     exam_papers = exam.exampaper_set.all()
     # for exam_paper in exam_papers:
