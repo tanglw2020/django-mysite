@@ -240,10 +240,33 @@ def exampage_ppt_question(request, exampage_id):
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
+    uploadsucc = False
+    ppt_question = exam_page.ppt_questions_pk_()
+    if request.method == 'POST':
+        form = UploadPPTForm(request.POST, request.FILES)
+        if form.is_valid():
+            output_save_path = exam_page.ppt_answer_save_path_()
+            if os.path.exists(output_save_path): shutil.rmtree(output_save_path)
+            os.makedirs(output_save_path)
+
+            output_save_file = os.path.join(output_save_path, 'ppt.pptx')
+            handle_uploaded_file(request.FILES['file'], output_save_file)
+
+            exam_page.ppt_answer = output_save_file
+            _, score = ppt_question.score_(output_save_file)
+            exam_page.ppt_result = exam_page.exam.ppt_score * score
+            exam_page.save()
+            
+            uploadsucc = True
+    else:
+        form = UploadPPTForm()
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
         'exam_page': exam_page,
+        'ppt_question': ppt_question,
+        'form': form,
+        'uploadsucc': uploadsucc,
         }
     return render(request, 'polls/exam_page_ppt_question.html', context)
 

@@ -22,7 +22,7 @@
     <div class="alert alert-primary" role="alert">
       <h4>说明：下载zip文件并解压，在文件夹下完成下列操作，
         并将结果压缩成zip文件上传。(注意：不要更改题目要求以外的文件或文件夹) </h4> 
-      <p>{{ system_question.question_content }}</p>
+      {{ system_question.question_content }}
       <a type="button" class="btn btn-info" href="{% url 'exam:api-download-system-zipfile'  exam_page.id %}">下载文件ZIP文件</a>
     </div>
 

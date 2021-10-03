@@ -193,14 +193,7 @@ class PPTQuestion(models.Model):
             result_list.append(find_2rd_item_in_maps(self.table_target_slide,Slide_Names)+\
                 self.table_target_shape+'中插入'+self.table_rows+'行'+self.table_columns+'列表格，'+\
                     '具体内容是如下：')
-
-            html_table = format_html("<table border='2'>")
-            for rows in self.table_content.split('\n'):
-                html_table = html_table+ format_html("<tr>")
-                for item in rows.split(','):
-                    html_table = html_table+ format_html("<td>"+item+"</td>")
-                html_table = html_table+ format_html("</tr>")
-            html_table = html_table+ format_html("</table>")
+            html_table = self.html_table_()
 
         return format_html(pre_description) + \
                 format_html("<ol>") + \
@@ -211,6 +204,15 @@ class PPTQuestion(models.Model):
                 + format_html("</ol>") + html_table
     question_content.short_description = '题目内容'
 
+    def html_table_(self):
+        html_table = format_html("<div><table border='2' align='center'>")
+        for rows in self.table_content.split('\n'):
+            html_table = html_table+ format_html("<tr >")
+            for item in rows.split(','):
+                html_table = html_table+ format_html("<td>&nbsp"+item+"&nbsp</td>")
+            html_table = html_table+ format_html("</tr>")
+        html_table = html_table+ format_html("</table></div>")
+        return html_table
 
     def file_path_(self):
         if self.upload_pptx:
@@ -229,7 +231,7 @@ class PPTQuestion(models.Model):
                 prs = Presentation(answer_file_path)
                 slides_len = len(prs.slides)
             except:
-                return ['文件打开异常']
+                return ['文件打开异常'], 0
 
             if self.slide_layout_op:
                 slide_id = int(self.slide_layout_target_slide)
@@ -317,7 +319,8 @@ class PPTQuestion(models.Model):
         else:
             result_list.append('Nothing to score')
 
-        return result_list
+        score = len([x for x in result_list if x.split('::')[1]])*1.0/len(result_list)
+        return result_list, score
 
 
     def test_(self):
@@ -326,10 +329,12 @@ class PPTQuestion(models.Model):
             answer_file_path = self.upload_pptx.path
         else:
             answer_file_path = ''
+
+        result_list, score = self.score_(answer_file_path)
         return format_html("<ol>") + \
                 format_html_join(
                 '\n', '<li style="color:black;">{}</li>',
-                ((x,) for x in self.score_(answer_file_path))
+                ((x,) for x in result_list)
                 ) \
                 + format_html("</ol>")
     test_.short_description = '测试结果'

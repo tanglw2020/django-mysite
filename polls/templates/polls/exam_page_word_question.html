@@ -16,12 +16,12 @@
 
 {% block content %}
 <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width="100%" color=#987 cb 9 SIZE=20>
-    <h3>Word操作题</h3>
+    <h4>Word操作题</h4>
     
     <div class="alert alert-primary" role="alert">
-      <h4>说明：下载zip文件并解压，完成下列操作后将.docx文件上传。(注意：不要更改题目要求以外的文件或文件夹) </h4>
-      <p>{{ word_question.operation_description_all }}</p>
-      <a type="button" class="btn btn-info" href="{% url 'exam:api-download-word-zipfile'  exam_page.id %}">下载文件ZIP文件</a>
+      <h5>说明：下载zip文件并解压，完成下列操作后将.docx文件上传。(注意：不要更改题目要求以外的文件或文件夹) </h5>
+      {{ word_question.operation_description_all }}
+      <a class="btn btn-info" href="{% url 'exam:api-download-word-zipfile'  exam_page.id %}">下载文件ZIP文件</a>
     </div>
 
 <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width="100%" color=#987 cb 9 SIZE=60>
