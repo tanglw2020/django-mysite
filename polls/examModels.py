@@ -111,32 +111,6 @@ class Student(models.Model):
         return self.class_name+" "+self.student_name +" "+self.student_id
 
 
-class StudentInfoImporter(models.Model):
-    class Meta:
-        verbose_name = '考试-批量导入考生'
-        verbose_name_plural = '考试-批量导入考生信息'
-
-    def __str__(self):
-        return '导入考生信息'+str(self.id)
-
-    upload_description_file = models.FileField(upload_to='upload_import_files/', null=True, blank=True, 
-    validators=[validate_txtfile], verbose_name='上传考生信息文件[.txt]')
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # Call the "real" save() method.
-        print(self.upload_description_file, 'saved')
-        with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
-            lines = [x.strip().replace('\t',' ').split(' ') for x in f.readlines()[:] if len(x)>0]
-            class_name = ''
-            for x in lines:
-                if len(x)==1: 
-                    class_name = x[0]
-                    continue
-                if len(x)>5 and (x[0] !='学号'):
-                    Student.objects.get_or_create(class_name=class_name, student_id=x[0], student_name=x[1])
-
-
-
 class ExamPaper(models.Model):
     class Meta:
         verbose_name = '考试-试卷'
@@ -313,4 +287,30 @@ class ExamPaper(models.Model):
         _,_, choice_question_correct_num = self.choice_question_result_stat()
         _,_, coding_question_correct_num = self.coding_question_result_stat()
         return choice_question_correct_num*self.exam.choice_question_score + coding_question_correct_num*self.exam.coding_question_score
+
+
+
+class StudentInfoImporter(models.Model):
+    class Meta:
+        verbose_name = '考试-批量导入考生'
+        verbose_name_plural = '考试-批量导入考生信息'
+
+    def __str__(self):
+        return '导入考生信息'+str(self.id)
+
+    upload_description_file = models.FileField(upload_to='upload_import_files/', null=True, blank=True, 
+    validators=[validate_txtfile], verbose_name='上传考生信息文件[.txt]')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+        print(self.upload_description_file, 'saved')
+        with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
+            lines = [x.strip().replace('\t',' ').split(' ') for x in f.readlines()[:] if len(x)>0]
+            class_name = ''
+            for x in lines:
+                if len(x)==1: 
+                    class_name = x[0]
+                    continue
+                if len(x)>5 and (x[0] !='学号'):
+                    Student.objects.get_or_create(class_name=class_name, student_id=x[0], student_name=x[1])
 
