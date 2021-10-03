@@ -202,10 +202,34 @@ def exampage_excel_question(request, exampage_id):
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
+    uploadsucc = False
+    excel_question = exam_page.excel_questions_pk_()
+    if request.method == 'POST':
+        form = UploadExcelForm(request.POST, request.FILES)
+        if form.is_valid():
+            output_save_path = exam_page.excel_answer_save_path_()
+            if os.path.exists(output_save_path): shutil.rmtree(output_save_path)
+            os.makedirs(output_save_path)
+
+            output_save_file = os.path.join(output_save_path, 'excel.xlsx')
+            handle_uploaded_file(request.FILES['file'], output_save_file)
+
+            exam_page.excel_answer = output_save_file
+            _, score = excel_question.score_(output_save_file)
+            exam_page.excel_result = exam_page.exam.excel_score * score
+            exam_page.save()
+            
+            uploadsucc = True
+    else:
+        form = UploadExcelForm()
+
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
         'exam_page': exam_page,
+        'excel_question': excel_question,
+        'form': form,
+        'uploadsucc': uploadsucc,
         }
     return render(request, 'polls/exam_page_excel_question.html', context)
 
@@ -409,12 +433,53 @@ def api_download_word_zipfile(request, exampage_id):
         return HttpResponse(json.dumps(a), content_type='application/json')
     
     word_question = exam_page.word_questions_pk_()
-
     file_path = word_question.zip_path_()
     if file_path:
         response = FileResponse(open(file_path, 'rb'))
         response['Content-Type'] = 'application/octet-stream'
         response['Content-Disposition'] = 'attachment;filename="word.zip"'
+        return response
+    else:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+
+
+@csrf_exempt
+def api_download_excel_zipfile(request, exampage_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    
+    question = exam_page.excel_questions_pk_()
+    file_path = question.zip_path_()
+    if file_path:
+        response = FileResponse(open(file_path, 'rb'))
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="excel.zip"'
+        return response
+    else:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+
+
+@csrf_exempt
+def api_download_ppt_zipfile(request, exampage_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    
+    question = exam_page.ppt_questions_pk_()
+    file_path = question.zip_path_()
+    if file_path:
+        response = FileResponse(open(file_path, 'rb'))
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="ppt.zip"'
         return response
     else:
         a = {"result":"null"}

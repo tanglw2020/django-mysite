@@ -231,7 +231,7 @@ class ExcelQuestion(models.Model):
                 wb = load_workbook(answer_file_path)
                 ws = wb.active 
             except:
-                return ['文件打开异常']
+                return ['文件打开异常'], 0
 
             if self.rename_sheet_op:
                 result = 'rename_sheet::'
@@ -376,7 +376,9 @@ class ExcelQuestion(models.Model):
 
         else:
             result_list.append('Nothing to score')
-        return result_list
+
+        score = len([x for x in result_list if x.split('::')[1]])*1.0/len(result_list)
+        return result_list, score
 
 
     def test_(self):
@@ -385,10 +387,12 @@ class ExcelQuestion(models.Model):
             answer_file_path = self.upload_excel.path
         else:
             answer_file_path = ''
+
+        result_list, score = self.score_(answer_file_path)
         return format_html("<ol>") + \
                 format_html_join(
                 '\n', '<li style="color:black;">{}</li>',
-                ((x,) for x in self.score_(answer_file_path))
+                ((x,) for x in result_list)
                 ) \
                 + format_html("</ol>")
     test_.short_description = '测试结果'

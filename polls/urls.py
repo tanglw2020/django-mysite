@@ -18,4 +18,6 @@ urlpatterns = [
     path('api/sendchoiceanswer/<int:exampage_id>/<int:choice_question_id>/<int:choice_id>', views.api_handle_choice_answer,name='api-choiceanswer'),
     path('api/download/systemzip/<int:exampage_id>', views.api_download_system_zipfile, name='api-download-system-zipfile'),
     path('api/download/wordzip/<int:exampage_id>', views.api_download_word_zipfile, name='api-download-word-zipfile'),
+    path('api/download/excelzip/<int:exampage_id>', views.api_download_excel_zipfile, name='api-download-excel-zipfile'),
+    path('api/download/pptzip/<int:exampage_id>', views.api_download_ppt_zipfile, name='api-download-ppt-zipfile'),
 ]

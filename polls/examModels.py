@@ -210,14 +210,6 @@ class ExamPaper(models.Model):
     #     return choice_questions_all
     # choice_questions_all_.short_description = '全部选择题'
 
-    # def coding_questions_all_(self):
-    #     coding_question_ids = [int(x) for x in self.coding_questions.split(',') if len(x)]
-    #     coding_questions_all = []
-    #     for i in coding_question_ids:
-    #         coding_questions_all.append(CodingQuestion.objects.get(pk=i))
-    #     return coding_questions_all
-    # coding_questions_all_.short_description = '全部编程题'
-
     ## question_id start from 1 to n
     def choice_questions_pk_(self, question_id):
         question_database_id = int(self.choice_questions.split(',')[question_id-1])
@@ -244,49 +236,10 @@ class ExamPaper(models.Model):
         results = [x for x in self.choice_question_results.split(',') if x=='1']
         return self.exam.choice_question_num, len(answers), len(results)
 
-        # print(self.choice_question_results)
-
-    def update_coding_question_answer_result_(self, coding_question_id, output_save_path):
-        old_answers = self.coding_question_answers.split(',')
-        old_answers[coding_question_id-1] = str(output_save_path)
-        self.coding_question_answers = ','.join(old_answers)
-
-        ## 
-        coding_question = self.coding_questions_pk_(coding_question_id)
-        answer_path = coding_question.upload_answer_file.path
-        with open(answer_path, encoding='utf-8') as f:
-            answers = [x.strip() for x in f.readlines()]
-        with open(output_save_path, encoding='utf-8') as f:
-            outputs = [x.strip() for x in f.readlines()]
-        # print(outputs)
-        min_len = min(len(answers), len(outputs))
-        correct_cnt = 0
-        for i in range(min_len):
-            if answers[i] == outputs[i]: correct_cnt = correct_cnt + 1
-        score = str(correct_cnt*1.0/len(answers))
-        old_answers = self.coding_question_results.split(',')
-        old_answers[coding_question_id-1] = score
-        print(old_answers)
-        self.coding_question_results = ','.join(old_answers)
-        self.save()
-
-    def coding_question_result_stat(self):
-        answers = [x for x in self.coding_question_answers.split(',') if x!='+']
-        results = [float(x) for x in self.coding_question_results.split(',')]
-        sum = 0
-        for i in range(len(results)):
-            sum = sum + results[i]
-        return self.exam.coding_question_num, len(answers), sum
-
-    def coding_question_result_detail(self):
-        answers = [x for x in self.coding_question_answers.split(',') if x!='+']
-        results = [float(x) for x in self.coding_question_results.split(',')]
-        return results
 
     def total_score(self):
         _,_, choice_question_correct_num = self.choice_question_result_stat()
-        _,_, coding_question_correct_num = self.coding_question_result_stat()
-        return choice_question_correct_num*self.exam.choice_question_score + coding_question_correct_num*self.exam.coding_question_score
+        return choice_question_correct_num*self.exam.choice_question_score
 
 
 
