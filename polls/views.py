@@ -96,7 +96,7 @@ def exampage_email_question(request, exampage_id):
             if cleaned_data['name2'] == email_question.cop_name: score = score + 1
             if cleaned_data['topic'] == email_question.topic: score = score + 1
             if cleaned_data['content'] == email_question.content: score = score + 1
-            exam_page.email_result = exam_page.exam.email_score * score / 4
+            exam_page.email_result = round(exam_page.exam.email_score * score / 4, 1)
             exam_page.email_answer = cleaned_data['topic']+':'+cleaned_data['content']
             exam_page.save()
     else:
@@ -140,8 +140,8 @@ def exampage_system_question(request, exampage_id):
                 exam_page.system_operation_result = 0
             else:
                 corrects_ = [x for x in results if x]
-                exam_page.system_operation_result = exam_page.exam.file_operation_score * len(corrects_) / len(results)
-            print(exam_page.system_operation_result)
+                exam_page.system_operation_result = round(exam_page.exam.file_operation_score * len(corrects_) / len(results), 1)
+            # print(exam_page.system_operation_result)
             exam_page.save()
             
             uploadsucc = True
@@ -178,7 +178,7 @@ def exampage_word_question(request, exampage_id):
             handle_uploaded_file(request.FILES['file'], output_save_file)
 
             exam_page.word_answer = output_save_file
-            exam_page.word_result = exam_page.exam.word_score * word_question.score_(output_save_file)
+            exam_page.word_result = round(exam_page.exam.word_score * word_question.score_(output_save_file), 1)
             exam_page.save()
             
             uploadsucc = True
@@ -216,7 +216,7 @@ def exampage_excel_question(request, exampage_id):
 
             exam_page.excel_answer = output_save_file
             _, score = excel_question.score_(output_save_file)
-            exam_page.excel_result = exam_page.exam.excel_score * score
+            exam_page.excel_result = round(exam_page.exam.excel_score * score, 1)
             exam_page.save()
             
             uploadsucc = True
@@ -254,7 +254,7 @@ def exampage_ppt_question(request, exampage_id):
 
             exam_page.ppt_answer = output_save_file
             _, score = ppt_question.score_(output_save_file)
-            exam_page.ppt_result = exam_page.exam.ppt_score * score
+            exam_page.ppt_result = round(exam_page.exam.ppt_score * score, 1)
             exam_page.save()
             
             uploadsucc = True

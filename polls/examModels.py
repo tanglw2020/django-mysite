@@ -236,11 +236,14 @@ class ExamPaper(models.Model):
         results = [x for x in self.choice_question_results.split(',') if x=='1']
         return self.exam.choice_question_num, len(answers), len(results)
 
-
     def total_score(self):
         _,_, choice_question_correct_num = self.choice_question_result_stat()
-        return choice_question_correct_num*self.exam.choice_question_score
-
+        return round(choice_question_correct_num*self.exam.choice_question_score 
+                    + float(self.email_result)
+                    + float(self.system_operation_result) 
+                    + float(self.word_result) 
+                    + float(self.excel_result) 
+                    + float(self.ppt_result), 1)
 
 
 class StudentInfoImporter(models.Model):
