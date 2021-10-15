@@ -358,6 +358,8 @@ class ExcelQuestion(models.Model):
                 p1, p2 = self.formula_maxmin_result_position.split(':')
                 formula1 = str(ws[p1].value)
                 formula2 = str(ws[p2].value)
+                print(formula1)
+                print(formula2)
                 # print(formula1, formula2)
                 if reg.match(formula1) and reg.match(formula2):
                     result = result+formula1+'-'+formula2

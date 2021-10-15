@@ -301,6 +301,7 @@ class PPTQuestion(models.Model):
                 slide_id = int(self.notes_slide_target_slide)
                 result = 'notes_slide::'+str(slide_id)+'::'
                 if slide_id+1 <= slides_len:
+                    # print('notes_slide_op', prs.slides[slide_id].notes_slide.notes_text_frame.text)
                     if self.notes_slide_content == prs.slides[slide_id].notes_slide.notes_text_frame.text:
                         result = result + self.notes_slide_content
                 result_list.append(result)
@@ -422,16 +423,16 @@ class PPTQuestion(models.Model):
     text_op = models.BooleanField('考查修改文字内容？', default=False)
     text_target_slide = models.CharField('要操作的幻灯片', choices=Slide_Names ,max_length=50, blank=True, default='0')
     text_target_shape_1 = models.CharField('区域1', choices=Shape_Names ,max_length=50, blank=True, default='标题')
-    text_target_content_1 = models.TextField('区域1内容',  blank=True, default='大标题')
+    text_target_content_1 = models.TextField('区域1内容[不分行]',  blank=True, default='大标题')
     text_target_shape_2 = models.CharField('区域2', choices=Shape_Names ,max_length=50, blank=True, default='内容')
-    text_target_content_2 = models.TextField('区域2内容',  blank=True, default='小标题')
+    text_target_content_2 = models.TextField('区域2内容[不分行]',  blank=True, default='小标题')
 
 
     # 修改字体格式
     font_op = models.BooleanField('考查修改字体格式？', default=False)
     font_target_slide = models.CharField('要操作的幻灯片', choices=Slide_Names ,max_length=50, blank=True, default='0')
     font_target_shape = models.CharField('文字区域', choices=Shape_Names ,max_length=50, blank=True, default='标题')
-    font_target_content = models.TextField('文字内容', blank=True, default='')
+    font_target_content = models.TextField('文字内容[不分行]', blank=True, default='')
     font_name = models.CharField('字体', choices=FONT_NAME_CHOICES ,max_length=50, blank=True, )
     font_size = models.CharField('字号[磅]', choices=FONT_SIZE_CHOICES ,max_length=50, blank=True, )
     font_color = models.CharField('颜色', choices=Standard_Color_Choices ,max_length=50, blank=True,default='红色')
@@ -460,6 +461,6 @@ class PPTQuestion(models.Model):
     table_target_shape = models.CharField('表格插入区域', choices=Shape_Names ,max_length=50, blank=True, default='左侧内容')
     table_rows = models.CharField('表格行数',max_length=50, choices=LINE_NUM_CHOICES, blank=True, default='2')
     table_columns = models.CharField('表格列数',max_length=50, choices=LINE_NUM_CHOICES, blank=True, default='4')
-    table_content = models.TextField('表格内容[用逗号和换行分割]',  blank=True, default='橘子,苹果,香蕉,桃子\n黄色,红色,黄色,红色')
+    table_content = models.TextField('表格内容[用英文逗号和换行分割]',  blank=True, default='橘子,苹果,香蕉,桃子\n黄色,红色,黄色,红色')
 
 

@@ -11,7 +11,9 @@ from .examModels import *
 
 # Register your models here.
 class StudentAdmin(admin.ModelAdmin):
-        list_display = ('class_name', 'student_name', 'student_id', )
+        list_display = ('id', 'class_name', 'student_name', 'student_id', )
+
+        search_fields = ['student_id']
 
 
 class ExamAdmin(admin.ModelAdmin):
