@@ -5,7 +5,8 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, format_html_join
 from docx import Document
 import zipfile
-import Levenshtein
+# import Levenshtein
+from difflib import SequenceMatcher
 from .wordChoices import *
 from .fileModels import *
 from pathlib import Path
@@ -452,7 +453,8 @@ class WordQuestion(models.Model):
         i = 0
         for para in para_text_list_:
             while i < (len(all_paras_)):
-                if Levenshtein.ratio(all_paras_[i].text, para)>0.6:
+                if SequenceMatcher(None, all_paras_[i].text, para).quick_ratio()>0.6:
+                # if Levenshtein.ratio(all_paras_[i].text, para)>0.6:
                     matched_index_list.append(i)
                     break
                 i = i + 1
