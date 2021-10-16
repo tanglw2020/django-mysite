@@ -1,0 +1,4 @@
+
+pip install python-docx
+pip install openpyxl
+pip install python-pptx
