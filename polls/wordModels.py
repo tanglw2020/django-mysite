@@ -116,7 +116,7 @@ class WordQuestion(models.Model):
     def char_edit_description(self):
         if self.char_edit_op:
             desc_all = '将段落【'+self.para_text_simple(self.char_edit_text)+'】'\
-                +'中所有“'+self.char_edit_origin+'”替换成“'+self.char_edit_replace+'”'+'.'
+                +'中所有“'+self.char_edit_origin+'”替换成“'+self.char_edit_replace+'”'+'。'
             return desc_all
         else:
             return ''
@@ -134,7 +134,7 @@ class WordQuestion(models.Model):
             if self.font_underline !='': 
                 setting_list.append([x[1] for x in FONT_UNDERLINE_CHOICES if x[0]==self.font_underline][0])
             desc_all = '将段落【'+self.para_text_simple(self.font_text)+'】'\
-                +'字体设置成'+'、'.join(setting_list)+'.'
+                +'字体设置成'+'、'.join(setting_list)+'。'
             return desc_all
         else:
             return ''
@@ -153,10 +153,10 @@ class WordQuestion(models.Model):
             if self.para_space_before !='': setting_list.append('段前'+self.para_space_before+'磅')
             if self.para_space_after !='':  setting_list.append('段后'+self.para_space_after+'磅')
             if self.para_line_spacing_rule !='': 
-                if self.para_line_spacing_rule in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:3]):
+                if self.para_line_spacing_rule in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:2]):
                     setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.para_line_spacing_rule][0])
                 else:
-                    setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.para_line_spacing_rule][0]+self.para_line_spacing+'倍行距')
+                    setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.para_line_spacing_rule][0]+self.para_line_spacing+'行')
             
             # if self.para_firstchardropcap !='' and self.para_firstchardropcaplines !='': 
             #     if self.para_firstchardropcap == PARA_FIRSTCHARDROPCAP_CHOICES[0][0]:
@@ -170,7 +170,7 @@ class WordQuestion(models.Model):
             if self.widow_control==True: setting_list.append('孤行控制')
 
             desc_all = '将段落【'+self.para_text_simple(self.paraformat_text)+'】'\
-                +'其段落格式设置成'+'、'.join(setting_list)+'.'
+                +'其段落格式设置成'+'、'.join(setting_list)+'。'
             return desc_all
         else:
             return ''
@@ -210,10 +210,10 @@ class WordQuestion(models.Model):
             if self.style_para_space_before !='': para_setting_list.append('段前'+self.style_para_space_before+'磅')
             if self.style_para_space_after !='':  para_setting_list.append('段后'+self.style_para_space_before+'磅')
             if self.style_para_line_spacing_rule !='': 
-                if self.style_para_line_spacing_rule in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:3]):
+                if self.style_para_line_spacing_rule in (x[0] for x in PARA_LINE_SPACING_RULE_CHOICES[:2]):
                     para_setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.style_para_line_spacing_rule][0])
                 else:
-                    para_setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.style_para_line_spacing_rule][0]+self.para_line_spacing+'倍行距')
+                    para_setting_list.append([x[1] for x in PARA_LINE_SPACING_RULE_CHOICES if x[0]==self.style_para_line_spacing_rule][0]+self.para_line_spacing+'行')
                 # if self.style_para_line_spacing_rule in ('单倍行距','双倍行距','1.5倍行距'):
                 #     para_setting_list.append(self.style_para_line_spacing_rule)
                 # else:
@@ -229,7 +229,7 @@ class WordQuestion(models.Model):
             if len(para_setting_list)>0:
                 style_des_add.append('其段落格式设置成'+'、'.join(para_setting_list))
             desc_all = '为段落【'+self.para_text_simple(self.style_text)+'】'\
-                +style_des+'('+'，'.join(style_des_add)+')'+'.'
+                +style_des+'('+'，'.join(style_des_add)+')'+'。'
             return desc_all
         else:
             return ''
@@ -238,12 +238,12 @@ class WordQuestion(models.Model):
     def image_description(self):
         if self.image_op:
             image_desc = '在段落【'+self.para_text_simple(self.image_text)+'】后以"'+\
-                self.image_position_style+'"格式插入图片"'+self.upload_image_file.name.split('/')[-1]+'"'
+                self.image_position_style+'"格式插入图片"'+self.upload_image_file.name.split('/')[-1]+'"，其行距设为单倍行距'
             if self.image_width !='':
-                image_desc = image_desc + '、宽度设置为'+self.image_width+'厘米'
+                image_desc = image_desc + '，宽度设置为'+self.image_width+'厘米'
             if self.image_height !='': 
-                image_desc = image_desc + '、高度设置为'+self.image_height+'厘米'
-            return image_desc+'.'
+                image_desc = image_desc + '，高度设置为'+self.image_height+'厘米'
+            return image_desc+'。'
         else:
             return ''
     image_description.short_description = '图片插入描述'
@@ -257,7 +257,7 @@ class WordQuestion(models.Model):
                 table_desc = table_desc +'， 应用"'+ [x[1] for x in TABLE_STYLE_CHOICES if x[0]==self.table_style][0] +'"表格样式'
             if self.table_autofit:
                 table_desc = table_desc +'，根据内容自动调整表格' 
-            return table_desc+'.'
+            return table_desc+'。'
         else:
             return ''
     table_description.short_description = '表格插入描述'
@@ -679,7 +679,7 @@ class WordQuestion(models.Model):
                         pstyle_format.line_spacing])
 
                 if self.style_page_break_before==True: 
-                    result_list.append(['段前分页', self.style_style_page_break_before, pstyle_format.page_break_before])
+                    result_list.append(['段前分页', self.style_page_break_before, pstyle_format.page_break_before])
                 if self.style_keep_with_next==True: 
                     result_list.append(['与下段同页',self.style_keep_with_next, pstyle_format.keep_with_next])
                 if self.style_keep_together==True: 

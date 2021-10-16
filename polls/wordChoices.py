@@ -2,9 +2,9 @@
 
 FONT_NAME_ASCII_CHOICES = [
     ('Arial Black', 'Arial Black'),
-    ('Bahnschrift', 'Bahnschrift'),
-    ('Book Antiqua', 'Book Antiqua'),
-    ('Dubai', 'Dubai'),
+    ('Batang', 'Batang'),
+    ('Dotum', 'Dotum'),
+    ('Meiryo', 'Meiryo'),
     ('Impact', 'Impact'),
 ]
 

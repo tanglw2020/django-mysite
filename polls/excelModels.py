@@ -322,14 +322,15 @@ class ExcelQuestion(models.Model):
                                 # break
                 result_list.append(result)
 
-            if self.table_style_op:
-                result = 'table_style::'
-                for table in ws._tables:
-                    # print('套用表格格式:',table.name, table.ref, table.tableStyleInfo.name)
-                    if str(table.ref) == self.table_style_position \
-                        and table.tableStyleInfo.name == self.table_style_choice: 
-                        result = result+self.table_style_position+'-'+self.table_style_choice
-                result_list.append(result)
+            # if self.table_style_op:
+            #     result = 'table_style::'
+            #     for table in ws._tables:
+            #         print('套用表格格式:',table)
+            #         # print('套用表格格式:',table.name, table.ref, table.tableStyleInfo.name)
+            #         if str(table.ref) == self.table_style_position \
+            #             and table.tableStyleInfo.name == self.table_style_choice: 
+            #             result = result+self.table_style_position+'-'+self.table_style_choice
+            #     result_list.append(result)
 
             if self.chart_op:
                 result = 'chart::'
@@ -543,7 +544,7 @@ class ExcelQuestion(models.Model):
 
     # 公式 max/min
     # 题目示例：用公式计算工作表[Start:End单元格/]的最大值/最小值，将计算公式写在X单元格
-    formula_maxmin_op = models.BooleanField('考查公式max/min？', default=False)
+    formula_maxmin_op = models.BooleanField('考查公式1？', default=False)
     formula_maxmin_description = models.TextField('题目文字描述', 
         default='计算工作表[Start:End单元格/]数据的最大值/最小值(使用MAX/MIN函数)，将相应公式写在X单元格')
     formula_maxmin_data_position = models.CharField('数据区域[Start:End]', max_length=20, blank=True, default='A2:A20')
@@ -554,7 +555,7 @@ class ExcelQuestion(models.Model):
 
     # 公式 sum/average
     # 题目示例：用公式计算工作表[Start:End单元格/]的总和/平均值，将计算公式写在X单元格
-    formula_sumavg_op = models.BooleanField('考查公式sum/average？', default=False)
+    formula_sumavg_op = models.BooleanField('考查公式2？', default=False)
     formula_sumavg_description = models.TextField('题目文字描述', 
         default='用公式计算工作表[Start:End单元格/]的总和/平均值，将计算公式写在X单元格')
     formula_sumavg_data_position = models.CharField('数据区域[Start:End]', max_length=20, blank=True, default='A2:A20')
