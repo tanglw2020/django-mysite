@@ -12,7 +12,7 @@ urlpatterns = [
     path('exampage/<int:exampage_id>/wordquestion/', views.exampage_word_question, name='exampage-wordquestion'),
     path('exampage/<int:exampage_id>/excelquestion/', views.exampage_excel_question, name='exampage-excelquestion'),
     path('exampage/<int:exampage_id>/pptquestion/', views.exampage_ppt_question, name='exampage-pptquestion'),
-    path('room/<int:exam_id>', views.exam_room, name='examroom'),
+    path('room/I-1iak_sdo123pf37lkn==Yl234kf1e4<int:exam_id>21oio32874ia78412j765s98fuo', views.exam_room, name='examroom'),
     path('api/download/scorelist<int:exam_id>.txt', views.api_download_scorelist, name='api-download-scorelist'),
     path('api/getservertime/<int:exampage_id>', views.api_get_server_time,name='api-getservertime'),
     path('api/sendchoiceanswer/<int:exampage_id>/<int:choice_question_id>/<int:choice_id>', views.api_handle_choice_answer,name='api-choiceanswer'),

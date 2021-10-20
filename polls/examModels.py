@@ -94,7 +94,7 @@ class Exam(models.Model):
     period_.short_description = '考试时长'
 
     def out_link_(self):
-        return format_html('<a href="/exam/room/{}" target="_blank">点击查看</a>'.format(self.id))
+        return format_html('<a href="/exam/room/I-1iak_sdo123pf37lkn==Yl234kf1e4{}21oio32874ia78412j765s98fuo" target="_blank">点击查看</a>'.format(self.id))
     out_link_.short_description = '考场详情'
 
 
