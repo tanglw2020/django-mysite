@@ -2,7 +2,7 @@
 
 FONT_NAME_ASCII_CHOICES = [
     ('Arial Black', 'Arial Black'),
-    ('Batang', 'Batang'),
+    ('Bahnschrift', 'Bahnschrift'),
     ('Dotum', 'Dotum'),
     ('Meiryo', 'Meiryo'),
     ('Impact', 'Impact'),

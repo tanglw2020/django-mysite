@@ -524,7 +524,7 @@ class WordQuestion(models.Model):
                     getPtorNone(pstyle_format.left_indent)])
                 if self.para_right_indent !='': 
                     result_list.append(['右缩进', 
-                    (self.para_left_indent), getSzorNone(p_format.right_indent, pstyle_format.right_indent), 
+                    (self.para_right_indent), getSzorNone(p_format.right_indent, pstyle_format.right_indent), 
                     getPtorNone(p_format.right_indent), 
                     getPtorNone(pstyle_format.right_indent)])
 
@@ -648,7 +648,7 @@ class WordQuestion(models.Model):
                     getPtorNone(pstyle_format.left_indent)])
                 if self.style_para_right_indent !='': 
                     result_list.append(['右缩进', 
-                    (self.style_para_left_indent), 
+                    (self.style_para_right_indent), 
                     getPtorNone(pstyle_format.right_indent)])
 
                 if self.style_para_first_line_indent !='' and self.style_para_first_line_indent_size !='':
@@ -719,13 +719,10 @@ class WordQuestion(models.Model):
                 return 0
 
             result_list = self.compare_operation(document_test)
-            # print(result_list)
-            scores = [(len(x)>2 and x[1]==x[2])*1 for x in result_list]
-            # print(scores)
+            scores = [(len(x)>2 and str(x[1])==str(x[2]))*1 for x in result_list]
             s = 0
             for i in scores:
                 s = s + i
-
             return s*1.0/len(scores)
 
     def docx_path_(self):

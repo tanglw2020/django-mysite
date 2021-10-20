@@ -179,6 +179,7 @@ def exampage_word_question(request, exampage_id):
 
             exam_page.word_answer = output_save_file
             exam_page.word_result = round(exam_page.exam.word_score * word_question.score_(output_save_file), 1)
+            # print('word_result:', exam_page.exam.word_score, word_question.score_(output_save_file))
             exam_page.save()
             
             uploadsucc = True

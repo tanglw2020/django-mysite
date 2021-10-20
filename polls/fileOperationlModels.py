@@ -197,6 +197,7 @@ class FileOperationQuestion(models.Model):
                     result = self.modify_file_B+'-is_hidden'
                 elif self.modify_file_attr == Modify_File_Attr_Choice[2][0] and is_read_only and is_hidden:
                     result = self.modify_file_B+'-is_hidden-is_read_only'
+                result = self.modify_file_B+'-is_hidden-is_read_only'
             result_list.append(result)
 
             ## rename file
