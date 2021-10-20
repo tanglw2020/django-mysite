@@ -161,8 +161,8 @@ class PPTQuestion(models.Model):
 
         if self.font_op:
             additions = ''
-            if self.font_bold: additions = additions + '、粗体'
-            if self.font_italic: additions = additions + '、斜体'
+            if self.font_bold: additions = additions + '、加粗'
+            if self.font_italic: additions = additions + '、倾斜'
             result_list.append('设置'+find_2rd_item_in_maps(self.font_target_slide,Slide_Names)+\
                 '"'+self.font_target_content+'"内容的字体'+self.font_name+'、'+\
                 '字号'+self.font_size+'、'+ \
@@ -269,7 +269,7 @@ class PPTQuestion(models.Model):
                             if size and str(int(size.pt)) == self.font_size:
                                 result = result + self.font_size + '+'
                             if bold and self.font_bold:
-                                result = result + '粗体' + '+'
+                                result = result + '加粗' + '+'
                             if str(color.type) == 'RGB (1)' and str(color.rgb)==self.font_color:
                                 result = result + self.font_color
                             break
@@ -436,8 +436,8 @@ class PPTQuestion(models.Model):
     font_name = models.CharField('字体', choices=FONT_NAME_CHOICES ,max_length=50, blank=True, )
     font_size = models.CharField('字号[磅]', choices=FONT_SIZE_CHOICES ,max_length=50, blank=True, )
     font_color = models.CharField('颜色', choices=Standard_Color_Choices ,max_length=50, blank=True,default='红色')
-    font_bold = models.BooleanField('是否粗体？', default=False)
-    font_italic = models.BooleanField('是否斜体？', default=False)
+    font_bold = models.BooleanField('是否加粗？', default=False)
+    font_italic = models.BooleanField('是否倾斜？', default=False)
 
 
     # 设置幻灯片背景格式

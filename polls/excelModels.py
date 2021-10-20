@@ -176,7 +176,7 @@ class ExcelQuestion(models.Model):
 
         if self.conditional_formatting_op:
             if self.conditional_formatting_type not in ['greaterThan', 'lessThan', 'equal']:
-                result_list.append('将数据区域'+self.conditional_formatting_position+ \
+                result_list.append('使用条件格式将数据区域'+self.conditional_formatting_position+ \
                 '按"'+find_2rd_item_in_maps(self.conditional_formatting_type,Conditional_Formatting_Type_Choice)+ \
                     '"设置为"'+self.conditional_formatting_coloring+'".')
             else:
@@ -185,7 +185,7 @@ class ExcelQuestion(models.Model):
                    self.conditional_formatting_param+'"设置为"'+self.conditional_formatting_coloring+'".')
         
         if self.table_style_op:
-            result_list.append('将数据区域'+self.table_style_position+ \
+            result_list.append('使用条件格式将数据区域'+self.table_style_position+ \
                 '设置为套用表格格式'+find_2rd_item_in_maps(self.table_style_choice, Table_Style_Maps)+'.')
 
         if self.chart_op:
