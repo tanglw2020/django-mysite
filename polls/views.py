@@ -363,7 +363,7 @@ def login(request):
 
 
 @csrf_exempt
-def api_download_scorelist(request, exam_id):
+def api_download_scorelist_txt(request, exam_id):
     try:
         exam = Exam.objects.get(id=exam_id)
     except Exam.DoesNotExist:
@@ -393,6 +393,42 @@ def api_download_scorelist(request, exam_id):
     response = FileResponse(open(file_path, 'rb'))
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="scorelist{}.txt"'.format(exam_id)
+    return response
+
+
+from openpyxl import Workbook
+
+@csrf_exempt
+def api_download_scorelist_xlsx(request, exam_id):
+    try:
+        exam = Exam.objects.get(id=exam_id)
+    except Exam.DoesNotExist:
+        raise Http404("exam does not exist")
+
+    wb = Workbook()
+    ws = wb.active
+
+    exam_papers = exam.exampaper_set.all()
+    line_head ="编号 班级 姓名 学号 选择题 操作系统题 上网题 Word题 Excel题 PPT题 总分"
+    ws.append(line_head.split(' '))
+    for i,exam_paper in enumerate(exam_papers):
+        one_line = [str(i), exam_paper.student.class_name, exam_paper.student.student_name, 
+        exam_paper.student.student_id,
+        exam_paper.choice_question_results,
+        float(exam_paper.system_operation_result),
+        float(exam_paper.email_result),
+        float(exam_paper.word_result),
+        float(exam_paper.excel_result),
+        float(exam_paper.ppt_result),
+        exam_paper.total_score()]
+        ws.append(one_line)
+    
+    file_path = 'media/temp_scorelist/scorelist{}.xlsx'.format(exam_id)
+    wb.save(file_path)
+
+    response = FileResponse(open(file_path, 'rb'))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="scorelist{}.xlsx"'.format(exam_id)
     return response
 
 
