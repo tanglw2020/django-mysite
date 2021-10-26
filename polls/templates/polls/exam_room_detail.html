@@ -74,11 +74,11 @@
     <div class="jumbotron">
       <div class="container">
         <h1>{{ exam.exam_type_ }}<small>在线考试系统</small></h1>
-        <p>考试登陆网址: {{ login_url }} </p>
+        <p>考试网址: {{ login_url }} </p>
         <p>考场编号: {{ exam.id }} </p>
+        <p><strong>|请将考试网址和考场编号告知考生|</strong></p>
         <p>考试时长: {{ exam.period_ }}</p>
         <p>考试人数: {{ exam_papers.count }}</p>
-        <p><strong>|请将考试登陆网址和考场编号告知考生|</strong></p>
       </div>
     </div>
 
