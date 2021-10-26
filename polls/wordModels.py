@@ -698,7 +698,7 @@ class WordQuestion(models.Model):
                 return self.upload_docx.path+'打开异常'
 
             result_list = self.compare_operation(document_test)
-            print(result_list)
+            # print(result_list)
 
             return format_html("<ol>") + \
                 format_html_join(

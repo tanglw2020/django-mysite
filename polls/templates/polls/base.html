@@ -39,7 +39,7 @@
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
         aria-expanded="false" aria-controls="navbar">
       </button>
-      <a class="navbar-brand" href="{% url 'exam:exampage'  exam_page.id %}">计算机等级考试</a>
+      <a class="navbar-brand" href="{% url 'exam:exampage'  exam_page.id %}">考试首页</a>
     </div>
     <div id="navbar" class="collapse navbar-collapse">
         {% block navbar %}
@@ -61,13 +61,10 @@
     <div class="card" style="width: 90%;">
       {% block baseinfo %}
       <div class="card-body">
-        <p></p>
-        <p>考生班级： {{ student.class_name }}</p>
-        <p>考生姓名： {{ student.student_name }}</p>
-        <p>考生学号： {{ student.student_id }}</p>
-        <p>考试科目： {{ exam.exam_type_ }} </p>
-        <p>考试时长： {{ exam.period_ }} </p>
-        <p id="serverTime">考试用时:</p>
+        <h3>{{ exam.exam_type_ }}</h3>
+        <p>考场编号： {{ exam.id }}</p>
+        <p>考生信息： {{ student.class_name }}--{{ student.student_name }}--{{ student.student_id }}</p>
+        <p>考试时间： 总时长{{ exam.period_ }}<span id="usedTime"></span></p>
       </div>
       {% endblock baseinfo %}
     </div>
@@ -107,9 +104,9 @@
         timeout: 10000,
         success: function (result) {
           if (result.result) {
-            $("#serverTime").html("考试用时：" + result.result);
+            $("#usedTime").html("--已用时" + result.result);
           } else {
-            $("#serverTime").html("无效数据");
+            $("#usedTime").html("");
           }
         }
       });
