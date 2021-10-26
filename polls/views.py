@@ -294,7 +294,7 @@ def exam_room(request, exam_id):
         'exam': exam,
         'exam_id': exam_id,
         'exam_papers': exam_papers,
-        'login_url': get_host_ip()+':8000/exam/login',
+        'login_url': get_host_ip()+':8000/exam',
         }
     return render(request, 'polls/exam_room_detail.html', context)
 
