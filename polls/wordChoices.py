@@ -1,11 +1,11 @@
 
 
 FONT_NAME_ASCII_CHOICES = [
-    ('Arial Black', 'Arial Black'),
-    ('Bahnschrift', 'Bahnschrift'),
-    ('Dotum', 'Dotum'),
-    ('Meiryo', 'Meiryo'),
-    ('Impact', 'Impact'),
+    ('Arial', 'Arial'),
+    ('Calibri', 'Calibri'),
+    ('Cambria', 'Cambria'),
+    ('Times New Roman', 'Times New Roman'),
+    ('Georgia', 'Georgia'),
 ]
 
 FONT_NAME_CHINESE_CHOICES = [

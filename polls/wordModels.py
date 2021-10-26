@@ -238,7 +238,7 @@ class WordQuestion(models.Model):
     def image_description(self):
         if self.image_op:
             image_desc = '在段落【'+self.para_text_simple(self.image_text)+'】后以"'+\
-                self.image_position_style+'"格式插入图片"'+self.upload_image_file.name.split('/')[-1]+'"，其行距设为单倍行距'
+                self.image_position_style+'"格式插入图片"'+self.upload_image_file.name.split('/')[-1]+'"，单独成段，其行距设为单倍行距'
             if self.image_width !='':
                 image_desc = image_desc + '，宽度设置为'+self.image_width+'厘米'
             if self.image_height !='': 
