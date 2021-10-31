@@ -4,35 +4,36 @@
 
 
 {% block content %}
-<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )"  align="left" width="30%" color=#987 cb 9 SIZE=20 >
-
-<div class="card" style="width: 90%;">
+{% if exam_page.choice_questions %}
+<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" align="left" width="30%" color=#987 cb 9
+    SIZE=20>
+<div style="width: 90%;">
     <div class="card-body">
-        <h3 class="card-title">选择题</h3>
+        <h4 class="card-title">选择题</h4>
         <div class="btn-group" role="group" aria-label="choice questions">
             {% for a in choice_questions_answers %}
-                {% if forloop.counter == choice_question_id %}
-                <a class="btn btn-primary"
-                    href="{% url 'exam:exampage-choicequestion'  exam_page.id  forloop.counter %}">题{{ forloop.counter }}</a>
-                {% elif a == '+' %}
-                <a class="btn btn-light"
-                    href="{% url 'exam:exampage-choicequestion'  exam_page.id  forloop.counter %}">题{{ forloop.counter }}</a>
-                {% else %}
-                <a class="btn btn-success"
-                    href="{% url 'exam:exampage-choicequestion'  exam_page.id  forloop.counter %}">题{{ forloop.counter }}</a>
-                {% endif %}
+            {% if forloop.counter == choice_question_id %}
+            <a class="btn btn-primary"
+                href="{% url 'exam:exampage-choicequestion'  exam_page.id  forloop.counter %}">题{{ forloop.counter }}</a>
+            {% elif a == '+' %}
+            <a class="btn btn-light"
+                href="{% url 'exam:exampage-choicequestion'  exam_page.id  forloop.counter %}">题{{ forloop.counter }}</a>
+            {% else %}
+            <a class="btn btn-success"
+                href="{% url 'exam:exampage-choicequestion'  exam_page.id  forloop.counter %}">题{{ forloop.counter }}</a>
+            {% endif %}
             {% endfor %}
         </div>
     </div>
 </div>
+{% endif %}
 
-
-<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )"   align="left" width="30%" color=#987 cb 9 SIZE=20>
-
-
-<div class="card" style="width: 60%;">
+{% if exam_page.system_operation_question %}
+<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" align="left" width="30%" color=#987 cb 9
+    SIZE=20>
+<div style="width: 60%;">
     <div class="card-body">
-        <h3 class="card-title">操作系统题</h3>
+        <h4 class="card-title">操作系统题</h4>
         <div class="btn-group" role="group" aria-label="coding questions">
             {% if exam_page.system_operation_answer == '' %}
             <a class="btn btn-light" href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">题1</a>
@@ -44,31 +45,34 @@
         </div>
     </div>
 </div>
-<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )"   align="left" width="30%" color=#987 cb 9 SIZE=20>
+{% endif %}
 
 
-<div class="card" style="width: 60%;">
+{% if exam_page.email_question %}
+<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" align="left" width="30%" color=#987 cb 9
+    SIZE=20>
+<div style="width: 60%;">
     <div class="card-body">
-        <h3 class="card-title">上网题</h3>
+        <h4 class="card-title">上网题</h4>
         <div class="btn-group" role="group" aria-label="coding questions">
             {% if exam_page.email_answer == '' %}
-            <a class="btn btn-light"
-                href="{% url 'exam:exampage-emailquestion'  exam_page.id  %}">题1</a>
+            <a class="btn btn-light" href="{% url 'exam:exampage-emailquestion'  exam_page.id  %}">题1</a>
             </li>
             {% else %}
-            <a class="btn btn-success"
-                href="{% url 'exam:exampage-emailquestion'  exam_page.id  %}">题1</a>
+            <a class="btn btn-success" href="{% url 'exam:exampage-emailquestion'  exam_page.id  %}">题1</a>
             </li>
             {% endif %}
         </div>
     </div>
 </div>
-<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )"   align="left" width="30%" color=#987 cb 9 SIZE=20>
+{% endif %}
 
-
-<div class="card" style="width: 60%;">
+{% if exam_page.word_question %}
+<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" align="left" width="30%" color=#987 cb 9
+    SIZE=20>
+<div style="width: 60%;">
     <div class="card-body">
-        <h3 class="card-title">Word题</h3>
+        <h4 class="card-title">Word题</h4>
         <div class="btn-group" role="group" aria-label="coding questions">
             {% if exam_page.word_answer == '' %}
             <a class="btn btn-light" href="{% url 'exam:exampage-wordquestion'  exam_page.id  %}">题1</a>
@@ -80,40 +84,47 @@
         </div>
     </div>
 </div>
-<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )"   align="left" width="30%" color=#987 cb 9 SIZE=20>
+{% endif %}
 
-    <div class="card" style="width: 60%;">
-        <div class="card-body">
-            <h3 class="card-title">Excel题</h3>
-            <div class="btn-group" role="group" aria-label="coding questions">
-                {% if exam_page.excel_answer == '' %}
-                <a class="btn btn-light" href="{% url 'exam:exampage-excelquestion'  exam_page.id  %}">题1</a>
-                </li>
-                {% else %}
-                <a class="btn btn-success" href="{% url 'exam:exampage-excelquestion'  exam_page.id  %}">题1</a>
-                </li>
-                {% endif %}
-            </div>
+{% if exam_page.excel_question %}
+<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" align="left" width="30%" color=#987 cb 9
+    SIZE=20>
+<div style="width: 60%;">
+    <div class="card-body">
+        <h4 class="card-title">Excel题</h4>
+        <div class="btn-group" role="group" aria-label="coding questions">
+            {% if exam_page.excel_answer == '' %}
+            <a class="btn btn-light" href="{% url 'exam:exampage-excelquestion'  exam_page.id  %}">题1</a>
+            </li>
+            {% else %}
+            <a class="btn btn-success" href="{% url 'exam:exampage-excelquestion'  exam_page.id  %}">题1</a>
+            </li>
+            {% endif %}
         </div>
     </div>
-    <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )"   align="left" width="30%" color=#987 cb 9 SIZE=20>
+</div>
+{% endif %}
 
-
-    <div class="card" style="width: 60%;">
-        <div class="card-body">
-            <h3 class="card-title">PPT题</h3>
-            <div class="btn-group" role="group" aria-label="coding questions">
-                {% if exam_page.ppt_answer == '' %}
-                <a class="btn btn-light" href="{% url 'exam:exampage-pptquestion'  exam_page.id  %}">题1</a>
-                </li>
-                {% else %}
-                <a class="btn btn-success" href="{% url 'exam:exampage-pptquestion'  exam_page.id  %}">题1</a>
-                </li>
-                {% endif %}
-            </div>
+{%if exam_page.ppt_question %}
+<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 ) " align="left" width="30%" color=#987 cb 9
+    SIZE=20>
+<div style="width: 60%;">
+    <div class="card-body">
+        <h4 class="card-title">PPT题</h4>
+        <div class="btn-group" role="group" aria-label="coding questions">
+            {% if exam_page.ppt_answer == '' %}
+            <a class="btn btn-light" href="{% url 'exam:exampage-pptquestion'  exam_page.id  %}">题1</a>
+            </li>
+            {% else %}
+            <a class="btn btn-success" href="{% url 'exam:exampage-pptquestion'  exam_page.id  %}">题1</a>
+            </li>
+            {% endif %}
         </div>
     </div>
-    <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )"   align="left" width="30%" color=#987 cb 9 SIZE=20>
+</div>
+{% endif %}
+<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" align="left" width="30%" color=#987 cb 9
+    SIZE=20>
 
 
 {% endblock content %}

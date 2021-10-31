@@ -8,11 +8,11 @@ from .wordModels import WordQuestion
 from .excelModels import ExcelQuestion
 from .pptModels import PPTQuestion
 from .examModels import *
+from polls.textinputModels import *
 
 # Register your models here.
 class StudentAdmin(admin.ModelAdmin):
         list_display = ('id', 'class_name', 'student_name', 'student_id', )
-
         search_fields = ['student_id']
 
 
@@ -22,6 +22,9 @@ class ExamAdmin(admin.ModelAdmin):
 class ExamPaperAdmin(admin.ModelAdmin):
         list_display = ('__str__', 'problem_type', 'student', 'exam', 'start_time_')
 
+
+class TextQuestionAdmin(admin.ModelAdmin):
+        list_display = ('__str__', 'content')
 
 class WordQuestionAdmin(admin.ModelAdmin):
         # list_display = ('__str__','word_op_numb','word_op_description', 'word_test_result')
@@ -172,6 +175,7 @@ class PPTQuestionAdmin(admin.ModelAdmin):
 
 
 
+admin.site.register(TextQuestion, TextQuestionAdmin)
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
 admin.site.register(WordQuestion, WordQuestionAdmin)
 admin.site.register(EmailQuestion, EmailQuestionAdmin)
