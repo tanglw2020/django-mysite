@@ -102,6 +102,10 @@ def exampage_text_question(request, exampage_id):
         else:
             form = TextInputForm()
 
+    if not exam_page.enabled:
+        form.fields['content'].widget.attrs['readonly'] = True
+        # form.fields['content'].widget.attrs['unselectable'] = "on"
+
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
@@ -607,3 +611,18 @@ def api_download_ppt_zipfile(request, exampage_id):
     else:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
+
+
+@csrf_exempt
+def api_submit_all(request, exampage_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    
+    exam_page.enabled = False
+    exam_page.save()
+    a = {"result":"null"}
+    return HttpResponse(json.dumps(a), content_type='application/json')

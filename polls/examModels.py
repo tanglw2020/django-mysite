@@ -147,6 +147,8 @@ class ExamPaper(models.Model):
 
     start_time = models.DateTimeField('开考时间', null=True, blank=True, default=timezone.now)
 
+    enabled = models.BooleanField("是否可以作答?", default=True)
+
     choice_questions = models.TextField("选择题列表", max_length=1000,  blank=True, default='')
     choice_question_answers = models.TextField("选择题答案列表", max_length=1000, blank=True,  default='')
     choice_question_results = models.TextField("选择题评分", max_length=1000, blank=True,  default='0')

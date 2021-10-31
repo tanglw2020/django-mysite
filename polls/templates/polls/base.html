@@ -37,17 +37,17 @@
       background-color: grey; 
       border: 0ch; 
       color: whitesmoke; 
-      padding: 5px;
+      padding: 5px 20px;
       margin-top: 10px;
     }
     
     .btn-download {
-      display:block;
+      display:inline-block;
       background-color: lightgray; 
       border: 0ch; 
       color: black; 
-      padding: 5px;
-      margin: 10px;
+      padding: 6px 20px;
+      margin: 10px 20px;
       font-size:15px;
     }
   </style>
@@ -101,7 +101,11 @@
     <div class="card" style="width: 90%;">
       {% block baseinfo %}
       <div class="card-body box-disable-copy">
+        {% if not exam_page.enabled %}
+        <h3>{{ exam.exam_type_ }}(交卷成功，不能再作答)</h3>
+        {% else %}
         <h3>{{ exam.exam_type_ }}</h3>
+        {% endif %}
         <p>考场编号： {{ exam.id }}</p>
         <p>考生信息： {{ student.class_name }}--{{ student.student_name }}--{{ student.student_id }}</p>
         <p>考试时间： 总时长{{ exam.period_ }}<span id="usedTime"></span></p>
