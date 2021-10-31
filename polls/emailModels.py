@@ -26,13 +26,21 @@ class EmailQuestion(models.Model):
         verbose_name_plural = '题目-电子邮件' 
         verbose_name = '题目-电子邮件题'  
 
+    def question_content_list(self):
+            result_list = []
+            result_list.append('收件人：'+self.des_name)
+            result_list.append('抄送人：'+self.cop_name)
+            result_list.append('主  题：'+self.topic)
+            result_list.append('内  容：'+self.content)
+            return result_list
+
     def question_content(self):
             result_list = []
             result_list.append('收件人：'+self.des_name)
             result_list.append('抄送人：'+self.cop_name)
             result_list.append('主  题：'+self.topic)
             result_list.append('内  容：'+self.content)
-            return format_html("发送一封电子邮件，具体内容要求如下：\n") + format_html("<ul>") + \
+            return format_html("发送一封电子邮件，具体内容及要求如下：\n") + format_html("<ul>") + \
                 format_html_join(
                 '\n', '<li style="color:black;">{}</li>',
                 ((x,) for x in result_list)

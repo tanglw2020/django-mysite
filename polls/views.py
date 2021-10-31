@@ -97,10 +97,17 @@ def exampage_email_question(request, exampage_id):
             if cleaned_data['topic'] == email_question.topic: score = score + 1
             if cleaned_data['content'] == email_question.content: score = score + 1
             exam_page.email_result = round(exam_page.exam.email_score * score / 4, 1)
-            exam_page.email_answer = cleaned_data['topic']+':'+cleaned_data['content']
+            exam_page.email_answer = cleaned_data['name1']+'\n'+cleaned_data['name2']+'\n'+cleaned_data['topic']+'\n'+cleaned_data['content']
             exam_page.save()
     else:
-        form = SendEmailForm()
+        cleaned_data = {}
+        if exam_page.email_answer:
+            datas = exam_page.email_answer.split('\n')
+            cleaned_data['name1'] = datas[0]
+            cleaned_data['name2'] = datas[1]
+            cleaned_data['topic'] = datas[2]
+            cleaned_data['content'] = datas[3]
+        form = SendEmailForm(cleaned_data)
 
     context = {
         'exam': exam_page.exam,

@@ -20,10 +20,17 @@
     body {
       padding-top: 50px;
     }
-
+  
     .starter-template {
       padding: 40px 15px;
       text-align: center;
+    }
+  
+    .box-disable-copy {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
   </style>
 
@@ -60,7 +67,7 @@
 
     <div class="card" style="width: 90%;">
       {% block baseinfo %}
-      <div class="card-body">
+      <div class="card-body box-disable-copy">
         <h3>{{ exam.exam_type_ }}</h3>
         <p>考场编号： {{ exam.id }}</p>
         <p>考生信息： {{ student.class_name }}--{{ student.student_name }}--{{ student.student_id }}</p>

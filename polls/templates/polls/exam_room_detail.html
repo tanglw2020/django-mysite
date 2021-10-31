@@ -43,6 +43,13 @@
             padding: 40px 15px;
             text-align: center;
         }
+
+        .box{  
+          -webkit-user-select: none;  
+          -moz-user-select: none;   
+          -ms-user-select: none;   
+          user-select: none;
+        }
     </style>
 </head>
 
@@ -74,7 +81,8 @@
     <div class="jumbotron">
       <div class="container">
         <h1>{{ exam.exam_type_ }}<small>在线考试系统</small></h1>
-        <p>考试网址: {{ login_url }} </p>
+        <p onbeforecopy='return false'>考试网址: {{ login_url }} </p>
+        <!-- <p class="box" onselectstart="return false;" unselectable="on">考场编号: {{ exam.id }} </p> -->
         <p>考场编号: {{ exam.id }} </p>
         <p><strong>|请将考试网址和考场编号告知考生|</strong></p>
         <p>考试时长: {{ exam.period_ }}</p>
