@@ -55,11 +55,12 @@ class Exam(models.Model):
 
     choice_question_num = models.IntegerField(verbose_name="选择题个数", default=20)
     choice_question_score = models.IntegerField(verbose_name="选择题分值", default=1)
+    text_score = models.IntegerField(verbose_name="文字录入题分值", default=20)
     file_operation_score = models.IntegerField(verbose_name="操作系统题分值", default=10)
     email_score = models.IntegerField(verbose_name="上网题分值", default=10)
     word_score = models.IntegerField(verbose_name="Word操作题分值", default=20)
-    excel_score = models.IntegerField(verbose_name="Excel操作题分值", default=20)
-    ppt_score = models.IntegerField(verbose_name="PPT操作题分值", default=20)
+    excel_score = models.IntegerField(verbose_name="Excel操作题分值", default=10)
+    ppt_score = models.IntegerField(verbose_name="PPT操作题分值", default=10)
 
     def __str__(self):
         return str(self.id) + ' ' +self.info_text
@@ -69,21 +70,33 @@ class Exam(models.Model):
     id_.short_description = '考试编号'
 
     def all_question_stat_(self):
-        result_list = [
-                        ['选择题'+str(self.choice_question_num)+'X'+str(self.choice_question_score)],
-                        ['操作系统题1X'+str(self.file_operation_score)],
-                        ['上网题1X'+str(self.email_score)],
-                        ['Word操作题1X'+str(self.word_score)],
-                        ['Excel操作题1X'+str(self.excel_score)],
-                        ['PPT操作题1X'+str(self.ppt_score)],
-                        ]
+        result_list = []
+        # [],
+        # ['Word操作题1X'+str(self.word_score)],
+        # ['Excel操作题1X'+str(self.excel_score)],
+        # ['PPT操作题1X'+str(self.ppt_score)],
+        if self.choice_question_num and self.choice_question_score:
+            result_list.append(['选择题'+str(self.choice_question_num)+' X '+str(self.choice_question_score)])
+        if self.text_score:
+            result_list.append(['文字录入题'+str(self.text_score)])
+        if self.email_score:
+            result_list.append(['上网题'+str(self.email_score)])
+        if self.file_operation_score:
+            result_list.append(['操作系统题'+str(self.file_operation_score)])
+        if self.word_score:
+            result_list.append(['Word操作题'+str(self.word_score)])
+        if self.excel_score:
+            result_list.append(['Excel操作题'+str(self.excel_score)])
+        if self.ppt_score:
+            result_list.append(['PPT操作题'+str(self.ppt_score)])
+
         return  format_html("<ul>") + \
                 format_html_join(
                 '\n', '<li style="color:black;">{}</li>',
                 result_list
                 ) \
                 + format_html("</ul>")
-    all_question_stat_.short_description = '考题统计'
+    all_question_stat_.short_description = '题目分值统计'
 
     def exam_type_(self):
         return str(EXAM_TYPE_CHOICES[int(self.problem_type)-1][1])
@@ -136,6 +149,10 @@ class ExamPaper(models.Model):
     choice_questions = models.TextField("选择题列表", max_length=1000,  blank=True, default='')
     choice_question_answers = models.TextField("选择题答案列表", max_length=1000, blank=True,  default='')
     choice_question_results = models.TextField("选择题评分", max_length=1000, blank=True,  default='0')
+
+    text_question = models.CharField("文字录入题", max_length=10, blank=True, default='')
+    text_question_answer = models.TextField("文字录入题答案", blank=True, default='')
+    text_question_result = models.CharField("文字录入题评分", max_length=10, blank=True, default='0')
 
     system_operation_question = models.CharField("系统操作题", max_length=1000, blank=True, default='')
     system_operation_answer = models.TextField("系统操作题答案", max_length=1000, blank=True, default='')

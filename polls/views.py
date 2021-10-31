@@ -21,6 +21,7 @@ from polls.fileOperationlModels import FileOperationQuestion
 from polls.wordModels import WordQuestion
 from polls.excelModels import ExcelQuestion
 from polls.pptModels import PPTQuestion
+from polls.textinputModels import TextQuestion
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
@@ -334,27 +335,37 @@ def login(request):
                 exam_paper.start_time = datetime.datetime.now()
 
                 #########
-                choice_questions_ids = [str(x['id']) for x in ChoiceQuestion.objects.values('id')]
-                choice_questions_ids = random.sample(choice_questions_ids, choice_question_numb)
-                exam_paper.choice_questions = ','.join(choice_questions_ids)
-                exam_paper.choice_question_answers = ','.join(['+' for i in range(len(choice_questions_ids))])
-                exam_paper.choice_question_results = ','.join(['0' for i in range(len(choice_questions_ids))])
+                if exam.choice_question_num and exam.choice_question_score:
+                    choice_questions_ids = [str(x['id']) for x in ChoiceQuestion.objects.values('id')]
+                    choice_questions_ids = random.sample(choice_questions_ids, choice_question_numb)
+                    exam_paper.choice_questions = ','.join(choice_questions_ids)
+                    exam_paper.choice_question_answers = ','.join(['+' for i in range(len(choice_questions_ids))])
+                    exam_paper.choice_question_results = ','.join(['0' for i in range(len(choice_questions_ids))])
 
                 #########
-                system_questions_ids = [str(x['id']) for x in FileOperationQuestion.objects.values('id')]
-                exam_paper.system_operation_question =  random.sample(system_questions_ids, 1)[0]
+                if exam.text_score:
+                    questions_ids = [str(x['id']) for x in TextQuestion.objects.values('id')]
+                    exam_paper.text_question =  random.sample(questions_ids, 1)[0]
 
-                email_questions_ids = [str(x['id']) for x in EmailQuestion.objects.values('id')]
-                exam_paper.email_question =  random.sample(email_questions_ids, 1)[0]
-                
-                questions_ids = [str(x['id']) for x in WordQuestion.objects.values('id')]
-                exam_paper.word_question =  random.sample(questions_ids, 1)[0]
-                
-                questions_ids = [str(x['id']) for x in ExcelQuestion.objects.values('id')]
-                exam_paper.excel_question =  random.sample(questions_ids, 1)[0]
-                
-                questions_ids = [str(x['id']) for x in PPTQuestion.objects.values('id')]
-                exam_paper.ppt_question =  random.sample(questions_ids, 1)[0]
+                if exam.file_operation_score:
+                    system_questions_ids = [str(x['id']) for x in FileOperationQuestion.objects.values('id')]
+                    exam_paper.system_operation_question =  random.sample(system_questions_ids, 1)[0]
+
+                if exam.email_score:
+                    email_questions_ids = [str(x['id']) for x in EmailQuestion.objects.values('id')]
+                    exam_paper.email_question =  random.sample(email_questions_ids, 1)[0]
+                    
+                if exam.word_score:
+                    questions_ids = [str(x['id']) for x in WordQuestion.objects.values('id')]
+                    exam_paper.word_question =  random.sample(questions_ids, 1)[0]
+                    
+                if exam.excel_score:
+                    questions_ids = [str(x['id']) for x in ExcelQuestion.objects.values('id')]
+                    exam_paper.excel_question =  random.sample(questions_ids, 1)[0]
+                    
+                if exam.ppt_score:
+                    questions_ids = [str(x['id']) for x in PPTQuestion.objects.values('id')]
+                    exam_paper.ppt_question =  random.sample(questions_ids, 1)[0]
                 
                 exam_paper.save()
             else:
