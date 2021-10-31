@@ -28,18 +28,19 @@
 </div>
 {% endif %}
 
-{% if exam_page.system_operation_question %}
+
+{% if exam_page.text_question %}
 <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" align="left" width="30%" color=#987 cb 9
     SIZE=20>
 <div style="width: 60%;">
     <div class="card-body">
-        <h4 class="card-title">操作系统题</h4>
+        <h4 class="card-title">文字录入题</h4>
         <div class="btn-group" role="group" aria-label="coding questions">
-            {% if exam_page.system_operation_answer == '' %}
-            <a class="btn btn-light" href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">题1</a>
+            {% if exam_page.text_question_answer == '' %}
+            <a class="btn btn-light" href="{% url 'exam:exampage-textquestion'  exam_page.id  %}">题1</a>
             </li>
             {% else %}
-            <a class="btn btn-success" href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">题1</a>
+            <a class="btn btn-success" href="{% url 'exam:exampage-textquestion'  exam_page.id  %}">题1</a>
             </li>
             {% endif %}
         </div>
@@ -66,6 +67,27 @@
     </div>
 </div>
 {% endif %}
+
+{% if exam_page.system_operation_question %}
+<HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" align="left" width="30%" color=#987 cb 9
+    SIZE=20>
+<div style="width: 60%;">
+    <div class="card-body">
+        <h4 class="card-title">操作系统题</h4>
+        <div class="btn-group" role="group" aria-label="coding questions">
+            {% if exam_page.system_operation_answer == '' %}
+            <a class="btn btn-light" href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">题1</a>
+            </li>
+            {% else %}
+            <a class="btn btn-success" href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">题1</a>
+            </li>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
 
 {% if exam_page.word_question %}
 <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" align="left" width="30%" color=#987 cb 9

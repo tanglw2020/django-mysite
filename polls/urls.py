@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.login, name='login'),
     path('exampage/<int:exampage_id>', views.exampage, name='exampage'),
     path('exampage/<int:exampage_id>/choicequestion/<int:choice_question_id>', views.exampage_choice_question, name='exampage-choicequestion'),
+    path('exampage/<int:exampage_id>/textquestion/', views.exampage_text_question, name='exampage-textquestion'),
     path('exampage/<int:exampage_id>/emailquestion/', views.exampage_email_question, name='exampage-emailquestion'),
     path('exampage/<int:exampage_id>/systemquestion/', views.exampage_system_question, name='exampage-systemquestion'),
     path('exampage/<int:exampage_id>/wordquestion/', views.exampage_word_question, name='exampage-wordquestion'),

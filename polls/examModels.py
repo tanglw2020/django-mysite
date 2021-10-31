@@ -20,6 +20,7 @@ from polls.fileOperationlModels import FileOperationQuestion
 from polls.wordModels import WordQuestion
 from polls.excelModels import ExcelQuestion
 from polls.pptModels import PPTQuestion
+from polls.textinputModels import TextQuestion
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
@@ -182,6 +183,10 @@ class ExamPaper(models.Model):
     def start_time_(self):
         return (self.start_time)
     start_time_.short_description = '开考时间'
+
+    def text_questions_pk_(self):
+        return TextQuestion.objects.get(pk=int(self.text_question))
+    text_questions_pk_.short_description = 'pk文字录入题'
 
     def system_questions_pk_(self):
         return FileOperationQuestion.objects.get(pk=int(self.system_operation_question))

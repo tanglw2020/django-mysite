@@ -78,6 +78,41 @@ def exampage_choice_question(request, exampage_id, choice_question_id):
     return render(request, 'polls/exam_page_choice_question.html', context)
 
 
+def exampage_text_question(request, exampage_id):
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('exam:login'))
+
+    uploadsucc = False
+    text_question = exam_page.text_questions_pk_()
+    if request.method == 'POST':
+        form = TextInputForm(request.POST)
+        if form.is_valid():
+            uploadsucc = True
+            cleaned_data = form.cleaned_data
+            # print(cleaned_data)
+            exam_page.text_question_result = round(exam_page.exam.text_score * text_question.score_(cleaned_data['content']), 1)
+            exam_page.text_question_answer = json.dumps(cleaned_data)
+            exam_page.save()
+    else:
+        if exam_page.text_question_answer:
+            cleaned_data = json.loads(exam_page.text_question_answer)
+            form = TextInputForm(cleaned_data)
+        else:
+            form = TextInputForm()
+
+    context = {
+        'exam': exam_page.exam,
+        'student': exam_page.student,
+        'exam_page': exam_page,
+        'text_question': text_question,
+        'form': form,
+        'uploadsucc': uploadsucc,
+        }
+    return render(request, 'polls/exam_page_text_question.html', context)
+
+
 def exampage_email_question(request, exampage_id):
     try:
         exam_page = ExamPaper.objects.get(id=exampage_id)
