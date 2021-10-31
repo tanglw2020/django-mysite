@@ -18,7 +18,7 @@
 <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width="100%" color=#987 cb 9 SIZE=20>
 <h4>Excel操作题</h4>
 
-<div class="alert alert-primary" role="alert">
+<div  class="box-disable-copy">
   <h5>说明：下载zip文件并解压，完成下列操作后将.xlsx文件上传。(注意：不要更改题目要求以外的文件或文件夹) </h5>
   <p>{{ excel_question.question_content }}</p>
   <a class=" btn btn-info" href="{% url 'exam:api-download-excel-zipfile'  exam_page.id %}">下载 excel.zip</a>
@@ -31,7 +31,7 @@
     {% csrf_token %}
     {{ form.non_field_errors }}
     <div  class="form-text">
-            <label>提交作答</label>
+          <label>提交作答[提交次数{{ exam_page.excel_submit_cnt }}]</label>
     </div>
     <div class="mb-3">
       {{ form.file }} {{ form.file.errors }}

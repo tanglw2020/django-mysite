@@ -137,9 +137,10 @@ class ExamPaper(models.Model):
     choice_question_answers = models.TextField("选择题答案列表", max_length=1000, blank=True,  default='')
     choice_question_results = models.TextField("选择题评分", max_length=1000, blank=True,  default='0')
 
-    system_operation_question = models.TextField("系统操作题", max_length=1000, blank=True, default='')
+    system_operation_question = models.CharField("系统操作题", max_length=1000, blank=True, default='')
     system_operation_answer = models.TextField("系统操作题答案", max_length=1000, blank=True, default='')
-    system_operation_result = models.TextField("系统操作题评分", max_length=1000, blank=True, default='0')
+    system_operation_result = models.CharField("系统操作题评分", max_length=1000, blank=True, default='0')
+    system_operation_submit_cnt = models.CharField("系统操作题提交次数", max_length=10, blank=True, default='0')
 
     email_question = models.CharField("上网题", max_length=10, blank=True, default='')
     email_answer = models.TextField("上网题答案", max_length=1000, blank=True, default='')
@@ -148,14 +149,17 @@ class ExamPaper(models.Model):
     word_question = models.CharField("Word题", max_length=10, blank=True, default='')
     word_answer = models.TextField("Word题答案", max_length=1000, blank=True, default='')
     word_result = models.CharField("Word题评分", max_length=10, blank=True, default='0')
+    word_submit_cnt = models.CharField("Word题提交次数", max_length=10, blank=True, default='0')
     
     excel_question = models.CharField("excel题", max_length=10, blank=True, default='')
     excel_answer = models.TextField("excel题答案", max_length=1000, blank=True, default='')
     excel_result = models.CharField("excel题评分", max_length=10, blank=True, default='0')
+    excel_submit_cnt = models.CharField("Excel题提交次数", max_length=10, blank=True, default='0')
 
     ppt_question = models.CharField("ppt题", max_length=10, blank=True, default='')
     ppt_answer = models.TextField("ppt题答案", max_length=1000, blank=True, default='')
     ppt_result = models.CharField("ppt题评分", max_length=10, blank=True, default='0')
+    ppt_submit_cnt = models.CharField("PPT题提交次数", max_length=10, blank=True, default='0')
 
 
     def start_time_(self):

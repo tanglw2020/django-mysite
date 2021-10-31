@@ -97,17 +97,16 @@ def exampage_email_question(request, exampage_id):
             if cleaned_data['topic'] == email_question.topic: score = score + 1
             if cleaned_data['content'] == email_question.content: score = score + 1
             exam_page.email_result = round(exam_page.exam.email_score * score / 4, 1)
-            exam_page.email_answer = cleaned_data['name1']+'\n'+cleaned_data['name2']+'\n'+cleaned_data['topic']+'\n'+cleaned_data['content']
+            # exam_page.email_answer = cleaned_data['name1']+'\n'+cleaned_data['name2']+'\n'+cleaned_data['topic']+'\n'+cleaned_data['content']
+            exam_page.email_answer = json.dumps(cleaned_data)
             exam_page.save()
     else:
         cleaned_data = {}
         if exam_page.email_answer:
-            datas = exam_page.email_answer.split('\n')
-            cleaned_data['name1'] = datas[0]
-            cleaned_data['name2'] = datas[1]
-            cleaned_data['topic'] = datas[2]
-            cleaned_data['content'] = datas[3]
-        form = SendEmailForm(cleaned_data)
+            cleaned_data = json.loads(exam_page.email_answer)
+            form = SendEmailForm(cleaned_data)
+        else:
+            form = SendEmailForm()
 
     context = {
         'exam': exam_page.exam,
@@ -142,6 +141,7 @@ def exampage_system_question(request, exampage_id):
                 myzip.extractall(output_save_path)
 
             exam_page.system_operation_answer = output_save_file
+            exam_page.system_operation_submit_cnt = str(int(exam_page.system_operation_submit_cnt)+1)
             results = system_question.score_(os.path.join(output_save_path, 'exam_system_operation'))
             if len(results)==0:
                 exam_page.system_operation_result = 0
@@ -184,6 +184,7 @@ def exampage_word_question(request, exampage_id):
             output_save_file = os.path.join(output_save_path, 'word.docx')
             handle_uploaded_file(request.FILES['file'], output_save_file)
 
+            exam_page.word_submit_cnt = str(int(exam_page.word_submit_cnt)+1)
             exam_page.word_answer = output_save_file
             exam_page.word_result = round(exam_page.exam.word_score * word_question.score_(output_save_file), 1)
             # print('word_result:', exam_page.exam.word_score, word_question.score_(output_save_file))
@@ -222,6 +223,7 @@ def exampage_excel_question(request, exampage_id):
             output_save_file = os.path.join(output_save_path, 'excel.xlsx')
             handle_uploaded_file(request.FILES['file'], output_save_file)
 
+            exam_page.excel_submit_cnt = str(int(exam_page.excel_submit_cnt)+1)
             exam_page.excel_answer = output_save_file
             _, score = excel_question.score_(output_save_file)
             exam_page.excel_result = round(exam_page.exam.excel_score * score, 1)
@@ -260,6 +262,7 @@ def exampage_ppt_question(request, exampage_id):
             output_save_file = os.path.join(output_save_path, 'ppt.pptx')
             handle_uploaded_file(request.FILES['file'], output_save_file)
 
+            exam_page.ppt_submit_cnt = str(int(exam_page.ppt_submit_cnt)+1)
             exam_page.ppt_answer = output_save_file
             _, score = ppt_question.score_(output_save_file)
             exam_page.ppt_result = round(exam_page.exam.ppt_score * score, 1)
