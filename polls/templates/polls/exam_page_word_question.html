@@ -35,7 +35,7 @@
     <div class="box-disable-copy">
       <h5>说明：下载zip文件并解压，完成下列操作后将.docx文件上传。(注意：不要更改题目要求以外的文件或文件夹) </h5>
       {{ word_question.operation_description_all }}
-      <a class="btn btn-info" href="{% url 'exam:api-download-word-zipfile'  exam_page.id %}">下载 word.zip</a>
+      <a class="btn-download" href="{% url 'exam:api-download-word-zipfile'  exam_page.id %}">下载 word.zip</a>
     </div>
 
 <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width="100%" color=#987 cb 9 SIZE=60>
@@ -50,7 +50,7 @@
       {{ form.file }} {{ form.file.errors }}
     </div>
     <div class='form-group' style=" margin-top: 10px">
-      <input type="submit" class="btn btn-primary" value="上传.docx文件" name="">
+      <input type="submit" class="btn-upload" value="上传.docx文件" name="">
       {% if uploadsucc %}
       <label for="UploadSucc" style="color: green; margin-left: 20px">上传成功!</label>
       {% endif %}
