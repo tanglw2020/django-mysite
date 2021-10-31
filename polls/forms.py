@@ -41,7 +41,7 @@ class SendEmailForm(forms.Form):
     name1 = forms.CharField(label='收件人:',  max_length=200)
     name2 = forms.CharField(label='抄送人:',  max_length=200)
     topic = forms.CharField(label='主  题:',  max_length=200)
-    content = forms.CharField(label='内  容:',  widget=forms.Textarea)
+    content = forms.CharField(label='内  容:',  widget=forms.Textarea(attrs={'cols': '80', 'rows': '5'}))
 
 class TextInputForm(forms.Form):
-    content = forms.CharField(label='',  widget=forms.Textarea)
+    content = forms.CharField(label='',  widget=forms.Textarea(attrs={'cols': 130, 'rows': 16}))
