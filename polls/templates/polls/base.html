@@ -51,13 +51,25 @@
     <div id="navbar" class="collapse navbar-collapse">
         {% block navbar %}
         <ul class="nav navbar-nav">
+          {% if exam_page.choice_questions %}
           <li><a href="{% url 'exam:exampage-choicequestion'  exam_page.id  1 %}">选择题</a></li>
-          <li><a href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">操作系统题</a></li>
+          {% endif %}
+          {% if exam_page.system_operation_question %}
+            <li><a href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">操作系统题</a></li>
+          {% endif %}
+          {% if exam_page.email_question %}
           <li><a href="{% url 'exam:exampage-emailquestion'  exam_page.id  %}">上网题</a></li>
+          {% endif %}
+          {% if exam_page.word_question %}
           <li><a href="{% url 'exam:exampage-wordquestion'  exam_page.id  %}">Word题</a></li>
+          {% endif %}
+          {% if exam_page.excel_question %}
           <li><a href="{% url 'exam:exampage-excelquestion'  exam_page.id  %}">Excel题</a></li>
+          {% endif %}
+          {% if exam_page.ppt_question %}
           <li><a href="{% url 'exam:exampage-pptquestion'  exam_page.id  %}">PPT题</a></li>
-        </ul>
+          {% endif %}
+          </ul>
         {% endblock %}
       </div>
     </div>
