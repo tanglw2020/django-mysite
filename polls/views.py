@@ -148,6 +148,12 @@ def exampage_email_question(request, exampage_id):
         else:
             form = SendEmailForm()
 
+    if not exam_page.enabled:
+        form.fields['name1'].widget.attrs['readonly'] = True
+        form.fields['name2'].widget.attrs['readonly'] = True
+        form.fields['topic'].widget.attrs['readonly'] = True
+        form.fields['content'].widget.attrs['readonly'] = True
+
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
@@ -195,6 +201,9 @@ def exampage_system_question(request, exampage_id):
     else:
         form = UploadZipFileForm()
 
+    if not exam_page.enabled:
+        form.fields['file'].widget.attrs['disabled'] = True
+
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
@@ -233,6 +242,9 @@ def exampage_word_question(request, exampage_id):
             uploadsucc = True
     else:
         form = UploadWordForm()
+
+    if not exam_page.enabled:
+        form.fields['file'].widget.attrs['disabled'] = True
 
     context = {
         'exam': exam_page.exam,
@@ -273,6 +285,9 @@ def exampage_excel_question(request, exampage_id):
     else:
         form = UploadExcelForm()
 
+    if not exam_page.enabled:
+        form.fields['file'].widget.attrs['disabled'] = True
+
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
@@ -311,6 +326,9 @@ def exampage_ppt_question(request, exampage_id):
             uploadsucc = True
     else:
         form = UploadPPTForm()
+    if not exam_page.enabled:
+        form.fields['file'].widget.attrs['disabled'] = True
+        
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,

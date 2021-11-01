@@ -54,7 +54,11 @@
             {{ form.file }} {{ form.file.errors }}
           </div>
           <div class='form-group' style=" margin-top: 10px">
-            <input type="submit" class="btn-upload" value="上传zip文件" name=""> 
+            {% if exam_page.enabled %}
+            <input type="submit" class="btn-upload" value="上传zip文件" name="">
+          {% else %}
+            <input type="submit" class="btn btn-dark" value="上传zip文件" name=""  disabled>
+          {% endif %}
               {% if uploadsucc %}
               <label for="UploadSucc" style="color: green; margin-left: 20px">上传成功!</label>
               {% endif %}

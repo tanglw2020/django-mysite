@@ -64,7 +64,11 @@
         {% include "polls/form_item.html" with form_item=form.content %}
       </div>
       <div class='form-group' style=" margin-top: 10px">
+        {% if exam_page.enabled %}
         <input type="submit" class="btn btn-dark" value="发送邮件" name="">
+        {% else %}
+        <input type="submit" class="btn btn-dark" value="发送邮件" name="" disabled>
+        {% endif %}
         {% if uploadsucc %}
         <label for="UploadSucc" style="color: green; margin-left: 20px">邮件发送成功!!</label>
         {% endif %}
