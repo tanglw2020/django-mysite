@@ -328,7 +328,7 @@ def exampage_ppt_question(request, exampage_id):
         form = UploadPPTForm()
     if not exam_page.enabled:
         form.fields['file'].widget.attrs['disabled'] = True
-        
+
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
@@ -486,14 +486,15 @@ def api_download_scorelist_xlsx(request, exam_id):
     ws = wb.active
 
     exam_papers = exam.exampaper_set.all()
-    line_head ="编号 班级 姓名 学号 选择题 操作系统题 上网题 Word题 Excel题 PPT题 总分"
+    line_head ="编号 班级 姓名 学号 选择题 文字录入题 上网题 操作系统题 Word题 Excel题 PPT题 总分"
     ws.append(line_head.split(' '))
     for i,exam_paper in enumerate(exam_papers):
         one_line = [str(i), exam_paper.student.class_name, exam_paper.student.student_name, 
         exam_paper.student.student_id,
         exam_paper.choice_question_results,
-        float(exam_paper.system_operation_result),
+        float(exam_paper.text_question_result),
         float(exam_paper.email_result),
+        float(exam_paper.system_operation_result),
         float(exam_paper.word_result),
         float(exam_paper.excel_result),
         float(exam_paper.ppt_result),

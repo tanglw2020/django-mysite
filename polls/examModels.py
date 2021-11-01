@@ -267,11 +267,12 @@ class ExamPaper(models.Model):
     def total_score(self):
         _,_, choice_question_correct_num = self.choice_question_result_stat()
         return round(choice_question_correct_num*self.exam.choice_question_score 
+                    + float(self.text_question_result)
                     + float(self.email_result)
                     + float(self.system_operation_result) 
                     + float(self.word_result) 
                     + float(self.excel_result) 
-                    + float(self.ppt_result), 1)
+                    + float(self.ppt_result), 0)
 
 
 class StudentInfoImporter(models.Model):
