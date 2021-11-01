@@ -108,7 +108,13 @@
         {% endif %}
         <p>考场编号： {{ exam.id }}</p>
         <p>考生信息： {{ student.class_name }}--{{ student.student_name }}--{{ student.student_id }}</p>
-        <p>考试时间： 总时长{{ exam.period_ }}<span id="usedTime"></span></p>
+        {% if  exam_page.add_time %}
+          <p>考试时长： {{ exam.period_ }}+延时{{ exam_page.add_time }}分 </p>
+        {% else %}
+          <p>考试时长： {{ exam.period_ }} </p>
+        {% endif %}
+
+        <strong>剩余时间： <span id="usedTime"></span></strong>
       </div>
       {% endblock baseinfo %}
     </div>
@@ -148,7 +154,7 @@
         timeout: 10000,
         success: function (result) {
           if (result.result) {
-            $("#usedTime").html("--已用时" + result.result);
+            $("#usedTime").html(result.result);
           } else {
             $("#usedTime").html("");
           }

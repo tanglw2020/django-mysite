@@ -390,6 +390,7 @@ def login(request):
                 exam_paper = ExamPaper.objects.create(student=student, exam=exam)
                 exam_paper.problem_type = exam.problem_type
                 exam_paper.start_time = datetime.datetime.now()
+                exam_paper.end_time = datetime.datetime.now() + datetime.timedelta(hours=1, minutes=30)
 
                 #########
                 if exam.choice_question_num and exam.choice_question_score:
@@ -642,6 +643,7 @@ def api_submit_all(request, exampage_id):
         return HttpResponse(json.dumps(a), content_type='application/json')
     
     exam_page.enabled = False
+    exam_page.end_time = datetime.datetime.now()
     exam_page.save()
     a = {"result":"null"}
     return HttpResponse(json.dumps(a), content_type='application/json')

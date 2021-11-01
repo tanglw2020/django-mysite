@@ -55,18 +55,6 @@ class EmailQuestion(models.Model):
 
     # 提交前的判断
     def clean(self):
-        # raise ValidationError('请完善未选择的项目。')
-        # if self.des_name == '':
-        #     raise ValidationError(_('收件人不能为空'))
-
-        # if self.cop_name == '':
-        #     raise ValidationError(_('抄送人不能为空'))
-
-        # if self.topic == '':
-        #     raise ValidationError(_('主题不能为空'))
-
-        # if self.content == '':
-        #     raise ValidationError(_('邮件内容不能为空'))
 
         if self.des_name == self.cop_name:
             raise ValidationError(_('抄送人不能和收件人相同'))

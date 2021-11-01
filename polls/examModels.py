@@ -66,16 +66,19 @@ class Exam(models.Model):
     def __str__(self):
         return str(self.id) + ' ' +self.info_text
 
+    def clean(self):
+        score = self.choice_question_num*self.choice_question_score + \
+            self.text_score + self.email_score + self.file_operation_score+ \
+                self.word_score + self.excel_score + self.ppt_score
+        if score != 100:
+            raise ValidationError(_('总分值不等于100'))
+
     def id_(self):
         return str(self.id)
     id_.short_description = '考试编号'
 
     def all_question_stat_(self):
         result_list = []
-        # [],
-        # ['Word操作题1X'+str(self.word_score)],
-        # ['Excel操作题1X'+str(self.excel_score)],
-        # ['PPT操作题1X'+str(self.ppt_score)],
         if self.choice_question_num and self.choice_question_score:
             result_list.append(['选择题'+str(self.choice_question_num)+' X '+str(self.choice_question_score)])
         if self.text_score:
@@ -146,6 +149,8 @@ class ExamPaper(models.Model):
     ) 
 
     start_time = models.DateTimeField('开考时间', null=True, blank=True, default=timezone.now)
+    end_time = models.DateTimeField('交卷时间', null=True, blank=True, default=timezone.now)
+    add_time = models.IntegerField("附加延时[分]", default=0)
 
     enabled = models.BooleanField("是否可以作答?", default=True)
 
