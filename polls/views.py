@@ -390,7 +390,10 @@ def login(request):
                 exam_paper = ExamPaper.objects.create(student=student, exam=exam)
                 exam_paper.problem_type = exam.problem_type
                 exam_paper.start_time = datetime.datetime.now()
-                exam_paper.end_time = datetime.datetime.now() + datetime.timedelta(hours=1, minutes=30)
+                if exam_paper.problem_type == '1':
+                    exam_paper.end_time = datetime.datetime.now() + datetime.timedelta(hours=1, minutes=30)
+                if exam_paper.problem_type == '2':
+                    exam_paper.end_time = datetime.datetime.now() + datetime.timedelta(hours=2, minutes=0)
                 exam_paper.student_id_local = student_id
                 exam_paper.exam_id_local = exam_id
 
@@ -523,11 +526,23 @@ def api_get_server_time(request, exampage_id):
         return HttpResponse(json.dumps(a), content_type='application/json')
 
     # diff = int(timezone.now().timestamp() - exam_page.start_time.timestamp())
+    # print(exam_page.start_time.tzinfo, start_time.tzinfo)
     start_time = exam_page.start_time.replace(tzinfo=None)
     diff = int(datetime.datetime.now().timestamp() - start_time.timestamp())
-    # print(exam_page.start_time.tzinfo, start_time.tzinfo)
-    
+    if exam_page.problem_type == '1':
+        diff = (90+exam_page.add_time)*60 - diff
+    elif exam_page.problem_type == '2':
+        diff = (120+exam_page.add_time)*60 - diff
+
     a = {}
+    a["refresh"] = 0
+    if diff < 0:  
+        diff = 0
+        if exam_page.enabled:
+            exam_page.enabled = False
+            exam_page.save()
+            a["refresh"] = 1  
+
     a["result"] = str(int(diff/60))+'分钟'+str(diff%60)+'秒'  ##"post_success"
     return HttpResponse(json.dumps(a), content_type='application/json')
 

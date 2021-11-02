@@ -109,7 +109,7 @@
         <p>考场编号： {{ exam.id }}</p>
         <p>考生信息： {{ student.class_name }}--{{ student.student_name }}--{{ student.student_id }}</p>
         {% if  exam_page.add_time %}
-          <p>考试时长： {{ exam.period_ }}+延时{{ exam_page.add_time }}分 </p>
+          <p>考试时长： {{ exam.period_ }}+延时{{ exam_page.add_time }}分钟 </p>
         {% else %}
           <p>考试时长： {{ exam.period_ }} </p>
         {% endif %}
@@ -155,6 +155,9 @@
         success: function (result) {
           if (result.result) {
             $("#usedTime").html(result.result);
+            if(result.refresh){
+              location.reload();
+            }
           } else {
             $("#usedTime").html("");
           }
@@ -162,7 +165,7 @@
       });
       setTimeout('refreshTime()', 1000);
     }
-    setTimeout('refreshTime()', 1000);
+    setTimeout('refreshTime()', 10);
   </script>
 
 </body>
