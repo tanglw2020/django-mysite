@@ -19,8 +19,10 @@ class StudentAdmin(admin.ModelAdmin):
 class ExamAdmin(admin.ModelAdmin):
         list_display = ('id_', 'problem_type', 'info_text','all_question_stat_','out_link_',)
 
+
 class ExamPaperAdmin(admin.ModelAdmin):
-        list_display = ('__str__', 'problem_type', 'student', 'exam', 'start_time_')
+        list_display = ('__str__', 'problem_type', 'student', 'exam', 'start_time_','end_time_')
+        search_fields = ['student_id_local', 'exam_id_local']
 
 
 class TextQuestionAdmin(admin.ModelAdmin):

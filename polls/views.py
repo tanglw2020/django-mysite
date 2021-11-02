@@ -391,6 +391,8 @@ def login(request):
                 exam_paper.problem_type = exam.problem_type
                 exam_paper.start_time = datetime.datetime.now()
                 exam_paper.end_time = datetime.datetime.now() + datetime.timedelta(hours=1, minutes=30)
+                exam_paper.student_id_local = student_id
+                exam_paper.exam_id_local = exam_id
 
                 #########
                 if exam.choice_question_num and exam.choice_question_score:

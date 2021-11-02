@@ -151,8 +151,10 @@ class ExamPaper(models.Model):
     start_time = models.DateTimeField('开考时间', null=True, blank=True, default=timezone.now)
     end_time = models.DateTimeField('交卷时间', null=True, blank=True, default=timezone.now)
     add_time = models.IntegerField("附加延时[分]", default=0)
-
     enabled = models.BooleanField("是否可以作答?", default=True)
+
+    student_id_local = models.CharField('学号', max_length=20, default='')
+    exam_id_local = models.CharField('考场号', max_length=20, default='')
 
     choice_questions = models.TextField("选择题列表", max_length=1000,  blank=True, default='')
     choice_question_answers = models.TextField("选择题答案列表", max_length=1000, blank=True,  default='')
@@ -188,8 +190,12 @@ class ExamPaper(models.Model):
 
 
     def start_time_(self):
-        return (self.start_time)
+        return (self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
     start_time_.short_description = '开考时间'
+
+    def end_time_(self):
+        return (self.end_time.strftime("%Y-%m-%d %H:%M:%S"))
+    end_time_.short_description = '结束时间'
 
     def text_questions_pk_(self):
         return TextQuestion.objects.get(pk=int(self.text_question))
