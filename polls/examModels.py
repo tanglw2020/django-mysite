@@ -189,6 +189,11 @@ class ExamPaper(models.Model):
     ppt_submit_cnt = models.CharField("PPT题提交次数", max_length=10, blank=True, default='0')
 
 
+    def disable_(self):
+        self.enabled = False
+        self.end_time = datetime.datetime.now()
+        self.save()
+
     def start_time_(self):
         return (self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
     start_time_.short_description = '开考时间'

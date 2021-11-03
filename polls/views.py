@@ -542,12 +542,8 @@ def api_get_server_time(request, exampage_id):
     if diff < 0:  
         diff = 0
         if exam_page.enabled:
-            exam_page.enabled = False
-            exam_page.end_time = datetime.datetime.now()
-            exam_page.save()
+            exam_page.disable_()
             a["refresh"] = 1  
-
-
 
     a["result"] = str(int(diff/60))+'分钟'+str(diff%60)+'秒'  ##"post_success"
     return HttpResponse(json.dumps(a), content_type='application/json')
@@ -665,8 +661,7 @@ def api_submit_all(request, exampage_id):
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
     
-    exam_page.enabled = False
-    exam_page.end_time = datetime.datetime.now()
-    exam_page.save()
+    if exam_page.enabled:
+        exam_page.disable_()
     a = {"result":"null"}
     return HttpResponse(json.dumps(a), content_type='application/json')
