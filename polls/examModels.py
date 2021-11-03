@@ -194,6 +194,11 @@ class ExamPaper(models.Model):
         self.end_time = datetime.datetime.now()
         self.save()
 
+    def add_time_enable_(self, t=3):
+        self.enabled = True
+        self.add_time = self.add_time + t
+        self.save()
+
     def start_time_(self):
         return (self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
     start_time_.short_description = '开考时间'

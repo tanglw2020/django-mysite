@@ -22,4 +22,5 @@ urlpatterns = [
     path('api/download/excelzip/<int:exampage_id>', views.api_download_excel_zipfile, name='api-download-excel-zipfile'),
     path('api/download/pptzip/<int:exampage_id>', views.api_download_ppt_zipfile, name='api-download-ppt-zipfile'),
     path('api/submitall/<int:exampage_id>', views.api_submit_all, name='api-submit-all'),
+    path('api/addtime/<int:exampage_id>', views.add_time_enable, name='api-addtime'),
 ]

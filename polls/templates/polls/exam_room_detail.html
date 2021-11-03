@@ -50,6 +50,24 @@
           -ms-user-select: none;   
           user-select: none;
         }
+        
+        .btn-upload {
+          background-color: lightcoral; 
+          border: 0ch; 
+          color: white; 
+          padding: 2px 2px;
+          margin-top: 2px;
+        }
+        
+        .btn-download {
+          display:inline-block;
+          background-color: lightgray; 
+          border: 0ch; 
+          color: black; 
+          padding: 6px 6px;
+          margin: 10px 20px;
+          font-size:15px;
+        }
     </style>
 </head>
 
@@ -110,6 +128,8 @@
               <td>Excel题</td>
               <td>PPT题</td>
               <td>总分</td>
+              <td>总延时</td>
+              <td>加时</td>
             </tr>
             {% for exam_paper in exam_papers %}
             <tr>
@@ -126,6 +146,10 @@
               <td>{{ exam_paper.excel_result }}</td>
               <td>{{ exam_paper.ppt_result }}</td>
               <td>{{ exam_paper.total_score }}</td>
+              <td>{{ exam_paper.add_time }}</td>
+              <td> <button id="add-time" 
+                class="btn-upload" style="margin:5px auto" 
+                onclick="add_time('{{ exam_paper.id }}', '{{ exam_paper.student_id_local }}')">加3</button></td>
             </tr>
             {% endfor %}
         </table>
@@ -144,5 +168,23 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 </body>
+
+<script type="text/javascript">
+  function add_time(exam_page_id, student_id) {
+      var Val = confirm("确认给"+student_id+"增加3分钟延时?");
+      if (Val == true) {
+          $.ajax({
+              url: '/exam/api/addtime/' + exam_page_id,
+              type: 'POST',
+              data: {},
+              dataType: 'json',
+              timeout: 10000,
+              success: function (result) {
+                  location.reload();
+              }
+          });
+      }
+  }
+</script>
 
 </html>

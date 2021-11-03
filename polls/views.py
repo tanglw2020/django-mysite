@@ -665,3 +665,17 @@ def api_submit_all(request, exampage_id):
         exam_page.disable_()
     a = {"result":"null"}
     return HttpResponse(json.dumps(a), content_type='application/json')
+
+
+@csrf_exempt
+def add_time_enable(request, exampage_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    
+    exam_page.add_time_enable_(3)
+    a = {"result":"null"}
+    return HttpResponse(json.dumps(a), content_type='application/json')
