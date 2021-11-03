@@ -536,12 +536,18 @@ def api_get_server_time(request, exampage_id):
 
     a = {}
     a["refresh"] = 0
+    a["color"] = 'black'
+    if diff < 60*5: 
+        a["color"] = 'red'
     if diff < 0:  
         diff = 0
         if exam_page.enabled:
             exam_page.enabled = False
+            exam_page.end_time = datetime.datetime.now()
             exam_page.save()
             a["refresh"] = 1  
+
+
 
     a["result"] = str(int(diff/60))+'分钟'+str(diff%60)+'秒'  ##"post_success"
     return HttpResponse(json.dumps(a), content_type='application/json')

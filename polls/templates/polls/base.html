@@ -155,12 +155,13 @@
         success: function (result) {
           if (result.result) {
             $("#usedTime").html(result.result);
+            if (result.color) {
+              $("#usedTime").css({'color':result.color});
+            }
             if(result.refresh){
               location.reload();
             }
-          } else {
-            $("#usedTime").html("");
-          }
+          } 
         }
       });
       setTimeout('refreshTime()', 1000);
