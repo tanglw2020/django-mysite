@@ -189,3 +189,6 @@ admin.site.register(Exam, ExamAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(ExamPaper, ExamPaperAdmin)
 admin.site.register([StudentInfoImporter, ChoiceQuestionImporter])
+
+admin.site.site_title = "计算等级考试后台管理系统"
+admin.site.site_header = "计算等级考试后台管理系统"
