@@ -362,7 +362,7 @@ def exam_room(request, exam_id):
         'exam': exam,
         'exam_id': exam_id,
         'exam_papers': exam_papers,
-        'login_url': get_host_ip()+':8000/exam',
+        'login_url': 'http://'+get_host_ip()+':8000/exam',
         }
     return render(request, 'polls/exam_room_detail.html', context)
 
@@ -389,11 +389,11 @@ def login(request):
             if not ExamPaper.objects.filter(student=student, exam=exam).exists():
                 exam_paper = ExamPaper.objects.create(student=student, exam=exam)
                 exam_paper.problem_type = exam.problem_type
-                exam_paper.start_time = datetime.datetime.now()
+                exam_paper.start_time = timezone.now()
                 if exam_paper.problem_type == '1':
-                    exam_paper.end_time = datetime.datetime.now() + datetime.timedelta(hours=1, minutes=30)
+                    exam_paper.end_time = timezone.now() + datetime.timedelta(hours=1, minutes=30)
                 if exam_paper.problem_type == '2':
-                    exam_paper.end_time = datetime.datetime.now() + datetime.timedelta(hours=2, minutes=0)
+                    exam_paper.end_time = timezone.now() + datetime.timedelta(hours=2, minutes=0)
                 exam_paper.student_id_local = student_id
                 exam_paper.exam_id_local = exam_id
 
@@ -525,10 +525,8 @@ def api_get_server_time(request, exampage_id):
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
 
-    # diff = int(timezone.now().timestamp() - exam_page.start_time.timestamp())
-    # print(exam_page.start_time.tzinfo, start_time.tzinfo)
-    start_time = exam_page.start_time.replace(tzinfo=None)
-    diff = int(datetime.datetime.now().timestamp() - start_time.timestamp())
+    # start_time = exam_page.start_time.replace(tzinfo=None)
+    diff = int(timezone.now().timestamp() - exam_page.start_time.timestamp())
     if exam_page.problem_type == '1':
         diff = (90+exam_page.add_time)*60 - diff
     elif exam_page.problem_type == '2':
