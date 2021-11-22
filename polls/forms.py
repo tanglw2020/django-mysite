@@ -11,7 +11,7 @@ from polls.fileModels import *
 class StudentForm(forms.Form):
     exam_id = forms.IntegerField(label='考场编号')
     name = forms.CharField(label='姓名',  max_length=50)
-    student_id = forms.IntegerField(label='学号')
+    student_id = forms.CharField(label='学号', max_length=50)
 
     def clean(self):
         cleaned_data = super().clean()

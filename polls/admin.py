@@ -131,6 +131,7 @@ class ExcelQuestionAdmin(admin.ModelAdmin):
 class PPTQuestionAdmin(admin.ModelAdmin):
 
         list_display = ('__str__', 'question_content', 'test_', 'file_path_',)
+        # list_display = ('__str__', 'question_content', 'test_',)
 
         fieldsets = (
                 ('上传题目所需ppt文件', {'fields':('pub_date', 'upload_pptx',)}),
