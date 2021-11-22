@@ -355,7 +355,7 @@ def exam_room(request, exam_id):
     except Exam.DoesNotExist:
         raise Http404("exam {} does not exist".format(exam_id))
     
-    exam_papers = exam.exampaper_set.all()
+    exam_papers = exam.exampaper_set.order_by('student_id_local')
     # for exam_paper in exam_papers:
         # print(exam_paper.student, exam_paper.student.id)
     context = {
