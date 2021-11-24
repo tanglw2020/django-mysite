@@ -33,7 +33,8 @@
     <h4>Word操作题({{ exam.word_score }}分)</h4>
     
     <div class="box-disable-copy">
-      <h5>说明：下载zip文件并解压，完成下列操作后将.docx文件上传。(注意：不要更改题目要求以外的文件或文件夹) </h5>
+      <h4>说明：下载<strong>word.zip</strong>到<strong>桌面</strong>，再解压到<strong>当前文件夹</strong>，完成下列操作后将<strong>word.docx</strong>文件上传。
+        (注意：不要更改题目要求以外的文件或文件夹) </h4>
       {{ word_question.operation_description_all }}
       <a class="btn-download" href="{% url 'exam:api-download-word-zipfile'  exam_page.id %}">下载 word.zip</a>
     </div>
@@ -51,9 +52,9 @@
     </div>
     <div class='form-group' style=" margin-top: 10px">
       {% if exam_page.enabled %}
-      <input type="submit" class="btn-upload" value="上传.docx文件" name="">
+      <input type="submit" class="btn-upload" value="上传 word.docx文件" name="">
     {% else %}
-      <input type="submit" class="btn btn-dark" value="上传.docx文件" name=""  disabled>
+      <input type="submit" class="btn btn-dark" value="上传 word.docx文件" name=""  disabled>
     {% endif %}
       {% if uploadsucc %}
       <label for="UploadSucc" style="color: green; margin-left: 20px">上传成功!</label>

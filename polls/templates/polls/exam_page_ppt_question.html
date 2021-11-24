@@ -34,7 +34,9 @@
 <h4>PPT操作题({{ exam.ppt_score }}分)</h4>
 
 <div  class="box-disable-copy">
-  <h5>说明：下载zip文件并解压，完成下列操作后将.pptx文件上传。(注意：不要更改题目要求以外的文件或文件夹) </h5>
+        <h4>说明：下载<strong>ppt.zip</strong>到<strong>桌面</strong>，再解压到<strong>当前文件夹</strong>，
+          完成下列操作后将<strong>ppt.pptx</strong>文件上传。
+          (注意：不要更改题目要求以外的文件或文件夹) </h4>
   {{ ppt_question.question_content }}
   <a class="btn-download" 
   href="{% url 'exam:api-download-ppt-zipfile'  exam_page.id %}" >下载 ppt.zip</a>
@@ -54,9 +56,9 @@
     </div>
     <div class='form-group' style=" margin-top: 10px">
       {% if exam_page.enabled %}
-      <input type="submit" class="btn-upload" value="上传.pptx文件" name="">
+      <input type="submit" class="btn-upload" value="上传 ppt.pptx文件" name="">
     {% else %}
-      <input type="submit" class="btn btn-dark" value="上传.pptx文件" name=""  disabled>
+      <input type="submit" class="btn btn-dark" value="上传 ppt.pptx文件" name=""  disabled>
     {% endif %}
       {% if uploadsucc %}
       <label for="UploadSucc" style="color: green; margin-left: 20px">上传成功!!</label>
