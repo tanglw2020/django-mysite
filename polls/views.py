@@ -183,12 +183,12 @@ def exampage_system_question(request, exampage_id):
             output_save_file = os.path.join(output_save_path, 'files.zip')
             handle_uploaded_file(request.FILES['file'], output_save_file)
 
-            with ZipFile(output_save_file) as myzip:
-                myzip.extractall(output_save_path)
+            # with ZipFile(output_save_file) as myzip:
+            #     myzip.extractall(output_save_path)
 
             exam_page.system_operation_answer = output_save_file
             exam_page.system_operation_submit_cnt = str(int(exam_page.system_operation_submit_cnt)+1)
-            results = system_question.score_(os.path.join(output_save_path, 'exam_system_operation'))
+            results = system_question.score_zip_(output_save_file)
             if len(results)==0:
                 exam_page.system_operation_result = 0
             else:
@@ -579,7 +579,7 @@ def api_download_system_zipfile(request, exampage_id):
     if file_path:
         response = FileResponse(open(file_path, 'rb'))
         response['Content-Type'] = 'application/octet-stream'
-        response['Content-Disposition'] = 'attachment;filename="operation-system.zip"'
+        response['Content-Disposition'] = 'attachment;filename="exam.zip"'
         return response
     else:
         a = {"result":"null"}
