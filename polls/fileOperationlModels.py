@@ -226,48 +226,51 @@ class FileOperationQuestion(models.Model):
 
             azip = ZipFile(answer_folder_path,'r')
             namelist = azip.namelist()
-            print(namelist)
+            # print(namelist)
             
             ## create file
             result = ''
             targeted_path = "/".join([self.new_folder_dir_A, self.new_file_B])
-            print("targeted_path: ", targeted_path)
+            # print("targeted_path: ", targeted_path)
             for filename in namelist:
                 if filename.find(targeted_path)>-1:
                     result = targeted_path
                     break
             result_list.append(result)
 
-
             ## delete file
-            # targeted_path = os.path.join(answer_folder_path, self.del_folder_A, self.del_folder_B)
-            # targeted_file = os.path.join(answer_folder_path, self.del_folder_A, self.del_folder_B, self.del_file_C)
-            # result = ''
-            # if os.path.exists(targeted_path) and (not os.path.exists(targeted_file)):
-            #     result = (self.del_file_C)
-            # result_list.append(result)
-
+            targeted_path = "/".join([self.del_folder_A, self.del_folder_B, self.del_file_C])
+            result = targeted_path
+            for filename in namelist:
+                if filename.find(targeted_path)>-1:
+                    result = ''
+                    break
+            result_list.append(result)
 
             # ## modify file
             # targeted_file = os.path.join(answer_folder_path, self.modify_folder_A, self.modify_file_B)
-            # result = self.modify_file_B+'-is_hidden-is_read_only'
-            # result_list.append(result)
+            result = self.modify_file_B+'-is_hidden-is_read_only'
+            result_list.append(result)
 
             ## rename file
-            # targeted_file_1 = os.path.join(answer_folder_path, self.rename_folder_A, self.rename_file_B)
-            # targeted_file_2 = os.path.join(answer_folder_path, self.rename_folder_A, self.rename_file_C)
-            # result = ''
-            # if os.path.exists(targeted_file_2):
-            #     result = self.rename_file_C
-            # result_list.append(result)
+            targeted_path = "/".join([self.rename_folder_A, self.rename_file_C])
+            result = ''
+            for filename in namelist:
+                if filename.find(targeted_path)>-1:
+                    result = targeted_path
+                    break
+            result_list.append(result)
 
             ## cp or mv file
             # targeted_file_1 = os.path.join(answer_folder_path, self.copy_folder_A, self.copy_file_B)
             # targeted_file_2 = os.path.join(answer_folder_path, self.copy_folder_C, self.copy_file_B)
-            # result = ''
-            # if os.path.exists(targeted_file_2):
-            #     result = (self.copy_file_B)
-            # result_list.append(result)
+            targeted_path = "/".join([self.copy_folder_C, self.copy_file_B])
+            result = ''
+            for filename in namelist:
+                if filename.find(targeted_path)>-1:
+                    result = targeted_path
+                    break
+            result_list.append(result)
             print("result_list:", result_list)
         return result_list
 
