@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import UniqueConstraint
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django import forms
@@ -132,9 +133,16 @@ class ExamPaper(models.Model):
     class Meta:
         verbose_name = '考试-试卷'
         verbose_name_plural = '考试-试卷'
+        # unique_together = ['student', 'exam']
+        # constraints = [
+        #      UniqueConstraint(fields=['student', 'exam'], name='unique_exam_student'),
+        # ]
 
     def __str__(self):
-        return '试卷'+str(self.id)
+        return '试卷'+self.unique_key 
+
+    def id(self):
+        return self.unique_key 
 
     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
     student = models.ForeignKey(
@@ -146,7 +154,9 @@ class ExamPaper(models.Model):
         Exam,
         on_delete=models.CASCADE, null=True,
         verbose_name='所属考试'
-    ) 
+    )
+
+    unique_key = models.CharField('unique-key', max_length=20, primary_key=True, default='xxx')  #  student_id_local+exam_id_local
 
     start_time = models.DateTimeField('开考时间', null=True, blank=True, default=timezone.now)
     end_time = models.DateTimeField('交卷时间', null=True, blank=True, default=timezone.now)

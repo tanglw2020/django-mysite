@@ -34,7 +34,7 @@ def handle_uploaded_file(f, output_save_path):
 
 def exampage(request, exampage_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
@@ -49,7 +49,7 @@ def exampage(request, exampage_id):
 
 def exampage(request, exampage_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
@@ -63,7 +63,7 @@ def exampage(request, exampage_id):
 
 def exampage_choice_question(request, exampage_id, choice_question_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
@@ -80,7 +80,7 @@ def exampage_choice_question(request, exampage_id, choice_question_id):
 
 def exampage_text_question(request, exampage_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
@@ -119,7 +119,7 @@ def exampage_text_question(request, exampage_id):
 
 def exampage_email_question(request, exampage_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
@@ -167,7 +167,7 @@ def exampage_email_question(request, exampage_id):
 
 def exampage_system_question(request, exampage_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
@@ -217,7 +217,7 @@ def exampage_system_question(request, exampage_id):
 
 def exampage_word_question(request, exampage_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
     
@@ -259,7 +259,7 @@ def exampage_word_question(request, exampage_id):
 
 def exampage_excel_question(request, exampage_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
@@ -301,7 +301,7 @@ def exampage_excel_question(request, exampage_id):
 
 def exampage_ppt_question(request, exampage_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('exam:login'))
 
@@ -379,6 +379,7 @@ def login(request):
             # 查询用户是否在数据库中
             exam_id = cleaned_data['exam_id']
             student_id = cleaned_data['student_id']
+            unique_key = str(exam_id)+'-'+str(student_id)
 
             exam = Exam.objects.get(pk=exam_id)
             student = Student.objects.get(student_id=student_id)
@@ -386,8 +387,8 @@ def login(request):
             # 检查该考场和学号对应的试卷是否存在，不存在就创建新的试卷
             # 同时随机抽取题目
             choice_question_numb = exam.choice_question_num
-            if not ExamPaper.objects.filter(student=student, exam=exam).exists():
-                exam_paper = ExamPaper.objects.create(student=student, exam=exam)
+            exam_paper, created = ExamPaper.objects.get_or_create(student=student, exam=exam, unique_key=unique_key)
+            if created:
                 exam_paper.problem_type = exam.problem_type
                 exam_paper.start_time = timezone.now()
                 if exam_paper.problem_type == '1':
@@ -431,10 +432,8 @@ def login(request):
                     exam_paper.ppt_question =  random.sample(questions_ids, 1)[0]
                 
                 exam_paper.save()
-            else:
-                exam_paper = ExamPaper.objects.get(student=student, exam=exam)
 
-            return HttpResponseRedirect(reverse('exam:exampage', args=(exam_paper.id,)))
+            return HttpResponseRedirect(reverse('exam:exampage', args=(exam_paper.unique_key,)))
     else:
         form = StudentForm()
 
@@ -520,7 +519,7 @@ def api_download_scorelist_xlsx(request, exam_id):
 def api_get_server_time(request, exampage_id):
 
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
@@ -551,7 +550,7 @@ def api_get_server_time(request, exampage_id):
 def api_handle_choice_answer(request, exampage_id, choice_question_id, choice_id):
 
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
@@ -568,7 +567,7 @@ def api_handle_choice_answer(request, exampage_id, choice_question_id, choice_id
 def api_download_system_zipfile(request, exampage_id):
 
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
@@ -591,7 +590,7 @@ def api_download_system_zipfile(request, exampage_id):
 def api_download_word_zipfile(request, exampage_id):
 
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
@@ -612,7 +611,7 @@ def api_download_word_zipfile(request, exampage_id):
 def api_download_excel_zipfile(request, exampage_id):
 
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
@@ -633,7 +632,7 @@ def api_download_excel_zipfile(request, exampage_id):
 def api_download_ppt_zipfile(request, exampage_id):
 
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
@@ -654,7 +653,7 @@ def api_download_ppt_zipfile(request, exampage_id):
 def api_submit_all(request, exampage_id):
 
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
@@ -669,7 +668,7 @@ def api_submit_all(request, exampage_id):
 def add_time_enable(request, exampage_id):
 
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
