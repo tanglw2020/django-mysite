@@ -127,12 +127,12 @@ Copy_Or_Move_Choice = [
 class FileOperationQuestion(models.Model):
     # 控制 表项显示文字，默认按 类名object（n）显示
     def __str__(self):
-        return '操作系统' + str(self.id) #题目序号
+        return '文件操作' + str(self.id) #题目序号
 
     # 内部标签，项目显示名  项目详细名等
     class Meta:
-        verbose_name_plural = '题目-操作系统'  # 项目名
-        verbose_name = '题目-操作系统'  # 详细名称
+        verbose_name_plural = '题目-文件操作'  # 项目名
+        verbose_name = '题目-文件操作'  # 详细名称
 
 
     def base_path_(self):

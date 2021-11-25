@@ -70,13 +70,13 @@
 {% if exam_page.system_operation_question %}
 <div style="width: 60%;">
     <div class="card-body">
-        <!-- <h4 class="card-title">操作系统题</h4> -->
+        <!-- <h4 class="card-title">文件操作题</h4> -->
         <div class="btn-group" role="group" aria-label="coding questions">
             {% if exam_page.system_operation_answer == '' %}
-            <a class="btn btn-light" style="margin: 10px;"  href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">操作系统题</a>
+            <a class="btn btn-light" style="margin: 10px;"  href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">文件操作题</a>
             </li>
             {% else %}
-            <a class="btn btn-success" style="margin: 10px;"  href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">操作系统题</a>
+            <a class="btn btn-success" style="margin: 10px;"  href="{% url 'exam:exampage-systemquestion'  exam_page.id  %}">文件操作题</a>
             </li>
             {% endif %}
         </div>

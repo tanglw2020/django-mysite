@@ -451,8 +451,8 @@ def api_download_scorelist_txt(request, exam_id):
     except Exam.DoesNotExist:
         raise Http404("exam does not exist")
 
-    exam_papers = exam.exampaper_set.all()
-    line_head ="编号 班级 姓名 学号 选择题 操作系统题 上网题 Word题 Excel题 PPT题 总分"
+    exam_papers = exam.exampaper_set.order_by('student_id_local')
+    line_head ="编号 班级 姓名 学号 选择题 文件操作题 上网题 Word题 Excel题 PPT题 总分"
     lines = [line_head]
     for i,exam_paper in enumerate(exam_papers):
         one_line = ' '.join([str(i), exam_paper.student.class_name, exam_paper.student.student_name, 
@@ -490,8 +490,8 @@ def api_download_scorelist_xlsx(request, exam_id):
     wb = Workbook()
     ws = wb.active
 
-    exam_papers = exam.exampaper_set.all()
-    line_head ="编号 班级 姓名 学号 选择题 文字录入题 上网题 操作系统题 Word题 Excel题 PPT题 总分"
+    exam_papers = exam.exampaper_set.order_by('student_id_local')
+    line_head ="编号 班级 姓名 学号 选择题 文字录入题 上网题 文件操作题 Word题 Excel题 PPT题 总分"
     ws.append(line_head.split(' '))
     for i,exam_paper in enumerate(exam_papers):
         one_line = [str(i), exam_paper.student.class_name, exam_paper.student.student_name, 
