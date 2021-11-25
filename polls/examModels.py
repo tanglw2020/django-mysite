@@ -260,7 +260,7 @@ class ExamPaper(models.Model):
 
 
     def base_path_(self):
-        return os.path.join(MEDIA_ROOT, 'upload_exam_answer', str(self.id))
+        return os.path.join(MEDIA_ROOT, 'upload_exam_answer', str(self.unique_key))
 
     def system_operation_answer_save_path_(self):
         return os.path.join(self.base_path_(), 'system-operation-{}'.format(self.system_operation_question))
