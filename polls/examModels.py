@@ -144,6 +144,23 @@ class ExamPaper(models.Model):
     def id(self):
         return self.unique_key 
 
+    def is_empty_(self):
+        if self.exam.choice_question_num and self.exam.choice_question_score:
+            if len(self.choice_questions)<1: return True
+        if self.exam.text_score:
+            if len(self.text_question)<1: return True
+        if self.exam.file_operation_score:
+            if len(self.system_operation_question)<1: return True
+        if self.exam.email_score:
+            if len(self.email_question)<1: return True
+        if self.exam.word_score:
+            if len(self.word_question)<1: return True
+        if self.exam.excel_score:
+            if len(self.excel_question)<1: return True
+        if self.exam.ppt_score:
+            if len(self.ppt_question)<1: return True
+        return False
+
     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
     student = models.ForeignKey(
         Student,

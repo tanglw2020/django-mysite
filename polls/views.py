@@ -388,7 +388,7 @@ def login(request):
             # 同时随机抽取题目
             choice_question_numb = exam.choice_question_num
             exam_paper, created = ExamPaper.objects.get_or_create(student=student, exam=exam, unique_key=unique_key)
-            if created:
+            if created or exam_paper.is_empty_():
                 exam_paper.problem_type = exam.problem_type
                 exam_paper.start_time = timezone.now()
                 if exam_paper.problem_type == '1':
