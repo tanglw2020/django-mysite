@@ -526,7 +526,9 @@ def api_get_server_time(request, exampage_id):
 
     # start_time = exam_page.start_time.replace(tzinfo=None)
     diff = int(timezone.now().timestamp() - exam_page.start_time.timestamp())
-    if exam_page.problem_type == '1':
+    if not exam_page.enabled:
+        diff = 0
+    elif exam_page.problem_type == '1':
         diff = (90+exam_page.add_time)*60 - diff
     elif exam_page.problem_type == '2':
         diff = (120+exam_page.add_time)*60 - diff

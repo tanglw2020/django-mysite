@@ -71,7 +71,7 @@ FONT_UNDERLINE_CHOICES = [
 
 PARA_ALIGNMENT_CHOICES = [
     ('LEFT (0)', '左对齐'),   ##  or 'None'
-    ('CENTER (1)', '居中对齐'),
+    ('CENTER (1)', '居中'),
     ('RIGHT (2)', '右对齐'),
     ('JUSTIFY (3)', '两端对齐'),
     ('DISTRIBUTE (4)', '分散对齐'),
@@ -134,7 +134,7 @@ LINE_NUM_CHOICES = [
 
 
 IMAGE_POSITION_STYLE_CHOICES = [
-    ('嵌入文本行中','嵌入文本行中'),
+    ('嵌入型','嵌入型'),
 ]
 
 TABLE_ALIGNMENT_CHOICES = [
