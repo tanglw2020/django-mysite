@@ -23,7 +23,7 @@ MEDIA_ROOT  = BASE_DIR / 'media'
 SECRET_KEY = '-%xw_v1d$o&to8o*%ifd-r=c@*!8%1#)3c=(wxw1mh_57buq0_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 

@@ -316,11 +316,10 @@ class PPTQuestion(models.Model):
                             result = result + str(len(shape.table.columns))+'+'+\
                                 str(len(shape.table.rows))+'+'+shape.table.cell(0,0).text
                 result_list.append(result)
-
         else:
-            result_list.append('Nothing to score')
+            result_list.append('Nothing to score::0::')
 
-        score = len([x for x in result_list if x.split('::')[1]])*1.0/len(result_list)
+        score = len([x for x in result_list if x.split('::')[2]])*1.0/len(result_list)
         return result_list, score
 
 

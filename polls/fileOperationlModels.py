@@ -271,7 +271,7 @@ class FileOperationQuestion(models.Model):
                     result = targeted_path
                     break
             result_list.append(result)
-            print("result_list:", result_list)
+            # print("result_list:", result_list)
         return result_list
 
 
