@@ -12,6 +12,8 @@ import os
 import shutil
 import zipfile
 from pathlib import Path
+from openpyxl import load_workbook
+from openpyxl import cell
 
 from docx import Document
 from polls.fileModels import *
@@ -323,6 +325,11 @@ class ExamPaper(models.Model):
                     + float(self.ppt_result), 0)
 
 
+Student_Type_CHOICES = (
+    ("师院一本","师院一本"),
+    ("南岳学院","南岳学院"),
+)
+
 class StudentInfoImporter(models.Model):
     class Meta:
         verbose_name = '考试-批量导入考生'
@@ -332,18 +339,59 @@ class StudentInfoImporter(models.Model):
         return '导入考生信息'+str(self.id)
 
     upload_description_file = models.FileField(upload_to='upload_import_files/', null=True, blank=True, 
-    validators=[validate_txtfile], verbose_name='上传考生信息文件[.txt]')
+    verbose_name='上传考生信息文件[.txt]')
+    # validators=[validate_txtfile], verbose_name='上传考生信息文件[.txt]')
+    student_type = models.CharField('学生来源', max_length=20, choices= Student_Type_CHOICES, default = "师院一本")
+
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # Call the "real" save() method.
         print(self.upload_description_file, 'saved')
-        with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
-            lines = [x.strip().replace('\t',' ').split(' ') for x in f.readlines()[:] if len(x)>0]
-            class_name = ''
-            for x in lines:
-                if len(x)==1: 
-                    class_name = x[0]
-                    continue
-                if len(x)>5 and (x[0] !='学号'):
-                    Student.objects.get_or_create(class_name=class_name, student_id=x[0], student_name=x[1])
+        if self.student_type == "师院一本":
+            with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
+                lines = [x.strip().replace('\t',' ').split(' ') for x in f.readlines()[:] if len(x)>0]
+                class_name = ''
+                for x in lines:
+                    if len(x)==1: 
+                        class_name = x[0]
+                        continue
+                    if len(x)>5 and (x[0] !='学号'):
+                        Student.objects.get_or_create(class_name=class_name, student_id=x[0], student_name=x[1])
 
+        elif self.student_type == "南岳学院":
+            wb = load_workbook(self.upload_description_file.path)
+            ws = wb.active 
+            print('sheetnames: ', wb.sheetnames)
+
+            prep = ['A','B', 'J']
+            row_id = 1
+            empty_rows = 0
+            while empty_rows<10:
+                row_id = row_id + 1
+                id = ws[prep[0]+str(row_id)].value
+                name = ws[prep[1]+str(row_id)].value
+                classname = ws[prep[2]+str(row_id)].value
+                if id is None or id.strip() == '':
+                    empty_rows = empty_rows +1
+                    continue
+                
+                empty_rows = 0
+                print(id, name, classname)
+                if id == "学号" and name == "姓名" and classname == "班级":
+                    break
+
+            empty_rows = 0
+            while empty_rows<10:
+                row_id = row_id + 1
+                student_id = ws[prep[0]+str(row_id)].value
+                name = ws[prep[1]+str(row_id)].value
+                classname = ws[prep[2]+str(row_id)].value
+                if student_id is None or student_id.strip() == '' or name is None or classname is None:
+                    empty_rows = empty_rows +1
+                    continue
+                
+                empty_rows = 0
+                # print(student_id, name, classname)
+                Student.objects.get_or_create(class_name=classname, student_id=student_id, student_name=name)
+
+                    # info_list.append([id, name, classname])
