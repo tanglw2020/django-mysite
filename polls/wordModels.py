@@ -809,9 +809,9 @@ class WordQuestion(models.Model):
     ############## 图片插入
     image_text = models.TextField('图片插入的文字内容', blank=True, default='')
     image_op = models.BooleanField('考查图片插入？', default=False)
-    image_position_style = models.CharField('位置类型', choices=IMAGE_POSITION_STYLE_CHOICES, max_length=20, default='嵌入文本行中')
-    image_width = models.CharField('图像宽(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
-    image_height = models.CharField('图像高(厘米)',   choices=INDENT_NUM_CHOICES, max_length=200, blank=True, default='')
+    image_position_style = models.CharField('位置类型', choices=IMAGE_POSITION_STYLE_CHOICES, max_length=20, default='嵌入')
+    image_width = models.CharField('图像宽(厘米)',   choices=IMG_SIZE_CHOICES, max_length=20, blank=True, default='')
+    image_height = models.CharField('图像高(厘米)',   choices=IMG_SIZE_CHOICES, max_length=20, blank=True, default='')
     upload_image_file = models.FileField(upload_to='upload_image/', null=True, blank=True, 
     validators=[validate_image], verbose_name='上传图片')
 
