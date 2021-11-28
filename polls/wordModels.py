@@ -252,7 +252,7 @@ class WordQuestion(models.Model):
         if self.table_op:
             table_desc = '将内容【'+self.para_text_simple(self.table_text)+'】生成表格'
             if self.table_alignment!='':
-                table_desc = table_desc +'， 表格'+ [x[1] for x in TABLE_ALIGNMENT_CHOICES if x[0]==self.table_alignment][0]
+                table_desc = table_desc +'， 设置表格'+ [x[1] for x in TABLE_ALIGNMENT_CHOICES if x[0]==self.table_alignment][0]
             if self.table_style!='':
                 table_desc = table_desc +'， 应用"'+ [x[1] for x in TABLE_STYLE_CHOICES if x[0]==self.table_style][0] +'"表格样式'
             if self.table_autofit:
