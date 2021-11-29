@@ -52,7 +52,7 @@
         }
         
         .btn-upload {
-          background-color: lightcoral; 
+          background-color: lightgreen; 
           border: 0ch; 
           color: white; 
           padding: 2px 2px;
@@ -120,6 +120,7 @@
               <td>姓名</td>
               <td>学号</td>
               <td>开考时间</td>
+              <td>交卷</td>
               <td>选择题</td>
               <td>文字录入题</td>
               <td>上网题</td>
@@ -138,6 +139,11 @@
               <td>{{ exam_paper.student.student_name }}</td>
               <td>{{ exam_paper.student.student_id }}</td>
               <td>{{ exam_paper.start_time_ }}</td>
+              {% if exam_paper.enabled %}
+              <td><span style="color: red;">否</span></td>
+              {% else %}
+              <td><span style="color: green;">是</span></td>
+              {% endif %}
               <td>{{ exam_paper.choice_question_results }}</td>
               <td>{{ exam_paper.text_question_result }}</td>
               <td>{{ exam_paper.email_result }}</td>
@@ -149,7 +155,7 @@
               <td>{{ exam_paper.add_time }}</td>
               <td> <button id="add-time" 
                 class="btn-upload" style="margin:5px auto" 
-                onclick="add_time('{{ exam_paper.id }}', '{{ exam_paper.student_id_local }}')">加3</button></td>
+                onclick="add_time('{{ exam_paper.id }}', '{{ exam_paper.student_id_local }}')">3分钟</button></td>
             </tr>
             {% endfor %}
         </table>
