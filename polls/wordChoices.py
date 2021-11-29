@@ -79,7 +79,7 @@ PARA_ALIGNMENT_CHOICES = [
 
 PARA_FIRST_LINE_INDENT_CHOICES = [
     ('首行缩进', '缩进'),
-    ('首行悬挂', '悬挂'),
+    ('悬挂缩进', '悬挂'),
 ]
 
 PARA_LINE_SPACING_RULE_CHOICES = [
