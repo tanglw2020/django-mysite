@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>计算机等级考试登录页面</title>
+    <title>计算机基础考试登录页面</title>
     <style type="text/css">
         .login {
             height: 80%;
@@ -37,7 +37,7 @@
 <body>
     <div class="login">
         <h2>欢迎登陆</h2>
-        <h1>计算机等级考试系统</h1>
+        <h1>计算机基础考试系统</h1>
         <form action="{% url 'exam:login' %}" method="POST">
             {% csrf_token %}
             {{ form.non_field_errors }}

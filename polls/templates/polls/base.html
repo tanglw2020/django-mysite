@@ -11,7 +11,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>{% block title %}计算机等级考试页面{% endblock %}</title>
+  <title>{% block title %}计算机基础考试{% endblock %}</title>
 
   <!-- Bootstrap core CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'polls/css/bootstrap.min.css' %}" >
@@ -102,9 +102,11 @@
       {% block baseinfo %}
       <div class="card-body box-disable-copy">
         {% if not exam_page.enabled %}
-        <h3>{{ exam.exam_type_ }}(交卷成功，不能再作答)</h3>
+        <!-- <h3>{{ exam.exam_type_ }}(交卷成功，不能再作答)</h3> -->
+        <h3>计算机基础考试(交卷成功，不能再作答)</h3>
         {% else %}
-        <h3>{{ exam.exam_type_ }}</h3>
+        <h3>计算机基础考试</h3>
+        <!-- <h3>{{ exam.exam_type_ }}</h3> -->
         {% endif %}
         <p>考场编号： {{ exam.id }}</p>
         <p>考生信息： {{ student.class_name }}--{{ student.student_name }}--{{ student.student_id }}</p>
