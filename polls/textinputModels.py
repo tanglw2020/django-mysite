@@ -16,7 +16,11 @@ class TextQuestion(models.Model):
 
     def score_(self, input_text):
         if type(input_text)!= str: return 0.0
-        return SequenceMatcher(None, self.content, input_text).quick_ratio()
+        if len(self.content)<1 or len(input_text)<1: return 0.0
+        equel_size = 0.0
+        for block in SequenceMatcher(None, input_text, self.content).get_matching_blocks():
+            equel_size = equel_size + block[2]
+        return equel_size / len(self.content)
 
     content = models.TextField('录入内容',  default='')
 
