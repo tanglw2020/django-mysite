@@ -73,6 +73,7 @@ class WordQuestionAdmin(admin.ModelAdmin):
 class ChoiceQuestionAdmin(admin.ModelAdmin):
         list_display = ('__str__', 'question_text', 'description',)
         list_display_links = ('question_text',)
+        search_fields = ['question_text']
 
 
 class EmailQuestionAdmin(admin.ModelAdmin):
