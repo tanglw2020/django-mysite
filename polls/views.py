@@ -433,7 +433,12 @@ def login(request):
                 
                 exam_paper.save()
 
-            return HttpResponseRedirect(reverse('exam:exampage', args=(exam_paper.unique_key,)))
+                return HttpResponseRedirect(reverse('exam:exampage', args=(exam_paper.unique_key,)))
+
+            else:
+                return HttpResponseRedirect(reverse('exam:login-second'))
+
+
     else:
         form = StudentForm()
 
@@ -441,6 +446,29 @@ def login(request):
         'form': form,
         }
     return render(request, 'polls/login.html', context)
+
+
+
+def login_second(request):
+
+    if request.method == 'POST':
+        form = StudentFormSecondLogin(request.POST)
+
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+
+            # 查询用户是否在数据库中
+            exam_id = cleaned_data['exam_id']
+            student_id = cleaned_data['student_id']
+            unique_key = str(exam_id)+'-'+str(student_id)
+            return HttpResponseRedirect(reverse('exam:exampage', args=(unique_key,)))
+    else:
+        form = StudentFormSecondLogin()
+
+    context = {
+        'form': form,
+        }
+    return render(request, 'polls/login_second.html', context)
 
 
 

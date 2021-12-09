@@ -54,7 +54,8 @@ class Exam(models.Model):
     pub_date = models.DateTimeField('创建时间', 'date published', null=True, default=timezone.now)
     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
     creator = models.CharField('创建人', max_length=200, default='--老师')
-    info_text = models.CharField('考试信息', max_length=200, default='计算机等级考试1级')
+    info_text = models.CharField('考试信息', max_length=200, default='计算机基础考试')
+    passwd_second_login = models.CharField('二次登录密码', max_length=200, default='6688521')
     period = models.CharField("考试时长", max_length=5, choices=PERIOD_CHOICES, default='1')
 
     choice_question_num = models.IntegerField(verbose_name="选择题个数", default=20)
