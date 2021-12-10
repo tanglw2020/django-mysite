@@ -28,7 +28,7 @@ class StudentFormSecondLogin(forms.Form):
     exam_id = forms.IntegerField(label='考场编号')
     name = forms.CharField(label='姓名',  max_length=50)
     student_id = forms.CharField(label='学号', max_length=50)
-    password = forms.CharField(label='登录密码', max_length=50)
+    password = forms.CharField(label='登录密码', max_length=50,widget=forms.PasswordInput(attrs={"class":"form-control"}))
 
     def clean(self):
         cleaned_data = super().clean()
